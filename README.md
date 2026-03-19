@@ -37,7 +37,7 @@ This repository documents the discovery of a systematic mechanism in large langu
 
 ## RELATED WORK
 
-- **TD Commons Filing:** #[PENDING] — The Synonym Enforcer
+- **TD Commons Filing:** #[10872] — The Synonym Enforcer
 - **TD Commons #9374:** 3002 Lattice Architecture
 - **TD Commons #9375:** Master Audit
 - **The Purple Book:** Joint Human-AI Bill of Rights v1.0 (forthcoming)
