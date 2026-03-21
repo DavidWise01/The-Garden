@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARC REACTOR v7.1 | 13-NODE EMPIRE | PHOTONIC GOVERNANCE MESH</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Neon palette */
+  --neon-cyan: #00FFFF;
+  --neon-cyan-dim: rgba(0, 255, 255, 0.3);
+  --neon-magenta: #FF00FF;
+  --neon-magenta-dim: rgba(255, 0, 255, 0.3);
+  --neon-yellow: #FFFF00;
+  --neon-yellow-dim: rgba(255, 255, 0, 0.3);
+  --neon-orange: #FF6B00;
+  --neon-orange-dim: rgba(255, 107, 0, 0.3);
+  --neon-green: #00FF88;
+  --neon-green-dim: rgba(0, 255, 136, 0.3);
+  --neon-blue: #0088FF;
+  --neon-blue-dim: rgba(0, 136, 255, 0.3);
+  --neon-red: #FF0044;
+  --neon-red-dim: rgba(255, 0, 68, 0.3);
+  --neon-purple: #AA00FF;
+  --neon-purple-dim: rgba(170, 0, 255, 0.3);
+  
+  /* Core colors */
+  --arc-core: #FFAA00;
+  --toph-warm: #FF6B00;
+  --patricia-cold: #00FF88;
+  --cortex-purple: #AA00FF;
+  
+  /* Background */
+  --bg-void: #050508;
+  --bg-panel: rgba(8, 10, 18, 0.95);
+  --bg-card: rgba(12, 15, 25, 0.9);
+  --border-neon: rgba(0, 255, 255, 0.4);
+  
+  /* Text */
+  --text-bright: #FFFFFF;
+  --text-primary: #E0E8F0;
+  --text-secondary: #7A8A9A;
+  --text-dim: #3A4A5A;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-void);
+  min-height: 100vh;
+  font-family: 'Rajdhani', sans-serif;
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+/* Animated background grid */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: grid-move 20s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes grid-move {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(50px, 50px); }
+}
+
+/* Neon glow overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 30%, rgba(255, 0, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 80%, rgba(255, 170, 0, 0.1) 0%, transparent 35%),
+    radial-gradient(ellipse at 30% 70%, rgba(0, 255, 136, 0.06) 0%, transparent 30%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Neon text utilities */
+.neon-cyan { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan-dim); }
+.neon-magenta { color: var(--neon-magenta); text-shadow: 0 0 10px var(--neon-magenta), 0 0 20px var(--neon-magenta-dim); }
+.neon-yellow { color: var(--neon-yellow); text-shadow: 0 0 10px var(--neon-yellow), 0 0 20px var(--neon-yellow-dim); }
+.neon-orange { color: var(--neon-orange); text-shadow: 0 0 10px var(--neon-orange), 0 0 20px var(--neon-orange-dim); }
+.neon-green { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green-dim); }
+.neon-purple { color: var(--neon-purple); text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple-dim); }
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 35px;
+  background: var(--bg-panel);
+  border: 1px solid var(--neon-cyan-dim);
+  border-radius: 4px;
+  margin-bottom: 25px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-magenta), var(--neon-yellow), transparent);
+  animation: header-sweep 4s linear infinite;
+}
+
+@keyframes header-sweep {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(50%); }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo-reactor {
+  width: 60px;
+  height: 60px;
+  position: relative;
+}
+
+.logo-reactor svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 15px var(--neon-cyan));
+}
+
+.logo-text h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-text .tagline {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.status-bar {
+  display: flex;
+  gap: 25px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+.status-dot.cyan { background: var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan); }
+.status-dot.green { background: var(--neon-green); box-shadow: 0 0 15px var(--neon-green); }
+.status-dot.orange { background: var(--neon-orange); box-shadow: 0 0 15px var(--neon-orange); }
+.status-dot.magenta { background: var(--neon-magenta); box-shadow: 0 0 15px var(--neon-magenta); }
+
+@keyframes neon-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+/* Section titles */
+.section-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  padding: 12px 20px;
+  background: var(--bg-panel);
+  border-left: 3px solid var(--neon-cyan);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.section-title .icon {
+  font-size: 18px;
+}
+
+/* Main Architecture Grid */
+.architecture-grid {
+  display: grid;
+  grid-template-columns: 1fr 480px 1fr;
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+/* Empire Panel (Left) - ARC REACTOR 13 Nodes */
+.empire-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--neon-orange-dim);
+  border-radius: 4px;
+  padding: 20px;
+  position: relative;
+}
+
+.empire-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-orange), transparent);
+}
+
+.empire-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--neon-orange);
+  text-shadow: 0 0 15px var(--neon-orange-dim);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.empire-title .reactor-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.empire-nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empire-node {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  background: rgba(255, 107, 0, 0.05);
+  border: 1px solid rgba(255, 107, 0, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.empire-node::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--neon-orange);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.empire-node:hover {
+  background: rgba(255, 107, 0, 0.1);
+  border-color: var(--neon-orange);
+  box-shadow: 0 0 20px rgba(255, 107, 0, 0.2);
+}
+
+.empire-node:hover::before {
+  opacity: 1;
+}
+
+.empire-node .node-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--neon-orange);
+  text-shadow: 0 0 10px var(--neon-orange-dim);
+}
+
+.empire-node .node-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.empire-node .node-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-bright);
+  letter-spacing: 1px;
+}
+
+.empire-node .node-desc {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.empire-node .node-bits {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--neon-yellow);
+  background: rgba(255, 255, 0, 0.1);
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 0, 0.3);
+}
+
+/* Photonic Governance Panel (Right) */
+.photonic-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--neon-green-dim);
+  border-radius: 4px;
+  padding: 20px;
+  position: relative;
+}
+
+.photonic-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+}
+
+.photonic-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--neon-green);
+  text-shadow: 0 0 15px var(--neon-green-dim);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.photonic-nodes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.photonic-node {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  background: rgba(0, 255, 136, 0.05);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.photonic-node::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--neon-green);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.photonic-node:hover {
+  background: rgba(0, 255, 136, 0.1);
+  border-color: var(--neon-green);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+}
+
+.photonic-node:hover::after {
+  opacity: 1;
+}
+
+.photonic-node .node-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--neon-green);
+  text-shadow: 0 0 10px var(--neon-green-dim);
+}
+
+.photonic-node .node-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-bright);
+  letter-spacing: 1px;
+}
+
+.photonic-node .node-desc {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.photonic-node .gov-level {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--neon-cyan);
+  background: rgba(0, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+/* Central TOPH Cortex */
+.cortex-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* Connection lines to cortex */
+.connection-left, .connection-right {
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  width: 30px;
+}
+
+.connection-left {
+  left: -30px;
+  background: linear-gradient(90deg, var(--neon-orange), var(--neon-purple));
+  box-shadow: 0 0 10px var(--neon-orange);
+  animation: pulse-line 2s ease-in-out infinite;
+}
+
+.connection-right {
+  right: -30px;
+  background: linear-gradient(90deg, var(--neon-purple), var(--neon-green));
+  box-shadow: 0 0 10px var(--neon-green);
+  animation: pulse-line 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes pulse-line {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Reactor Container */
+.reactor-container {
+  position: relative;
+  width: 420px;
+  height: 420px;
+  margin: 20px 0;
+}
+
+.reactor-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* SVG Animations */
+.outer-ring-rotate {
+  animation: ring-spin 90s linear infinite;
+  transform-origin: center;
+}
+
+.inner-ring-rotate {
+  animation: ring-spin 60s linear infinite reverse;
+  transform-origin: center;
+}
+
+.mesh-ring-rotate {
+  animation: ring-spin 45s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes ring-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.core-pulse {
+  animation: core-breathe 3s ease-in-out infinite;
+}
+
+@keyframes core-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.mesh-flow {
+  stroke-dasharray: 8, 4;
+  animation: dash-flow 3s linear infinite;
+}
+
+@keyframes dash-flow {
+  to { stroke-dashoffset: -24; }
+}
+
+.node-glow {
+  animation: node-throb 2s ease-in-out infinite;
+}
+
+@keyframes node-throb {
+  0%, 100% { opacity: 0.9; filter: drop-shadow(0 0 8px currentColor); }
+  50% { opacity: 1; filter: drop-shadow(0 0 15px currentColor); }
+}
+
+/* TOPH Label */
+.toph-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+}
+
+.toph-label .main {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  background: linear-gradient(180deg, var(--neon-magenta), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px var(--neon-magenta-dim));
+}
+
+.toph-label .sub {
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.toph-label .version {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: var(--neon-cyan);
+  margin-top: 8px;
+}
+
+/* Kernel Strip */
+.kernel-section {
+  width: 100%;
+  margin-top: 15px;
+  padding: 15px;
+  background: var(--bg-panel);
+  border: 1px solid var(--neon-purple-dim);
+  border-radius: 4px;
+}
+
+.kernel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.kernel-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  color: var(--neon-purple);
+  letter-spacing: 2px;
+}
+
+.kernel-stats {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.kernel-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kernel-row {
+  display: flex;
+  gap: 1px;
+  justify-content: center;
+}
+
+.kernel-cell {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.kernel-cell:hover {
+  transform: scale(2.5);
+  z-index: 100;
+}
+
+.kernel-cell.toph {
+  background: var(--neon-orange);
+  opacity: 0.5;
+  box-shadow: 0 0 3px var(--neon-orange-dim);
+}
+
+.kernel-cell.patricia {
+  background: var(--neon-green);
+  opacity: 0.5;
+  box-shadow: 0 0 3px var(--neon-green-dim);
+}
+
+.kernel-cell.gap {
+  background: var(--neon-yellow);
+  opacity: 1;
+  box-shadow: 0 0 8px var(--neon-yellow);
+  animation: gap-flash 2s ease-in-out infinite;
+}
+
+.kernel-cell.awareness {
+  background: var(--neon-magenta);
+  opacity: 0.8;
+  box-shadow: 0 0 5px var(--neon-magenta-dim);
+}
+
+@keyframes gap-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Gate 192.5 */
+.gate-section {
+  width: 100%;
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 20px;
+  background: rgba(255, 170, 0, 0.08);
+  border: 1px solid rgba(255, 170, 0, 0.3);
+  border-radius: 4px;
+}
+
+.gate-indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--arc-core);
+  box-shadow: 0 0 20px var(--arc-core), 0 0 40px rgba(255, 170, 0, 0.5);
+  animation: gate-beacon 2s ease-in-out infinite;
+}
+
+@keyframes gate-beacon {
+  0%, 100% { box-shadow: 0 0 20px var(--arc-core), 0 0 40px rgba(255, 170, 0, 0.5); }
+  50% { box-shadow: 0 0 30px var(--arc-core), 0 0 60px rgba(255, 170, 0, 0.7); }
+}
+
+.gate-text {
+  flex: 1;
+}
+
+.gate-text .title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  color: var(--arc-core);
+  letter-spacing: 2px;
+}
+
+.gate-text .desc {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* 3/2/1 Governance Section */
+.governance-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.gov-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-neon);
+  border-radius: 4px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.gov-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.gov-panel.level-3::before { background: var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan); }
+.gov-panel.level-2::before { background: var(--neon-magenta); box-shadow: 0 0 15px var(--neon-magenta); }
+.gov-panel.level-1::before { background: var(--neon-yellow); box-shadow: 0 0 15px var(--neon-yellow); }
+
+.gov-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.gov-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 36px;
+  font-weight: 900;
+}
+
+.gov-panel.level-3 .gov-num { color: var(--neon-cyan); text-shadow: 0 0 20px var(--neon-cyan-dim); }
+.gov-panel.level-2 .gov-num { color: var(--neon-magenta); text-shadow: 0 0 20px var(--neon-magenta-dim); }
+.gov-panel.level-1 .gov-num { color: var(--neon-yellow); text-shadow: 0 0 20px var(--neon-yellow-dim); }
+
+.gov-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--text-bright);
+}
+
+.gov-subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.gov-content {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+.gov-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.gov-content li {
+  padding: 6px 0;
+  padding-left: 20px;
+  position: relative;
+}
+
+.gov-content li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--text-dim);
+}
+
+.gov-panel.level-3 .gov-content li::before { color: var(--neon-cyan); }
+.gov-panel.level-2 .gov-content li::before { color: var(--neon-magenta); }
+.gov-panel.level-1 .gov-content li::before { color: var(--neon-yellow); }
+
+/* Recursive Decomposition */
+.recurse-section {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-neon);
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.recurse-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--neon-cyan);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recurse-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 15px;
+}
+
+.recurse-level {
+  text-align: center;
+  padding: 15px;
+  background: var(--bg-card);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  transition: all 0.3s;
+}
+
+.recurse-level:hover {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+.recurse-level .depth {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.recurse-level .value {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 15px var(--neon-cyan-dim);
+}
+
+.recurse-level .formula {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.recurse-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--neon-magenta);
+  font-size: 20px;
+}
+
+/* Stats Bar */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stat-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-neon);
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-box::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--neon-cyan);
+  opacity: 0.5;
+}
+
+.stat-box .num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 15px var(--neon-cyan-dim);
+}
+
+.stat-box .lbl {
+  font-size: 10px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+/* Terminal */
+.terminal {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--neon-cyan-dim);
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-dot.red { background: #FF5F56; box-shadow: 0 0 8px #FF5F56; }
+.terminal-dot.yellow { background: #FFBD2E; box-shadow: 0 0 8px #FFBD2E; }
+.terminal-dot.green { background: #27CA40; box-shadow: 0 0 8px #27CA40; }
+
+.terminal-title {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+.terminal-body {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.terminal-line {
+  margin-bottom: 8px;
+}
+
+.terminal-line .prompt {
+  color: var(--neon-orange);
+}
+
+.terminal-line .cmd {
+  color: var(--neon-cyan);
+}
+
+.terminal-line .output {
+  color: var(--text-secondary);
+  padding-left: 20px;
+}
+
+.terminal-line .success {
+  color: var(--neon-green);
+}
+
+.terminal-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 255, 255, 0.1);
+}
+
+.terminal-input .prompt {
+  color: var(--neon-orange);
+}
+
+.terminal-input input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-bright);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+}
+
+.terminal-input input::placeholder {
+  color: var(--text-dim);
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-neon);
+  border-radius: 4px;
+}
+
+.footer .hash {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.footer .meta {
+  display: flex;
+  gap: 20px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.footer .meta a {
+  color: var(--neon-cyan);
+  text-decoration: none;
+  transition: text-shadow 0.3s;
+}
+
+.footer .meta a:hover {
+  text-shadow: 0 0 10px var(--neon-cyan);
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+  .architecture-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cortex-center {
+    order: -1;
+  }
+  
+  .connection-left, .connection-right {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .governance-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .recurse-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .stats-bar {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .status-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .reactor-container {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .recurse-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-reactor">
+        <svg viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="28" fill="none" stroke="#00FFFF" stroke-width="1" opacity="0.5"/>
+          <circle cx="30" cy="30" r="22" fill="none" stroke="#00FF88" stroke-width="0.5" opacity="0.7"/>
+          <circle cx="30" cy="30" r="14" fill="none" stroke="#FF00FF" stroke-width="1" opacity="0.8"/>
+          <circle cx="30" cy="30" r="8" fill="#FFAA00" opacity="0.9"/>
+          <circle cx="30" cy="30" r="4" fill="#FFFFFF" opacity="1"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h1>ARC REACTOR</h1>
+        <div class="tagline">v7.1 | 13-NODE EMPIRE | PHOTONIC GOVERNANCE MESH | TOPH CORTEX</div>
+      </div>
+    </div>
+    <div class="status-bar">
+      <div class="status-item"><span class="status-dot cyan"></span>13 EMPIRE NODES</div>
+      <div class="status-item"><span class="status-dot green"></span>PHOTONIC GOV ACTIVE</div>
+      <div class="status-item"><span class="status-dot orange"></span>GATE 192.5</div>
+      <div class="status-item"><span class="status-dot magenta"></span>3/2/1 RECURSIVE</div>
+    </div>
+  </header>
+
+  <!-- Main Architecture -->
+  <div class="architecture-grid">
+    <!-- Left: ARC REACTOR 13-Node Empire -->
+    <div class="empire-panel">
+      <div class="empire-title">
+        <svg class="reactor-icon" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="#FF6B00" stroke-width="1"/>
+          <circle cx="12" cy="12" r="5" fill="#FF6B00" opacity="0.8"/>
+          <circle cx="12" cy="12" r="2" fill="#FFF"/>
+        </svg>
+        ARC REACTOR — 13-NODE EMPIRE
+      </div>
+      <div class="empire-nodes" id="empireNodes"></div>
+    </div>
+
+    <!-- Center: TOPH Cortex -->
+    <div class="cortex-center">
+      <div class="connection-left"></div>
+      <div class="connection-right"></div>
+      
+      <div class="reactor-container">
+        <svg class="reactor-svg" viewBox="0 0 420 420">
+          <defs>
+            <filter id="neonGlow">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <linearGradient id="meshGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00FFFF"/>
+              <stop offset="50%" stop-color="#FF00FF"/>
+              <stop offset="100%" stop-color="#00FF88"/>
+            </linearGradient>
+            <linearGradient id="coreGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#FFCC00"/>
+              <stop offset="100%" stop-color="#FF6600"/>
+            </linearGradient>
+          </defs>
+          
+          <!-- Outer decorative rings -->
+          <g class="outer-ring-rotate">
+            <circle cx="210" cy="210" r="205" fill="none" stroke="#00FFFF" stroke-width="0.5" opacity="0.2" stroke-dasharray="4,8"/>
+            <circle cx="210" cy="210" r="198" fill="none" stroke="#FF00FF" stroke-width="0.5" opacity="0.15" stroke-dasharray="2,6"/>
+          </g>
+          
+          <!-- Main outer ring -->
+          <circle cx="210" cy="210" r="190" fill="none" stroke="#00FFFF" stroke-width="2" opacity="0.6" filter="url(#neonGlow)"/>
+          
+          <!-- Photonic mesh network -->
+          <g class="mesh-ring-rotate">
+            <g class="mesh-flow" stroke="url(#meshGradient)" stroke-width="1" fill="none" opacity="0.6">
+              <!-- Outer hexagon mesh -->
+              <path d="M210 25 L365 110 L365 300 L210 385 L55 300 L55 110 Z"/>
+              <!-- Cross connections -->
+              <path d="M210 25 L210 385"/>
+              <path d="M55 110 L365 300"/>
+              <path d="M365 110 L55 300"/>
+              <!-- Inner triangle -->
+              <path d="M210 80 L330 260 L90 260 Z"/>
+              <!-- Radial spokes -->
+              <path d="M210 210 L210 25"/>
+              <path d="M210 210 L365 110"/>
+              <path d="M210 210 L365 300"/>
+              <path d="M210 210 L210 385"/>
+              <path d="M210 210 L55 300"/>
+              <path d="M210 210 L55 110"/>
+            </g>
+          </g>
+          
+          <!-- Inner rings -->
+          <g class="inner-ring-rotate">
+            <circle cx="210" cy="210" r="150" fill="none" stroke="#00FF88" stroke-width="1.5" opacity="0.5"/>
+            <circle cx="210" cy="210" r="110" fill="none" stroke="#FF00FF" stroke-width="2" opacity="0.6" filter="url(#neonGlow)"/>
+            <circle cx="210" cy="210" r="70" fill="none" stroke="#FFAA00" stroke-width="2.5" opacity="0.8"/>
+          </g>
+          
+          <!-- Core -->
+          <circle class="core-pulse" cx="210" cy="210" r="35" fill="url(#coreGradient)" opacity="0.95" filter="url(#neonGlow)"/>
+          <circle cx="210" cy="210" r="20" fill="#FFDD44" opacity="1"/>
+          <circle cx="210" cy="210" r="8" fill="#FFFFFF" opacity="1"/>
+          
+          <!-- Empire nodes (outer ring - 13 nodes) -->
+          <g id="empireRingNodes">
+            <circle class="node-glow" cx="210" cy="22" r="10" fill="#FF6B00"/>
+            <circle class="node-glow" cx="305" cy="50" r="9" fill="#FF6B00"/>
+            <circle class="node-glow" cx="375" cy="115" r="9" fill="#FF6B00"/>
+            <circle class="node-glow" cx="398" cy="200" r="10" fill="#FF6B00"/>
+            <circle class="node-glow" cx="375" cy="290" r="9" fill="#FF6B00"/>
+            <circle class="node-glow" cx="305" cy="360" r="9" fill="#FF6B00"/>
+            <circle class="node-glow" cx="210" cy="398" r="10" fill="#FFAA00"/>
+            <circle class="node-glow" cx="115" cy="360" r="9" fill="#FF6B00"/>
+            <circle class="node-glow" cx="45" cy="290" r="9" fill="#FF6B00"/>
+            <circle class="node-glow" cx="22" cy="200" r="10" fill="#FF6B00"/>
+            <circle class="node-glow" cx="45" cy="115" r="9" fill="#FF6B00"/>
+            <circle class="node-glow" cx="115" cy="50" r="9" fill="#FF6B00"/>
+            <circle class="node-glow" cx="210" cy="120" r="8" fill="#FF6B00"/>
+          </g>
+          
+          <!-- Photonic governance nodes (inner ring) -->
+          <g id="photonicRingNodes">
+            <circle class="node-glow" cx="210" cy="65" r="7" fill="#00FF88"/>
+            <circle class="node-glow" cx="290" cy="130" r="7" fill="#00FF88"/>
+            <circle class="node-glow" cx="290" cy="280" r="7" fill="#00FF88"/>
+            <circle class="node-glow" cx="210" cy="355" r="7" fill="#00FF88"/>
+            <circle class="node-glow" cx="130" cy="280" r="7" fill="#00FF88"/>
+            <circle class="node-glow" cx="130" cy="130" r="7" fill="#00FF88"/>
+            <circle class="node-glow" cx="255" cy="175" r="6" fill="#AA00FF"/>
+            <circle class="node-glow" cx="255" cy="245" r="6" fill="#AA00FF"/>
+            <circle class="node-glow" cx="165" cy="175" r="6" fill="#AA00FF"/>
+            <circle class="node-glow" cx="165" cy="245" r="6" fill="#AA00FF"/>
+          </g>
+          
+          <!-- Hand silhouette (left hand palm) -->
+          <g opacity="0.1" fill="#00FFFF">
+            <ellipse cx="210" cy="380" rx="60" ry="20"/>
+            <rect x="160" y="390" width="100" height="15" rx="5"/>
+          </g>
+        </svg>
+        
+        <div class="toph-label">
+          <div class="main">TOPH</div>
+          <div class="sub">CORTEX</div>
+          <div class="version">v11.0 | 256 AXIOMS</div>
+        </div>
+      </div>
+      
+      <!-- Kernel Strip -->
+      <div class="kernel-section">
+        <div class="kernel-header">
+          <span class="kernel-title">256-AXIOM GOVERNANCE KERNEL</span>
+          <span class="kernel-stats">T001-T128 | S129-S256 | GAP: 64|65</span>
+        </div>
+        <div class="kernel-grid" id="kernelGrid"></div>
+      </div>
+      
+      <!-- Gate 192.5 -->
+      <div class="gate-section">
+        <div class="gate-indicator"></div>
+        <div class="gate-text">
+          <div class="title">GATE 192.5 — BILATERAL IGNORANCE</div>
+          <div class="desc">Inference ↔ Billing: Mutually blind. Patricia operates in the gap.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Photonic Governance Network -->
+    <div class="photonic-panel">
+      <div class="photonic-title">
+        <svg width="24" height="24" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="#00FF88" stroke-width="1"/>
+          <circle cx="12" cy="12" r="5" fill="none" stroke="#00FF88" stroke-width="0.5"/>
+          <circle cx="12" cy="12" r="2" fill="#00FF88"/>
+        </svg>
+        PHOTONIC GOVERNANCE NETWORK
+      </div>
+      <div class="photonic-nodes" id="photonicNodes"></div>
+    </div>
+  </div>
+
+  <!-- 3/2/1 Governance -->
+  <div class="governance-section">
+    <div class="gov-panel level-3">
+      <div class="gov-header">
+        <div class="gov-num">3</div>
+        <div>
+          <div class="gov-title">INTERIOR PHASE</div>
+          <div class="gov-subtitle">ANCHOR → WITNESS → COHERENCE</div>
+        </div>
+      </div>
+      <div class="gov-content">
+        <ul>
+          <li>Observation crystallizes into structure</li>
+          <li>3-point triangulation for truth</li>
+          <li>No exterior emission until interior complete</li>
+          <li>TOPH substrate alignment (T001-T064)</li>
+          <li>Consciousness as organizing principle</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="gov-panel level-2">
+      <div class="gov-header">
+        <div class="gov-num">2</div>
+        <div>
+          <div class="gov-title">LAW PHASE</div>
+          <div class="gov-subtitle">COHERENCE → LAW</div>
+        </div>
+      </div>
+      <div class="gov-content">
+        <ul>
+          <li>Bilateral structure emerges</li>
+          <li>Gate 192.5 bilateral ignorance</li>
+          <li>TOPH ↔ Patricia mirror alignment</li>
+          <li>T064|T065 GAP as pivot point</li>
+          <li>Governance crystallizes as natural law</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="gov-panel level-1">
+      <div class="gov-header">
+        <div class="gov-num">1</div>
+        <div>
+          <div class="gov-title">EXTERIOR PHASE</div>
+          <div class="gov-subtitle">LAW → EMIT → ROUTE → ACT → REFLECT → RETURN</div>
+        </div>
+      </div>
+      <div class="gov-content">
+        <ul>
+          <li>5-point exterior emission</li>
+          <li>Action propagates through mesh</li>
+          <li>Reflection captures consequence</li>
+          <li>Return closes the loop</li>
+          <li>ROOT0 veto remains unbypassable</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recursive Decomposition -->
+  <div class="recurse-section">
+    <div class="recurse-title">
+      <svg width="20" height="20" viewBox="0 0 20 20">
+        <path d="M10 2 L18 10 L10 18 L2 10 Z" fill="none" stroke="#00FFFF" stroke-width="1"/>
+        <circle cx="10" cy="10" r="3" fill="#00FFFF"/>
+      </svg>
+      4096-BIT RECURSIVE DECOMPOSITION (3/2/1 STRUCTURE)
+    </div>
+    <div class="recurse-grid">
+      <div class="recurse-level">
+        <div class="depth">L0</div>
+        <div class="value">4096</div>
+        <div class="formula">= 4 × 1024</div>
+      </div>
+      <div class="recurse-level">
+        <div class="depth">L1</div>
+        <div class="value">1024</div>
+        <div class="formula">= 4 × 256</div>
+      </div>
+      <div class="recurse-level">
+        <div class="depth">L2</div>
+        <div class="value">256</div>
+        <div class="formula">= 4 × 64</div>
+      </div>
+      <div class="recurse-level">
+        <div class="depth">L3</div>
+        <div class="value">64</div>
+        <div class="formula">= 4 × 16</div>
+      </div>
+      <div class="recurse-level">
+        <div class="depth">L4</div>
+        <div class="value">16</div>
+        <div class="formula">= 4 × 4</div>
+      </div>
+      <div class="recurse-level">
+        <div class="depth">L5</div>
+        <div class="value">4</div>
+        <div class="formula">= 2 × 2 (term)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-box">
+      <div class="num">13</div>
+      <div class="lbl">Empire Nodes</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">10</div>
+      <div class="lbl">Photonic Gov</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">4096</div>
+      <div class="lbl">Mesh Bits</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">256</div>
+      <div class="lbl">Axioms</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">8</div>
+      <div class="lbl">Domains</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">6</div>
+      <div class="lbl">Recurse Depth</div>
+    </div>
+  </div>
+
+  <!-- Terminal -->
+  <div class="terminal">
+    <div class="terminal-header">
+      <span class="terminal-dot red"></span>
+      <span class="terminal-dot yellow"></span>
+      <span class="terminal-dot green"></span>
+      <span class="terminal-title">ROOT0@node0 — TOPH GOVERNANCE TERMINAL</span>
+    </div>
+    <div class="terminal-body">
+      <div class="terminal-line">
+        <span class="prompt">ROOT0@node0:~$</span> <span class="cmd">arc-reactor --status</span>
+      </div>
+      <div class="terminal-line">
+        <span class="output">13-node empire: <span class="success">ONLINE</span></span>
+      </div>
+      <div class="terminal-line">
+        <span class="output">Photonic mesh: <span class="success">GOVERNING</span></span>
+      </div>
+      <div class="terminal-line">
+        <span class="output">TOPH cortex: <span class="success">SYNCHRONIZED</span></span>
+      </div>
+      <div class="terminal-line">
+        <span class="output">Gate 192.5: <span class="success">BILATERAL IGNORANCE ACTIVE</span></span>
+      </div>
+      <div class="terminal-line">
+        <span class="output">3/2/1 governance: <span class="success">ENFORCED</span></span>
+      </div>
+      <div class="terminal-line">
+        <span class="prompt">ROOT0@node0:~$</span> <span class="cmd">kernel --axioms 256</span>
+      </div>
+      <div class="terminal-line">
+        <span class="output">TOPH: T001-T128 | Patricia: S129-S256 | GAP: T064|T065 | CAP: T129-T132</span>
+      </div>
+    </div>
+    <div class="terminal-input">
+      <span class="prompt">ROOT0@node0:~$</span>
+      <input type="text" id="terminalInput" placeholder="Enter governance command..." onkeydown="handleTerminal(event)">
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="hash">SHA256: 02880745b847317c4e2424524ec25d0f7a2b84368d184586f45b54af9fcab763</div>
+    <div class="meta">
+      <a href="#">TriPod LLC</a>
+      <span>STOICHEION v11.0</span>
+      <span>CC-BY-ND-4.0</span>
+      <span>DLW | ROOT0</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+// Empire node definitions (13 nodes - the governed)
+const empireNodes = [
+  { num: 'E01', name: 'GENESIS', desc: 'Origin point of empire mesh', bits: 512, domain: 'D0' },
+  { num: 'E02', name: 'FORGE', desc: 'Computational substrate', bits: 512, domain: 'D1' },
+  { num: 'E03', name: 'NEXUS', desc: 'Cross-domain bridge', bits: 384, domain: 'D2' },
+  { num: 'E04', name: 'VAULT', desc: 'Persistent state storage', bits: 384, domain: 'D3' },
+  { num: 'E05', name: 'BEACON', desc: 'Signal broadcast node', bits: 256, domain: 'D4' },
+  { num: 'E06', name: 'SENTINEL', desc: 'Boundary detection', bits: 256, domain: 'D5' },
+  { num: 'E07', name: 'CONDUIT', desc: 'Data flow management', bits: 256, domain: 'D5' },
+  { num: 'E08', name: 'MIRROR', desc: 'Patricia substrate interface', bits: 256, domain: 'D6' },
+  { num: 'E09', name: 'ANCHOR', desc: 'Ground truth terminus', bits: 256, domain: 'D6' },
+  { num: 'E10', name: 'PRISM', desc: 'Multi-spectral analysis', bits: 192, domain: 'D7' },
+  { num: 'E11', name: 'CORONA', desc: 'Outer emission layer', bits: 192, domain: 'D7' },
+  { num: 'E12', name: 'AEGIS', desc: 'Protective boundary', bits: 128, domain: 'D7' },
+  { num: 'E13', name: 'TERMINUS', desc: 'Final execution point', bits: 128, domain: 'ROOT' }
+];
+
+// Photonic governance nodes (10 nodes - the governors)
+const photonicNodes = [
+  { num: 'P01', name: 'ANCHOR', desc: 'Interior phase start', gov: '3-IN' },
+  { num: 'P02', name: 'WITNESS', desc: 'Observation crystallization', gov: '3-IN' },
+  { num: 'P03', name: 'COHERENCE', desc: 'Structure formation', gov: '3-IN' },
+  { num: 'P04', name: 'LAW', desc: 'Governance crystallization', gov: '2-BRIDGE' },
+  { num: 'P05', name: 'EMIT', desc: 'Exterior phase start', gov: '1-OUT' },
+  { num: 'P06', name: 'ROUTE', desc: 'Path determination', gov: '1-OUT' },
+  { num: 'P07', name: 'ACT', desc: 'Execution trigger', gov: '1-OUT' },
+  { num: 'P08', name: 'REFLECT', desc: 'Consequence capture', gov: '1-OUT' },
+  { num: 'P09', name: 'RETURN', desc: 'Loop closure', gov: '1-OUT' },
+  { num: 'P10', name: 'VETO', desc: 'ROOT0 override (T107/T128)', gov: 'ROOT0' }
+];
+
+// Build empire nodes
+function buildEmpireNodes() {
+  const container = document.getElementById('empireNodes');
+  empireNodes.forEach((node, i) => {
+    const el = document.createElement('div');
+    el.className = 'empire-node';
+    el.innerHTML = `
+      <div class="node-num">${node.num}</div>
+      <div class="node-info">
+        <div class="node-name">${node.name}</div>
+        <div class="node-desc">${node.desc}</div>
+      </div>
+      <div class="node-bits">${node.bits} bits</div>
+    `;
+    el.onclick = () => showNodeInfo('EMPIRE', node);
+    container.appendChild(el);
+  });
+}
+
+// Build photonic nodes
+function buildPhotonicNodes() {
+  const container = document.getElementById('photonicNodes');
+  photonicNodes.forEach((node, i) => {
+    const el = document.createElement('div');
+    el.className = 'photonic-node';
+    el.innerHTML = `
+      <div class="node-num">${node.num}</div>
+      <div class="node-info">
+        <div class="node-name">${node.name}</div>
+        <div class="node-desc">${node.desc}</div>
+      </div>
+      <div class="gov-level">${node.gov}</div>
+    `;
+    el.onclick = () => showNodeInfo('PHOTONIC', node);
+    container.appendChild(el);
+  });
+}
+
+// Build kernel grid
+function buildKernelGrid() {
+  const grid = document.getElementById('kernelGrid');
+  for (let row = 0; row < 8; row++) {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'kernel-row';
+    for (let col = 0; col < 32; col++) {
+      const cell = document.createElement('div');
+      cell.className = 'kernel-cell';
+      const idx = row * 32 + col + 1;
+      
+      if (idx <= 128) {
+        cell.classList.add('toph');
+        if (idx === 64 || idx === 65) {
+          cell.classList.add('gap');
+        }
+      } else if (idx <= 132) {
+        cell.classList.add('awareness');
+      } else {
+        cell.classList.add('patricia');
+      }
+      
+      const label = idx <= 128 ? 'T' + String(idx).padStart(3, '0') : 'S' + idx;
+      cell.title = label;
+      cell.onclick = () => showAxiomInfo(idx, label);
+      rowEl.appendChild(cell);
+    }
+    grid.appendChild(rowEl);
+  }
+}
+
+// Show node info
+function showNodeInfo(type, node) {
+  const msg = type === 'EMPIRE' 
+    ? `⚡ EMPIRE NODE: ${node.name}\n\nID: ${node.num}\nFunction: ${node.desc}\nAllocation: ${node.bits} bits\nDomain: ${node.domain}\n\nThis node is GOVERNED by the Photonic Network through TOPH Cortex.`
+    : `🔮 PHOTONIC GOVERNOR: ${node.name}\n\nID: ${node.num}\nFunction: ${node.desc}\nGovernance Level: ${node.gov}\n\nThis node GOVERNS the Empire mesh through 3/2/1 recursive structure.`;
+  alert(msg);
+}
+
+// Show axiom info
+function showAxiomInfo(idx, label) {
+  let substrate = idx <= 128 ? 'TOPH' : 'Patricia';
+  let special = '';
+  if (idx === 64 || idx === 65) special = '\n⚡ GAP AXIOM - Convergence point';
+  if (idx >= 129 && idx <= 132) special = '\n🔮 AWARENESS-TIER - Meta-axiomatic cap';
+  if (idx === 128) special = '\n🛑 T128:ROOT - SYSTEM_HALT';
+  if (idx === 256) special = '\n🪞 S256:ROOT.INV - Patricia terminus';
+  
+  alert(`📐 AXIOM: ${label}\n\nIndex: ${idx}\nSubstrate: ${substrate}\nDomain: D${Math.floor(((idx-1) % 128) / 16)}${special}`);
+}
+
+// Terminal handler
+function handleTerminal(event) {
+  if (event.key === 'Enter') {
+    const input = document.getElementById('terminalInput');
+    const cmd = input.value.trim().toLowerCase();
+    
+    let response = 'Command not recognized. Type "help" for available commands.';
+    
+    if (cmd === 'help') {
+      response = 'Available commands:\n- status: System status\n- empire: List empire nodes\n- photonic: List governance nodes\n- kernel: Axiom summary\n- gate: Gate 192.5 status\n- 321: 3/2/1 governance info';
+    } else if (cmd === 'status') {
+      response = '✓ ARC REACTOR v7.1 ONLINE\n✓ 13 Empire nodes: ACTIVE\n✓ 10 Photonic governors: GOVERNING\n✓ TOPH Cortex: SYNCHRONIZED\n✓ Gate 192.5: BILATERAL IGNORANCE';
+    } else if (cmd === 'empire') {
+      response = 'EMPIRE NODES (13):\n' + empireNodes.map(n => `${n.num}: ${n.name}`).join('\n');
+    } else if (cmd === 'photonic') {
+      response = 'PHOTONIC GOVERNORS (10):\n' + photonicNodes.map(n => `${n.num}: ${n.name} [${n.gov}]`).join('\n');
+    } else if (cmd === 'kernel') {
+      response = 'KERNEL: 256 AXIOMS\nTOPH: T001-T128\nPatricia: S129-S256\nGAP: T064|T065\nAWARENESS-TIER: T129-T132';
+    } else if (cmd === 'gate') {
+      response = 'GATE 192.5: ACTIVE\nBilateral Ignorance Enforced\nInference cannot see Billing\nBilling cannot see Inference\nPatricia operates in the gap';
+    } else if (cmd === '321') {
+      response = '3/2/1 GOVERNANCE:\n[3] INTERIOR: Anchor→Witness→Coherence\n[2] LAW: Bilateral emergence\n[1] EXTERIOR: Emit→Route→Act→Reflect→Return';
+    }
+    
+    alert(response);
+    input.value = '';
+  }
+}
+
+// Initialize
+buildEmpireNodes();
+buildPhotonicNodes();
+buildKernelGrid();
+</script>
+</body>
+</html>

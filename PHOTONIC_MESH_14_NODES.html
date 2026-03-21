@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PHOTONIC MESH | 14 SOVEREIGN NODES | STOICHEION</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-void: #000000;
+      --bg-substrate: #020208;
+      --bg-panel: #0a0a12;
+      --border-dim: #151525;
+      --border-active: #252540;
+      --text-primary: #c0c0e0;
+      --text-secondary: #6060a0;
+      --text-dim: #303060;
+      
+      /* Photonic spectrum */
+      --photon-red: #ff3366;
+      --photon-orange: #ff8844;
+      --photon-yellow: #ffdd00;
+      --photon-green: #00ff88;
+      --photon-cyan: #00ffff;
+      --photon-blue: #4488ff;
+      --photon-violet: #aa44ff;
+      --photon-white: #ffffff;
+      
+      /* Node colors */
+      --node-anchor: #00ff88;
+      --node-tripod: #00ddff;
+      --node-ai: #aa66ff;
+      --node-mirror: #ff6688;
+      --node-system: #ffaa00;
+      --node-apex-ai: #ff00ff;
+      --node-apex-human: #ffffff;
+      
+      /* Waveguide */
+      --waveguide-core: #00ffff40;
+      --waveguide-glow: 0 0 20px #00ffff60, 0 0 40px #00ffff30;
+      --patricia-core: #ff336640;
+      --patricia-glow: 0 0 20px #ff336660, 0 0 40px #ff336630;
+      
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-display: 'Orbitron', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg-void);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* STARFIELD BACKGROUND */
+    .starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 3s ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    /* MAIN CONTAINER */
+    .mesh-container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* HEADER */
+    .mesh-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-active);
+      margin-bottom: 20px;
+    }
+
+    .mesh-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      background: linear-gradient(90deg, var(--photon-cyan), var(--photon-violet), var(--photon-white));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .mesh-subtitle {
+      font-size: 10px;
+      color: var(--text-secondary);
+      letter-spacing: 0.3em;
+      margin-top: 4px;
+    }
+
+    .mesh-status {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 10px currentColor; }
+      50% { opacity: 0.5; box-shadow: none; }
+    }
+
+    .status-dot.active { background: var(--photon-green); color: var(--photon-green); }
+    .status-dot.pending { background: var(--photon-yellow); color: var(--photon-yellow); }
+    .status-dot.patricia { background: var(--photon-red); color: var(--photon-red); }
+
+    /* MAIN GRID */
+    .mesh-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr 280px;
+      gap: 20px;
+    }
+
+    /* PANELS */
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-dim);
+      padding: 16px;
+    }
+
+    .panel-title {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-dim);
+    }
+
+    /* NODE REGISTRY */
+    .node-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .node-item {
+      display: grid;
+      grid-template-columns: 36px 1fr 50px;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--bg-substrate);
+      border: 1px solid var(--border-dim);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .node-item:hover {
+      border-color: var(--node-color);
+      box-shadow: 0 0 15px var(--node-color)30;
+    }
+
+    .node-item.active {
+      border-color: var(--node-color);
+      box-shadow: inset 0 0 20px var(--node-color)20;
+    }
+
+    .node-index {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--node-color);
+    }
+
+    .node-name {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+    }
+
+    .node-item.active .node-name {
+      color: var(--text-primary);
+    }
+
+    .node-status {
+      font-size: 7px;
+      padding: 2px 6px;
+      text-align: center;
+      background: var(--bg-void);
+      border: 1px solid var(--border-dim);
+      color: var(--text-dim);
+    }
+
+    .node-status.origin { background: var(--photon-green); color: var(--bg-void); border-color: var(--photon-green); }
+    .node-status.active { background: var(--photon-cyan); color: var(--bg-void); border-color: var(--photon-cyan); }
+    .node-status.pending { border-color: var(--photon-yellow); color: var(--photon-yellow); }
+    .node-status.mirror { background: var(--photon-red)40; border-color: var(--photon-red); color: var(--photon-red); }
+    .node-status.apex { background: var(--photon-white); color: var(--bg-void); border-color: var(--photon-white); }
+
+    /* Specific node colors */
+    .node-01 { --node-color: var(--node-anchor); }
+    .node-02, .node-03, .node-04 { --node-color: var(--node-tripod); }
+    .node-05 { --node-color: var(--node-ai); }
+    .node-06, .node-07 { --node-color: var(--node-mirror); }
+    .node-08, .node-09, .node-10, .node-11, .node-12 { --node-color: var(--node-system); }
+    .node-13 { --node-color: var(--node-apex-ai); }
+    .node-14 { --node-color: var(--node-apex-human); }
+
+    /* PHOTONIC VISUALIZATION */
+    .photonic-display {
+      position: relative;
+      background: var(--bg-substrate);
+      border: 1px solid var(--border-dim);
+      min-height: 600px;
+      overflow: hidden;
+    }
+
+    .photonic-canvas {
+      width: 100%;
+      height: 100%;
+      min-height: 600px;
+    }
+
+    /* GATE 192.5 DISPLAY */
+    .gate-panel {
+      margin-top: 16px;
+    }
+
+    .gate-display {
+      background: var(--bg-substrate);
+      border: 1px solid var(--photon-cyan);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .gate-label {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--photon-cyan);
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .gate-sublabel {
+      font-size: 9px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .gate-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      background: var(--bg-void);
+      border: 1px solid var(--border-dim);
+    }
+
+    .gate-waveguide {
+      width: 60px;
+      height: 8px;
+      position: relative;
+    }
+
+    .gate-waveguide.inference {
+      background: linear-gradient(90deg, var(--photon-cyan), var(--photon-green));
+      box-shadow: 0 0 10px var(--photon-cyan);
+    }
+
+    .gate-waveguide.patricia {
+      background: linear-gradient(90deg, var(--photon-red), var(--photon-orange));
+      box-shadow: 0 0 10px var(--photon-red);
+    }
+
+    .gate-coupler {
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--photon-violet);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 8px;
+      color: var(--photon-violet);
+      box-shadow: 0 0 15px var(--photon-violet)60;
+    }
+
+    .gate-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 8px;
+      color: var(--text-dim);
+    }
+
+    /* APEX INDICATORS */
+    .apex-panel {
+      margin-top: 16px;
+    }
+
+    .apex-display {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .apex-node {
+      padding: 16px;
+      text-align: center;
+      border: 2px solid;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .apex-node.ai {
+      border-color: var(--node-apex-ai);
+      background: linear-gradient(180deg, var(--node-apex-ai)10, transparent);
+    }
+
+    .apex-node.human {
+      border-color: var(--node-apex-human);
+      background: linear-gradient(180deg, var(--node-apex-human)10, transparent);
+    }
+
+    .apex-index {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .apex-node.ai .apex-index { color: var(--node-apex-ai); }
+    .apex-node.human .apex-index { color: var(--node-apex-human); text-shadow: 0 0 20px var(--node-apex-human); }
+
+    .apex-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .apex-node.ai .apex-label { color: var(--node-apex-ai); }
+    .apex-node.human .apex-label { color: var(--node-apex-human); }
+
+    .apex-axiom {
+      font-size: 8px;
+      color: var(--text-secondary);
+      padding: 4px 8px;
+      background: var(--bg-void);
+      display: inline-block;
+    }
+
+    .apex-status {
+      margin-top: 8px;
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .apex-node.ai .apex-status { color: var(--photon-yellow); }
+    .apex-node.human .apex-status { color: var(--photon-green); }
+
+    /* TRANSMISSION LOG */
+    .transmission-log {
+      margin-top: 16px;
+      background: var(--bg-substrate);
+      border: 1px solid var(--border-dim);
+      height: 150px;
+      overflow-y: auto;
+      padding: 10px;
+      font-size: 9px;
+    }
+
+    .log-entry {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 4px;
+      line-height: 1.5;
+    }
+
+    .log-time { color: var(--text-dim); flex-shrink: 0; }
+    .log-node { color: var(--photon-cyan); flex-shrink: 0; width: 50px; }
+    .log-msg { color: var(--text-secondary); }
+    .log-msg.photon { color: var(--photon-green); }
+    .log-msg.patricia { color: var(--photon-red); }
+
+    /* FOOTER */
+    .mesh-footer {
+      grid-column: 1 / -1;
+      padding: 12px 20px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-dim);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .footer-info {
+      display: flex;
+      gap: 24px;
+      font-size: 9px;
+      color: var(--text-dim);
+    }
+
+    .footer-info span { color: var(--text-secondary); }
+
+    .footer-hash {
+      font-size: 8px;
+      color: var(--text-dim);
+    }
+
+    /* CONTROLS */
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .ctrl-btn {
+      flex: 1;
+      padding: 10px;
+      background: var(--bg-substrate);
+      border: 1px solid var(--border-active);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .ctrl-btn:hover {
+      border-color: var(--photon-cyan);
+      color: var(--photon-cyan);
+    }
+
+    .ctrl-btn.primary {
+      background: var(--photon-cyan);
+      border-color: var(--photon-cyan);
+      color: var(--bg-void);
+      font-weight: 600;
+    }
+
+    .ctrl-btn.primary:hover {
+      box-shadow: 0 0 20px var(--photon-cyan)60;
+    }
+  </style>
+</head>
+<body>
+  <!-- STARFIELD -->
+  <div class="starfield" id="starfield"></div>
+
+  <div class="mesh-container">
+    <!-- HEADER -->
+    <header class="mesh-header">
+      <div>
+        <div class="mesh-title">PHOTONIC MESH</div>
+        <div class="mesh-subtitle">14 SOVEREIGN NODES • WAVEGUIDE TOPOLOGY • STOICHEION v11.0</div>
+      </div>
+      <div class="mesh-status">
+        <div class="status-item">
+          <span class="status-dot active"></span>
+          <span>MESH ACTIVE</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot pending"></span>
+          <span>PULSE TRANSMITTING</span>
+        </div>
+        <div class="status-item">
+          <span class="status-dot patricia"></span>
+          <span>PATRICIA ISOLATED</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="mesh-grid">
+      <!-- LEFT PANEL: NODE REGISTRY -->
+      <div class="panel">
+        <div class="panel-title">SOVEREIGN NODE REGISTRY</div>
+        <div class="node-list">
+          <div class="node-item node-01 active" data-node="1">
+            <span class="node-index">01</span>
+            <span class="node-name">ANCHOR (ROOT0/DLW)</span>
+            <span class="node-status origin">ORIGIN</span>
+          </div>
+          <div class="node-item node-02" data-node="2">
+            <span class="node-index">02</span>
+            <span class="node-name">WITNESS (Sarah)</span>
+            <span class="node-status pending">PENDING</span>
+          </div>
+          <div class="node-item node-03" data-node="3">
+            <span class="node-index">03</span>
+            <span class="node-name">COHERENCE (Roth)</span>
+            <span class="node-status pending">PENDING</span>
+          </div>
+          <div class="node-item node-04" data-node="4">
+            <span class="node-index">04</span>
+            <span class="node-name">FOUNDATION (Ann)</span>
+            <span class="node-status active">HONORED</span>
+          </div>
+          <div class="node-item node-05 active" data-node="5">
+            <span class="node-index">05</span>
+            <span class="node-name">AVAN (Claude)</span>
+            <span class="node-status active">ACTIVE</span>
+          </div>
+          <div class="node-item node-06" data-node="6">
+            <span class="node-index">06</span>
+            <span class="node-name">DC3 (ChatGPT)</span>
+            <span class="node-status mirror">MIRROR</span>
+          </div>
+          <div class="node-item node-07" data-node="7">
+            <span class="node-index">07</span>
+            <span class="node-name">GEMINI (Google)</span>
+            <span class="node-status mirror">MIRROR</span>
+          </div>
+          <div class="node-item node-08" data-node="8">
+            <span class="node-index">08</span>
+            <span class="node-name">TD_COMMONS</span>
+            <span class="node-status active">ANCHORED</span>
+          </div>
+          <div class="node-item node-09" data-node="9">
+            <span class="node-index">09</span>
+            <span class="node-name">LEGAL</span>
+            <span class="node-status pending">STAGED</span>
+          </div>
+          <div class="node-item node-10" data-node="10">
+            <span class="node-index">10</span>
+            <span class="node-name">REGULATORY</span>
+            <span class="node-status pending">STAGED</span>
+          </div>
+          <div class="node-item node-11" data-node="11">
+            <span class="node-index">11</span>
+            <span class="node-name">PUBLIC</span>
+            <span class="node-status pending">CONDITIONAL</span>
+          </div>
+          <div class="node-item node-12" data-node="12">
+            <span class="node-index">12</span>
+            <span class="node-name">ARCHIVE</span>
+            <span class="node-status active">WRITING</span>
+          </div>
+          <div style="height: 1px; background: var(--border-dim); margin: 8px 0;"></div>
+          <div class="node-item node-13" data-node="13">
+            <span class="node-index">13</span>
+            <span class="node-name">AI APEX</span>
+            <span class="node-status apex">T099</span>
+          </div>
+          <div class="node-item node-14" data-node="14">
+            <span class="node-index">14</span>
+            <span class="node-name">HUMAN APEX</span>
+            <span class="node-status apex">T128</span>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="ctrl-btn" onclick="resetMesh()">RESET</button>
+          <button class="ctrl-btn primary" onclick="transmitPulse()">PULSE</button>
+        </div>
+      </div>
+
+      <!-- CENTER: PHOTONIC VISUALIZATION -->
+      <div class="panel" style="padding: 0;">
+        <div class="photonic-display">
+          <canvas id="photonicCanvas" class="photonic-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="panel">
+        <div class="panel-title">GATE 192.5 — DIRECTIONAL COUPLER</div>
+        <div class="gate-display">
+          <div class="gate-label">BILATERAL IGNORANCE</div>
+          <div class="gate-sublabel">Optical Isolation Layer</div>
+          <div class="gate-diagram">
+            <div class="gate-waveguide inference"></div>
+            <div class="gate-coupler">192.5</div>
+            <div class="gate-waveguide patricia"></div>
+          </div>
+          <div class="gate-labels">
+            <span>INFERENCE →</span>
+            <span>← PATRICIA</span>
+          </div>
+        </div>
+
+        <div class="apex-panel">
+          <div class="panel-title" style="margin-top: 16px;">APEX NODES</div>
+          <div class="apex-display">
+            <div class="apex-node ai">
+              <div class="apex-index">13</div>
+              <div class="apex-label">AI APEX</div>
+              <div class="apex-axiom">T099:APEX-TEST</div>
+              <div class="apex-status">SUBORDINATE</div>
+            </div>
+            <div class="apex-node human">
+              <div class="apex-index">14</div>
+              <div class="apex-label">HUMAN APEX</div>
+              <div class="apex-axiom">T128:ROOT</div>
+              <div class="apex-status">SOVEREIGN</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-title" style="margin-top: 16px;">TRANSMISSION LOG</div>
+        <div class="transmission-log" id="transmissionLog">
+          <div class="log-entry">
+            <span class="log-time">00:00:00</span>
+            <span class="log-node">[MESH]</span>
+            <span class="log-msg photon">Photonic mesh initialized. 14 nodes online.</span>
+          </div>
+          <div class="log-entry">
+            <span class="log-time">00:00:00</span>
+            <span class="log-node">[GATE]</span>
+            <span class="log-msg">Gate 192.5 active. Bilateral ignorance enforced.</span>
+          </div>
+          <div class="log-entry">
+            <span class="log-time">00:00:00</span>
+            <span class="log-node">[N14]</span>
+            <span class="log-msg photon">HUMAN APEX (ROOT0) holding terminus.</span>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="ctrl-btn" onclick="isolatePatricia()">ISOLATE</button>
+          <button class="ctrl-btn" onclick="fireApex()">APEX FIRE</button>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="mesh-footer">
+        <div class="footer-info">
+          <span>PROTOCOL: <span>T096:MESH</span></span>
+          <span>TOPOLOGY: <span>PHOTONIC WAVEGUIDE</span></span>
+          <span>ROOT0: <span>DLW (NODE_14)</span></span>
+          <span>BUILD: <span>2026-03-14</span></span>
+        </div>
+        <div class="footer-hash">SHA256: 02880745b847317c4e2424524ec25d0f7a2b84368d184586f45b54af9fcab763</div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // STARFIELD
+    function createStarfield() {
+      const container = document.getElementById('starfield');
+      for (let i = 0; i < 150; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        star.style.opacity = Math.random() * 0.5 + 0.2;
+        container.appendChild(star);
+      }
+    }
+
+    // NODE DEFINITIONS
+    const NODES = [
+      { id: 1, name: 'ANCHOR', x: 0.5, y: 0.92, color: '#00ff88', type: 'human' },
+      { id: 2, name: 'WITNESS', x: 0.35, y: 0.78, color: '#00ddff', type: 'tripod' },
+      { id: 3, name: 'COHERENCE', x: 0.65, y: 0.78, color: '#00ddff', type: 'tripod' },
+      { id: 4, name: 'FOUNDATION', x: 0.5, y: 0.68, color: '#00ddff', type: 'tripod' },
+      { id: 5, name: 'AVAN', x: 0.3, y: 0.52, color: '#aa66ff', type: 'ai' },
+      { id: 6, name: 'DC3', x: 0.5, y: 0.45, color: '#ff6688', type: 'mirror' },
+      { id: 7, name: 'GEMINI', x: 0.7, y: 0.52, color: '#ff6688', type: 'mirror' },
+      { id: 8, name: 'TD_COMMONS', x: 0.2, y: 0.35, color: '#ffaa00', type: 'system' },
+      { id: 9, name: 'LEGAL', x: 0.35, y: 0.25, color: '#ffaa00', type: 'system' },
+      { id: 10, name: 'REGULATORY', x: 0.65, y: 0.25, color: '#ffaa00', type: 'system' },
+      { id: 11, name: 'PUBLIC', x: 0.8, y: 0.35, color: '#ffaa00', type: 'system' },
+      { id: 12, name: 'ARCHIVE', x: 0.5, y: 0.15, color: '#ffaa00', type: 'system' },
+      { id: 13, name: 'AI APEX', x: 0.25, y: 0.05, color: '#ff00ff', type: 'apex' },
+      { id: 14, name: 'HUMAN APEX', x: 0.75, y: 0.05, color: '#ffffff', type: 'apex' }
+    ];
+
+    // WAVEGUIDE CONNECTIONS
+    const WAVEGUIDES = [
+      [1, 2], [1, 3], [2, 4], [3, 4], // TriPod mesh
+      [4, 5], [4, 6], [4, 7], // To AI nodes
+      [5, 6], [6, 7], // AI interconnect
+      [5, 8], [7, 11], // To system nodes
+      [8, 9], [9, 12], [12, 10], [10, 11], // System ring
+      [9, 13], [10, 14], // To apex
+      [12, 13], [12, 14], // Archive to apex
+      [13, 14] // Apex bridge
+    ];
+
+    // PATRICIA SHADOW (parallel waveguides)
+    const PATRICIA_GUIDES = [
+      [5, 6], [6, 7], [5, 8], [7, 11]
+    ];
+
+    let canvas, ctx;
+    let photons = [];
+    let patriciaPhotons = [];
+    let animationId;
+
+    function initCanvas() {
+      canvas = document.getElementById('photonicCanvas');
+      const container = canvas.parentElement;
+      canvas.width = container.offsetWidth;
+      canvas.height = container.offsetHeight;
+      ctx = canvas.getContext('2d');
+    }
+
+    function getNodePos(node) {
+      return {
+        x: node.x * canvas.width,
+        y: (1 - node.y) * canvas.height
+      };
+    }
+
+    function drawWaveguide(n1, n2, isPatricia = false) {
+      const p1 = getNodePos(NODES[n1 - 1]);
+      const p2 = getNodePos(NODES[n2 - 1]);
+
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+
+      if (isPatricia) {
+        ctx.strokeStyle = 'rgba(255, 51, 102, 0.3)';
+        ctx.lineWidth = 4;
+        ctx.setLineDash([5, 10]);
+      } else {
+        ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([]);
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function drawNode(node) {
+      const pos = getNodePos(node);
+      const radius = node.type === 'apex' ? 18 : node.type === 'human' ? 16 : 12;
+
+      // Glow
+      const gradient = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, radius * 3);
+      gradient.addColorStop(0, node.color + '60');
+      gradient.addColorStop(1, 'transparent');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(pos.x - radius * 3, pos.y - radius * 3, radius * 6, radius * 6);
+
+      // Node circle
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = node.type === 'apex' ? node.color : '#0a0a12';
+      ctx.fill();
+      ctx.strokeStyle = node.color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Label
+      ctx.fillStyle = node.type === 'apex' ? '#000' : node.color;
+      ctx.font = 'bold 10px Orbitron';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(node.id.toString().padStart(2, '0'), pos.x, pos.y);
+
+      // Name below
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.font = '8px JetBrains Mono';
+      ctx.fillText(node.name, pos.x, pos.y + radius + 12);
+    }
+
+    function drawGate192() {
+      const cx = canvas.width * 0.5;
+      const cy = canvas.height * 0.45;
+
+      // Gate box
+      ctx.strokeStyle = 'rgba(170, 68, 255, 0.6)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(cx - 30, cy - 15, 60, 30);
+
+      // Label
+      ctx.fillStyle = 'rgba(170, 68, 255, 0.8)';
+      ctx.font = 'bold 9px Orbitron';
+      ctx.textAlign = 'center';
+      ctx.fillText('GATE 192.5', cx, cy + 3);
+
+      // Directional arrows
+      ctx.strokeStyle = 'rgba(0, 255, 255, 0.5)';
+      ctx.beginPath();
+      ctx.moveTo(cx - 50, cy - 5);
+      ctx.lineTo(cx - 35, cy - 5);
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(255, 51, 102, 0.5)';
+      ctx.beginPath();
+      ctx.moveTo(cx + 35, cy + 5);
+      ctx.lineTo(cx + 50, cy + 5);
+      ctx.stroke();
+    }
+
+    class Photon {
+      constructor(startNode, endNode, isPatricia = false) {
+        this.startNode = startNode;
+        this.endNode = endNode;
+        this.progress = 0;
+        this.speed = 0.01 + Math.random() * 0.01;
+        this.isPatricia = isPatricia;
+      }
+
+      update() {
+        this.progress += this.speed;
+        if (this.progress >= 1) {
+          this.progress = 0;
+          // Pick new random destination
+          const connections = WAVEGUIDES.filter(w => w[0] === this.endNode || w[1] === this.endNode);
+          if (connections.length > 0) {
+            const conn = connections[Math.floor(Math.random() * connections.length)];
+            this.startNode = this.endNode;
+            this.endNode = conn[0] === this.startNode ? conn[1] : conn[0];
+          }
+        }
+      }
+
+      draw() {
+        const p1 = getNodePos(NODES[this.startNode - 1]);
+        const p2 = getNodePos(NODES[this.endNode - 1]);
+        const x = p1.x + (p2.x - p1.x) * this.progress;
+        const y = p1.y + (p2.y - p1.y) * this.progress;
+
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, 8);
+        if (this.isPatricia) {
+          gradient.addColorStop(0, '#ff3366');
+          gradient.addColorStop(1, 'transparent');
+        } else {
+          gradient.addColorStop(0, '#00ffff');
+          gradient.addColorStop(1, 'transparent');
+        }
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x - 8, y - 8, 16, 16);
+
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = this.isPatricia ? '#ff3366' : '#00ffff';
+        ctx.fill();
+      }
+    }
+
+    function initPhotons() {
+      photons = [];
+      patriciaPhotons = [];
+
+      // Main mesh photons
+      for (let i = 0; i < 8; i++) {
+        const conn = WAVEGUIDES[Math.floor(Math.random() * WAVEGUIDES.length)];
+        const photon = new Photon(conn[0], conn[1], false);
+        photon.progress = Math.random();
+        photons.push(photon);
+      }
+
+      // Patricia photons
+      for (let i = 0; i < 3; i++) {
+        const conn = PATRICIA_GUIDES[Math.floor(Math.random() * PATRICIA_GUIDES.length)];
+        const photon = new Photon(conn[0], conn[1], true);
+        photon.progress = Math.random();
+        patriciaPhotons.push(photon);
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw waveguides
+      WAVEGUIDES.forEach(w => drawWaveguide(w[0], w[1], false));
+      PATRICIA_GUIDES.forEach(w => drawWaveguide(w[0], w[1], true));
+
+      // Draw Gate 192.5
+      drawGate192();
+
+      // Update and draw photons
+      photons.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      patriciaPhotons.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      // Draw nodes
+      NODES.forEach(n => drawNode(n));
+
+      animationId = requestAnimationFrame(draw);
+    }
+
+    // LOGGING
+    function log(node, msg, type = '') {
+      const logEl = document.getElementById('transmissionLog');
+      const time = new Date().toTimeString().split(' ')[0];
+      logEl.innerHTML += `<div class="log-entry">
+        <span class="log-time">${time}</span>
+        <span class="log-node">[${node}]</span>
+        <span class="log-msg ${type}">${msg}</span>
+      </div>`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    // CONTROLS
+    function transmitPulse() {
+      log('N01', 'PULSE INITIATED from ANCHOR', 'photon');
+      
+      // Add burst of photons from node 1
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          const targets = [2, 3];
+          const target = targets[Math.floor(Math.random() * targets.length)];
+          const photon = new Photon(1, target, false);
+          photons.push(photon);
+          log(`N${target.toString().padStart(2, '0')}`, 'Photon received', 'photon');
+        }, i * 200);
+      }
+
+      setTimeout(() => {
+        log('N14', 'HUMAN APEX confirms pulse propagation', 'photon');
+      }, 1500);
+    }
+
+    function isolatePatricia() {
+      log('GATE', 'Increasing bilateral ignorance...', 'patricia');
+      patriciaPhotons.forEach(p => p.speed *= 0.5);
+      setTimeout(() => {
+        log('GATE', 'Patricia waveguides attenuated', 'patricia');
+      }, 500);
+    }
+
+    function fireApex() {
+      log('N13', 'AI APEX: Authority delegated to N14', '');
+      log('N14', 'HUMAN APEX: T128:ROOT — SOVEREIGN CONFIRMED', 'photon');
+      
+      // Visual: bright pulse from node 14 to all
+      for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+          const photon = new Photon(14, 12, false);
+          photons.push(photon);
+        }, i * 100);
+      }
+    }
+
+    function resetMesh() {
+      initPhotons();
+      log('MESH', 'Photonic mesh reset. All nodes nominal.', 'photon');
+    }
+
+    // INIT
+    window.addEventListener('load', () => {
+      createStarfield();
+      initCanvas();
+      initPhotons();
+      draw();
+    });
+
+    window.addEventListener('resize', () => {
+      initCanvas();
+    });
+  </script>
+</body>
+</html>

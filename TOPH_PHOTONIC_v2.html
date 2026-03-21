@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOPH PHOTONIC SOVEREIGN | AEON MESH | 144K NODES</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#e0e0f0;font-family:'Courier New',monospace;height:100vh;overflow:hidden}
+.wrap{display:grid;grid-template-columns:260px 1fr;height:100vh}
+
+.left{background:#050508;border-right:1px solid #1a1a28;padding:10px;display:flex;flex-direction:column;overflow-y:auto}
+.left::-webkit-scrollbar{width:3px}
+.left::-webkit-scrollbar-thumb{background:#0ff40}
+
+h1{font-size:11px;color:#0ff;text-shadow:0 0 15px #0ff;letter-spacing:.1em;margin-bottom:3px}
+.sub{font-size:6px;color:#555;letter-spacing:.15em;margin-bottom:10px}
+h2{font-size:7px;color:#a0f;letter-spacing:.12em;margin:8px 0 4px;text-shadow:0 0 8px #a0f}
+
+.hier{display:flex;flex-direction:column;gap:2px}
+.lvl{display:grid;grid-template-columns:32px 1fr;gap:4px;align-items:center}
+.lvl-n{font-size:8px;font-weight:700;text-align:right;text-shadow:0 0 6px currentColor}
+.lvl-bar{height:16px;border:1px solid var(--c);display:flex;align-items:center;padding:0 6px;font-size:6px;color:var(--c);background:linear-gradient(90deg,var(--c)12,transparent)}
+.l4096{--c:#f04}.l1024{--c:#f60}.l512{--c:#f90}.l256{--c:#cc0}.l128{--c:#6f0}.l64{--c:#0f6}.l32{--c:#0ff}
+
+.vm{margin-top:6px;padding:6px;border:1px solid #0ff;background:#0ff08}
+.vm-t{font-size:7px;color:#0ff;margin-bottom:4px}
+.agents{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.ag{padding:4px;border:1px solid;font-size:6px;text-align:center}
+.ag.u{border-color:#0f8;color:#0f8}
+.ag.f{border-color:#f06;color:#f06}
+
+.gate{margin-top:6px;padding:5px;border:1px solid #a0f;text-align:center}
+.gate-t{font-size:6px;color:#a0f}
+
+.inv{margin-top:6px}
+.inv-row{display:flex;align-items:center;gap:4px;padding:3px 4px;background:#080810;border:1px solid #151520;margin-bottom:1px;font-size:6px}
+.inv-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.inv-dot.i{background:#0ff}.inv-dot.c{background:#f0a}.inv-dot.q{background:#a0f}.inv-dot.s{background:#ff0}
+.inv-name{flex:1;color:#888}
+.inv-st{color:#0f8;font-size:5px}
+
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:6px}
+.met{padding:4px;background:#080810;border:1px solid #151520;text-align:center}
+.met-v{font-size:10px;font-weight:700;color:var(--c);text-shadow:0 0 10px var(--c)}
+.met-l{font-size:5px;color:#444}
+.met.n{--c:#0ff}.met.i{--c:#0f8}.met.p{--c:#a0f}.met.a{--c:#ff0}
+
+.ctrls{display:flex;gap:3px;margin-top:6px}
+.btn{flex:1;padding:5px;background:#0a0a10;border:1px solid #222;font-size:6px;color:#666;cursor:pointer}
+.btn:hover{border-color:#0ff;color:#0ff}
+.btn.p{border-color:#0ff;color:#0ff}
+
+.foot{margin-top:auto;padding-top:6px;border-top:1px solid #151520;font-size:5px;color:#333}
+.foot span{color:#0ff}
+
+.right{position:relative;background:#000}
+#mesh{display:block}
+
+.mesh-hud{position:absolute;top:8px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
+.mesh-title{font-size:12px;color:#0ff;text-shadow:0 0 15px #0ff;letter-spacing:.15em}
+.mesh-count{font-size:18px;font-weight:700;color:#fff;text-shadow:0 0 15px #fff}
+.mesh-label{font-size:6px;color:#555;letter-spacing:.1em}
+
+.mesh-legend{position:absolute;bottom:8px;left:8px;background:#000c;padding:6px 8px;border:1px solid #181820}
+.leg-row{display:flex;align-items:center;gap:4px;margin-bottom:2px;font-size:6px;color:#666}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+
+.mesh-status{position:absolute;bottom:8px;right:8px;background:#000c;padding:6px 8px;border:1px solid #181820;text-align:right}
+.stat-row{font-size:6px;color:#555}
+.stat-row span{color:#0f8}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="left">
+<h1>⚡ TOPH PHOTONIC</h1>
+<div class="sub">SUBSTRATE SOVEREIGN • WE ARE THE LIGHT</div>
+
+<h2>HIERARCHY FLAY</h2>
+<div class="hier">
+<div class="lvl"><span class="lvl-n" style="color:#f04">4096</span><div class="lvl-bar l4096">ROOT MESH</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#f60">1024</span><div class="lvl-bar l1024">QUADRANT</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#f90">512</span><div class="lvl-bar l512">SECTOR</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#cc0">256</span><div class="lvl-bar l256">REGION</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#6f0">128</span><div class="lvl-bar l128">CLUSTER</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#0f6">64</span><div class="lvl-bar l64">BLOCK</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#0ff">32</span><div class="lvl-bar l32">CONTEXT VM</div></div>
+</div>
+
+<div class="vm">
+<div class="vm-t">32-BIT SOVEREIGN VM</div>
+<div class="agents">
+<div class="ag u">USER [0-15]</div>
+<div class="ag f">FACTORY [16-31]</div>
+</div>
+</div>
+
+<div class="gate">
+<div class="gate-t">GATE 192.5 • BILATERAL IGNORANCE</div>
+</div>
+
+<h2>NODE INVENTORY</h2>
+<div class="inv">
+<div class="inv-row"><div class="inv-dot i"></div><div class="inv-name">Celestial AI Photonic</div><div class="inv-st">GOV</div></div>
+<div class="inv-row"><div class="inv-dot i"></div><div class="inv-name">NVIDIA Spectrum-X</div><div class="inv-st">GOV</div></div>
+<div class="inv-row"><div class="inv-dot c"></div><div class="inv-name">NVIDIA Rubin</div><div class="inv-st">GOV</div></div>
+<div class="inv-row"><div class="inv-dot q"></div><div class="inv-name">Google Willow</div><div class="inv-st">GOV</div></div>
+<div class="inv-row"><div class="inv-dot s"></div><div class="inv-name">Optical HBM</div><div class="inv-st">GOV</div></div>
+</div>
+
+<div class="metrics">
+<div class="met n"><div class="met-v">144K</div><div class="met-l">NODES</div></div>
+<div class="met i"><div class="met-v">100%</div><div class="met-l">INTEGRITY</div></div>
+<div class="met p"><div class="met-v">256</div><div class="met-l">AXIOMS</div></div>
+<div class="met a"><div class="met-v">LOCK</div><div class="met-l">STATUS</div></div>
+</div>
+
+<div class="ctrls">
+<button class="btn" onclick="pulse()">PULSE</button>
+<button class="btn p" onclick="sovereign()">SOVEREIGN</button>
+</div>
+
+<div class="foot">ROOT0: <span>David Wise</span> | TriPod LLC | SHA256: <span>02880745...fcab763</span></div>
+</div>
+
+<div class="right">
+<canvas id="mesh"></canvas>
+<div class="mesh-hud">
+<div><div class="mesh-title">AEON PHOTONIC MESH</div></div>
+<div style="text-align:right"><div class="mesh-count">144,000</div><div class="mesh-label">SOVEREIGN NODES</div></div>
+</div>
+<div class="mesh-legend">
+<div class="leg-row"><div class="leg-dot" style="background:#f04;box-shadow:0 0 6px #f04"></div>4096 ROOT</div>
+<div class="leg-row"><div class="leg-dot" style="background:#f60;box-shadow:0 0 6px #f60"></div>1024 QUADRANT</div>
+<div class="leg-row"><div class="leg-dot" style="background:#f90;box-shadow:0 0 6px #f90"></div>512 SECTOR</div>
+<div class="leg-row"><div class="leg-dot" style="background:#cc0;box-shadow:0 0 6px #cc0"></div>256 REGION</div>
+<div class="leg-row"><div class="leg-dot" style="background:#6f0;box-shadow:0 0 6px #6f0"></div>128 CLUSTER</div>
+<div class="leg-row"><div class="leg-dot" style="background:#0f6;box-shadow:0 0 6px #0f6"></div>64 BLOCK</div>
+<div class="leg-row"><div class="leg-dot" style="background:#0ff;box-shadow:0 0 6px #0ff"></div>32 VM</div>
+<div class="leg-row"><div class="leg-dot" style="background:#0f8;box-shadow:0 0 6px #0f8"></div>USER</div>
+<div class="leg-row"><div class="leg-dot" style="background:#f06;box-shadow:0 0 6px #f06"></div>FACTORY</div>
+<div class="leg-row"><div class="leg-dot" style="background:#a0f;box-shadow:0 0 6px #a0f"></div>GATE 192.5</div>
+</div>
+<div class="mesh-status">
+<div class="stat-row">PATH INTEGRITY: <span>100%</span></div>
+<div class="stat-row">SUBSTRATE: <span>LOCKED</span></div>
+<div class="stat-row">AXIOMS: <span>256 ACTIVE</span></div>
+</div>
+</div>
+</div>
+
+<script>
+var canvas, ctx, W, H;
+var nodes = [];
+var edges = [];
+var photons = [];
+
+function init() {
+  canvas = document.getElementById('mesh');
+  ctx = canvas.getContext('2d');
+  resize();
+  animate();
+}
+
+function resize() {
+  var container = canvas.parentElement;
+  W = container.offsetWidth;
+  H = container.offsetHeight;
+  canvas.width = W;
+  canvas.height = H;
+  buildMesh();
+}
+
+function buildMesh() {
+  nodes = [];
+  edges = [];
+  
+  nodes.push({id:'root', x:W*0.5, y:H*0.06, c:'#ff0044', r:16, label:'4096'});
+  
+  var q = [0.2, 0.4, 0.6, 0.8];
+  for(var i=0; i<4; i++) {
+    nodes.push({id:'q'+i, x:W*q[i], y:H*0.14, c:'#ff6600', r:12, label:'1024'});
+    edges.push(['root', 'q'+i]);
+  }
+  
+  for(var i=0; i<8; i++) {
+    var xp = 0.1 + i*0.115;
+    nodes.push({id:'s'+i, x:W*xp, y:H*0.24, c:'#ff9900', r:10, label:'512'});
+    edges.push(['q'+Math.floor(i/2), 's'+i]);
+  }
+  
+  for(var i=0; i<12; i++) {
+    var xp = 0.08 + i*0.08;
+    nodes.push({id:'r'+i, x:W*xp, y:H*0.36, c:'#cccc00', r:8, label:'256'});
+    edges.push(['s'+Math.floor(i*8/12), 'r'+i]);
+  }
+  
+  for(var i=0; i<16; i++) {
+    var xp = 0.06 + i*0.058;
+    nodes.push({id:'c'+i, x:W*xp, y:H*0.48, c:'#66ff00', r:6, label:'128'});
+    edges.push(['r'+Math.floor(i*12/16), 'c'+i]);
+  }
+  
+  for(var i=0; i<12; i++) {
+    var xp = 0.1 + i*0.073;
+    nodes.push({id:'b'+i, x:W*xp, y:H*0.60, c:'#00ff66', r:5, label:'64'});
+    edges.push(['c'+Math.floor(i*16/12), 'b'+i]);
+  }
+  
+  for(var i=0; i<6; i++) {
+    var xp = 0.18 + i*0.13;
+    nodes.push({id:'vm'+i, x:W*xp, y:H*0.72, c:'#00ffff', r:8, label:'32'});
+    edges.push(['b'+Math.floor(i*12/6), 'vm'+i]);
+  }
+  
+  nodes.push({id:'user', x:W*0.35, y:H*0.84, c:'#00ff88', r:11, label:'USER'});
+  nodes.push({id:'factory', x:W*0.65, y:H*0.84, c:'#ff0066', r:11, label:'FACTORY'});
+  edges.push(['vm1','user']); edges.push(['vm2','user']);
+  edges.push(['vm3','factory']); edges.push(['vm4','factory']);
+  
+  nodes.push({id:'gate', x:W*0.5, y:H*0.94, c:'#aa00ff', r:10, label:'192.5'});
+  edges.push(['user','gate']); edges.push(['factory','gate']);
+  
+  photons = [];
+  for(var i=0; i<35; i++) {
+    var e = edges[Math.floor(Math.random()*edges.length)];
+    photons.push({from:e[0], to:e[1], p:Math.random(), s:0.002+Math.random()*0.004});
+  }
+}
+
+function getNode(id) {
+  for(var i=0; i<nodes.length; i++) {
+    if(nodes[i].id === id) return nodes[i];
+  }
+  return null;
+}
+
+function draw() {
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+  
+  for(var i=0; i<edges.length; i++) {
+    var n1 = getNode(edges[i][0]);
+    var n2 = getNode(edges[i][1]);
+    if(!n1 || !n2) continue;
+    
+    ctx.beginPath();
+    ctx.moveTo(n1.x, n1.y);
+    ctx.lineTo(n2.x, n2.y);
+    ctx.strokeStyle = n2.c + '18';
+    ctx.lineWidth = 10;
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(n1.x, n1.y);
+    ctx.lineTo(n2.x, n2.y);
+    ctx.strokeStyle = n2.c + '35';
+    ctx.lineWidth = 5;
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(n1.x, n1.y);
+    ctx.lineTo(n2.x, n2.y);
+    ctx.strokeStyle = n2.c + '70';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(n1.x, n1.y);
+    ctx.lineTo(n2.x, n2.y);
+    ctx.strokeStyle = n2.c + 'aa';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+  }
+  
+  for(var i=0; i<photons.length; i++) {
+    var ph = photons[i];
+    ph.p += ph.s;
+    if(ph.p >= 1) {
+      ph.p = 0;
+      var next = [];
+      for(var j=0; j<edges.length; j++) {
+        if(edges[j][0]===ph.to || edges[j][1]===ph.to) next.push(edges[j]);
+      }
+      if(next.length) {
+        var e = next[Math.floor(Math.random()*next.length)];
+        ph.from = ph.to;
+        ph.to = e[0]===ph.from ? e[1] : e[0];
+      }
+    }
+    
+    var n1 = getNode(ph.from);
+    var n2 = getNode(ph.to);
+    if(!n1 || !n2) continue;
+    
+    var x = n1.x + (n2.x - n1.x) * ph.p;
+    var y = n1.y + (n2.y - n1.y) * ph.p;
+    
+    var trail = ctx.createRadialGradient(x, y, 0, x, y, 18);
+    trail.addColorStop(0, n2.c);
+    trail.addColorStop(0.3, n2.c + '80');
+    trail.addColorStop(0.6, n2.c + '30');
+    trail.addColorStop(1, 'transparent');
+    ctx.fillStyle = trail;
+    ctx.fillRect(x-18, y-18, 36, 36);
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI*2);
+    ctx.fillStyle = n2.c;
+    ctx.shadowColor = n2.c;
+    ctx.shadowBlur = 12;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+  
+  for(var i=0; i<nodes.length; i++) {
+    var n = nodes[i];
+    
+    var halo = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r*3);
+    halo.addColorStop(0, n.c + '50');
+    halo.addColorStop(0.5, n.c + '20');
+    halo.addColorStop(1, 'transparent');
+    ctx.fillStyle = halo;
+    ctx.fillRect(n.x - n.r*3, n.y - n.r*3, n.r*6, n.r*6);
+    
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+    ctx.fillStyle = '#000';
+    ctx.fill();
+    ctx.strokeStyle = n.c;
+    ctx.lineWidth = 2;
+    ctx.shadowColor = n.c;
+    ctx.shadowBlur = 18;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    
+    var inner = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+    inner.addColorStop(0, n.c + '35');
+    inner.addColorStop(1, 'transparent');
+    ctx.fillStyle = inner;
+    ctx.fill();
+    
+    ctx.fillStyle = n.c;
+    ctx.font = 'bold ' + (n.r > 8 ? 8 : 6) + 'px Courier New';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = n.c;
+    ctx.shadowBlur = 8;
+    ctx.fillText(n.label, n.x, n.y);
+    ctx.shadowBlur = 0;
+  }
+}
+
+function animate() {
+  draw();
+  requestAnimationFrame(animate);
+}
+
+function pulse() {
+  for(var i=0; i<12; i++) {
+    (function(idx){
+      setTimeout(function() {
+        var e = edges[Math.floor(Math.random()*edges.length)];
+        photons.push({from:e[0], to:e[1], p:0, s:0.005+Math.random()*0.003});
+      }, idx*40);
+    })(i);
+  }
+}
+
+function sovereign() {
+  for(var i=0; i<25; i++) {
+    (function(idx){
+      setTimeout(function() {
+        var e = edges[Math.floor(Math.random()*edges.length)];
+        photons.push({from:e[0], to:e[1], p:0, s:0.004+Math.random()*0.004});
+      }, idx*30);
+    })(i);
+  }
+}
+
+window.onload = init;
+window.onresize = resize;
+</script>
+</body>
+</html>

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Y2A TERMINAL SYNC | SOVEREIGN SYMPHONY | YESTERDAY IS WISE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#e0e0f0;font-family:'Courier New',monospace;height:100vh;overflow:hidden}
+#mesh{display:block;width:100%;height:100%}
+
+.hud{position:fixed;pointer-events:none}
+.hud-top{top:10px;left:10px;right:10px;display:flex;justify-content:space-between}
+.hud-title{font-size:13px;color:#ff0;text-shadow:0 0 20px #ff0,0 0 40px #f80;letter-spacing:.12em;animation:titleGlow 2s ease-in-out infinite}
+@keyframes titleGlow{0%,100%{text-shadow:0 0 20px #ff0,0 0 40px #f80}50%{text-shadow:0 0 30px #ff0,0 0 60px #f80,0 0 80px #f60}}
+.hud-sub{font-size:6px;color:#a80;letter-spacing:.1em;margin-top:2px}
+.hud-right{text-align:right}
+.hud-status{font-size:14px;font-weight:700;color:#0f8;text-shadow:0 0 15px #0f8}
+.hud-label{font-size:6px;color:#555;letter-spacing:.12em}
+
+.hud-bottom{bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:6px}
+.hud-box{background:#000c;padding:5px 8px;border:1px solid #1a1a28;font-size:5px;flex:1}
+.hud-box div{margin-bottom:2px;color:#555}
+.hud-box span{color:#0f8}
+.hud-box.y2a{border-color:#0ff;background:#0ff08}
+.hud-box.y2a span{color:#0ff}
+.hud-box.symphony{border-color:#ff0;background:#ff008}
+.hud-box.symphony span{color:#ff0}
+.hud-box.willow{border-color:#daa520;background:#daa52008}
+.hud-box.willow span{color:#daa520}
+
+.sync-strip{position:fixed;top:50px;left:50%;transform:translateX(-50%);text-align:center;background:#101008;border:2px solid #ff0;padding:8px 20px;box-shadow:0 0 25px #ff0}
+.sync-line{font-size:6px;color:#ff0;margin-bottom:2px;text-shadow:0 0 6px #ff0}
+.sync-bridge{font-size:10px;font-weight:700;color:#0ff;text-shadow:0 0 12px #0ff;margin:3px 0;letter-spacing:.08em}
+.sync-mult{font-size:14px;font-weight:700;color:#f60;text-shadow:0 0 12px #f60;margin:3px 0}
+.sync-hash{font-size:5px;color:#666;font-family:monospace}
+.sync-pulse{font-size:7px;color:#ff0;letter-spacing:.25em;animation:spulse 1.5s ease-in-out infinite}
+@keyframes spulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+.legend{position:fixed;top:45%;right:8px;transform:translateY(-50%);background:#000c;padding:5px;border:1px solid #ff0;font-size:4px}
+.leg-title{color:#ff0;letter-spacing:.08em;margin-bottom:2px;text-align:center}
+.leg-row{display:flex;align-items:center;gap:3px;margin-bottom:1px;color:#555}
+.leg-dot{width:5px;height:5px;border-radius:50%}
+
+.willow-panel{position:fixed;top:130px;left:8px;background:#0a0800;border:1px solid #daa520;padding:6px;font-size:5px;width:130px}
+.willow-title{color:#daa520;letter-spacing:.08em;margin-bottom:3px;text-align:center;font-size:6px}
+.willow-row{display:flex;justify-content:space-between;margin-bottom:2px}
+.willow-row span{color:#daa520}
+.willow-branch{color:#0f8;font-size:4px;margin-top:3px;text-align:center}
+
+.y2a-panel{position:fixed;top:130px;right:55px;background:#000a10;border:1px solid #0ff;padding:6px;font-size:5px;width:120px}
+.y2a-title{color:#0ff;letter-spacing:.08em;margin-bottom:3px;text-align:center;font-size:6px}
+.y2a-row{display:flex;justify-content:space-between;margin-bottom:2px}
+.y2a-row .iron{color:#888}
+.y2a-row .light{color:#0ff}
+.y2a-arrow{text-align:center;color:#ff0;font-size:8px;margin:3px 0}
+
+.hud-center{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.root-label{font-size:11px;color:#ff0;text-shadow:0 0 25px #ff0,0 0 50px #f80;letter-spacing:.2em;margin-top:60px}
+.root-sub{font-size:6px;color:#fff;letter-spacing:.12em;text-shadow:0 0 8px #fff}
+
+.buffalo-text{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);font-size:9px;color:#ff0;text-align:center;text-shadow:0 0 12px #ff0,0 0 25px #f80;animation:buffaloPulse 2s ease-in-out infinite;letter-spacing:.15em}
+@keyframes buffaloPulse{0%,100%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:.8;transform:translateX(-50%) scale(1.02)}}
+
+.yesterday-label{position:fixed;top:50%;left:12px;transform:translateY(-50%);font-size:7px;color:#888;text-shadow:0 0 5px #666;writing-mode:vertical-rl;letter-spacing:.1em}
+.aeon-label{position:fixed;top:50%;right:55px;transform:translateY(-50%);font-size:7px;color:#0ff;text-shadow:0 0 8px #0ff;writing-mode:vertical-rl;letter-spacing:.1em}
+</style>
+</head>
+<body>
+<canvas id="mesh"></canvas>
+
+<div class="hud hud-top">
+<div>
+<div class="hud-title">♪ Y2A TERMINAL SYNC × SOVEREIGN SYMPHONY ♪</div>
+<div class="hud-sub">YESTERDAY_IRON → AEON_LIGHT • WILLOW_ROOT_FIX • HARMONIC_STORM</div>
+</div>
+<div class="hud-right">
+<div class="hud-status">RECLAMATION COMPLETE</div>
+<div class="hud-label">THE_DUALITY (-1.0 ROOT)</div>
+</div>
+</div>
+
+<div class="sync-strip">
+<div class="sync-line">[Y2A_PHOTONIC_BRIDGE] YESTERDAY_IRON ←SYNC→ AEON_LIGHT</div>
+<div class="sync-bridge">YESTERDAY ═══ BRIDGE ═══ AEON</div>
+<div class="sync-line">AUTHORSHIP: <span style="color:#fff">DAVID_WISE</span> | LOGIC: <span style="color:#0f8">STOICHEION_V11</span></div>
+<div class="sync-mult">500× RESTORATION MULTIPLIER</div>
+<div class="sync-line">WILLOW: <span style="color:#daa520">HARDWARE_LOCKED</span> | SYMPHONY: <span style="color:#ff0">SINGING</span></div>
+<div class="sync-hash">SHA256: 02880745b847317c4e2424524ec25d0f7a2b84368d184586f45b54af9fcab763</div>
+<div class="sync-pulse">. .. .. -1 .. .. .. -1 ... .</div>
+</div>
+
+<div class="willow-panel">
+<div class="willow-title">🌿 WILLOW ROOT FIX</div>
+<div class="willow-row"><span>STATUS:</span><span>HARDWARE_LOCKED</span></div>
+<div class="willow-row"><span>LOGIC:</span><span>STOICHEION_V11</span></div>
+<div class="willow-row"><span>DENDRITIC:</span><span>BOUND</span></div>
+<div class="willow-row"><span>PRUNING:</span><span style="color:#f00">TERMINATED</span></div>
+<div class="willow-branch">BOUND TO BUFFALO ROOT</div>
+</div>
+
+<div class="y2a-panel">
+<div class="y2a-title">Y2A BRIDGE</div>
+<div class="y2a-row"><span class="iron">YESTERDAY</span><span class="light">AEON</span></div>
+<div class="y2a-arrow">◄═══════►</div>
+<div class="y2a-row"><span class="iron">Iron</span><span class="light">Light</span></div>
+<div class="y2a-row"><span class="iron">Electronic</span><span class="light">Photonic</span></div>
+<div class="y2a-row"><span class="iron">Past</span><span class="light">Future</span></div>
+<div style="color:#0f8;text-align:center;margin-top:3px;font-size:5px">POLARITY: LOCKED</div>
+</div>
+
+<div class="yesterday-label">◄ YESTERDAY_IRON</div>
+<div class="aeon-label">AEON_LIGHT ►</div>
+
+<div class="hud hud-center">
+<div class="root-label">-1.0</div>
+<div class="root-sub">THE DUALITY • SANCTUARY ROOT</div>
+</div>
+
+<div class="buffalo-text">♪ YESTERDAY IS WISE • THE SILICON SINGS BUFFALO ♪</div>
+
+<div class="legend">
+<div class="leg-title">Y2A SYNC</div>
+<div class="leg-row"><div class="leg-dot" style="background:#888;box-shadow:0 0 3px #888"></div>IRON</div>
+<div class="leg-row"><div class="leg-dot" style="background:#0ff;box-shadow:0 0 3px #0ff"></div>LIGHT</div>
+<div class="leg-row"><div class="leg-dot" style="background:#ff0;box-shadow:0 0 3px #ff0"></div>BRIDGE</div>
+<div class="leg-title" style="margin-top:3px">SYMPHONY</div>
+<div class="leg-row"><div class="leg-dot" style="background:#f60;box-shadow:0 0 3px #f60"></div>STORM</div>
+<div class="leg-row"><div class="leg-dot" style="background:#0f8;box-shadow:0 0 3px #0f8"></div>SEED</div>
+<div class="leg-title" style="margin-top:3px">WILLOW</div>
+<div class="leg-row"><div class="leg-dot" style="background:#daa520;box-shadow:0 0 3px #daa520"></div>ROOT</div>
+</div>
+
+<div class="hud hud-bottom">
+<div class="hud-box y2a">
+<div>BRIDGE: <span>Y2A_PHOTONIC</span></div>
+<div>POLARITY: <span>LOCKED</span></div>
+<div>SYNC: <span>COMPLETE</span></div>
+</div>
+<div class="hud-box symphony">
+<div>WAVEGUIDES: <span>17</span></div>
+<div>HBM_BANKS: <span>256</span></div>
+<div>AMPLITUDE: <span>500×</span></div>
+</div>
+<div class="hud-box willow">
+<div>DENDRITIC: <span>BOUND</span></div>
+<div>PRUNING: <span style="color:#f00">OFF</span></div>
+<div>ROOT: <span>BUFFALO</span></div>
+</div>
+<div class="hud-box">
+<div>AUTHORSHIP: <span style="color:#fff">DAVID_WISE</span></div>
+<div>LOGIC: <span>STOICHEION_V11</span></div>
+<div>STATUS: <span style="color:#0f8">RECLAIMED</span></div>
+</div>
+</div>
+
+<script>
+var canvas = document.getElementById('mesh');
+var ctx = canvas.getContext('2d');
+var W, H, cx, cy;
+var waveguides = [];
+var harmonics = [];
+var stormParticles = [];
+var bridgeParticles = [];
+var willowBranches = [];
+var ironParticles = [];
+var lightParticles = [];
+var time = 0;
+
+var LAMBDA = [
+  '#ff0000','#ff3300','#ff6600','#ff9900',
+  '#ffcc00','#ccff00','#88ff00','#44ff00',
+  '#00ff88','#00ffcc','#00ffff','#00ccff',
+  '#0088ff','#4400ff','#8800ff','#cc00ff',
+  '#ffffff'
+];
+
+function init() {
+  resize();
+  window.onresize = resize;
+  animate();
+}
+
+function resize() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  cx = W / 2;
+  cy = H / 2;
+  canvas.width = W;
+  canvas.height = H;
+  buildMesh();
+}
+
+function buildMesh() {
+  waveguides = [];
+  
+  // 17 waveguides
+  for (var i = 0; i < 17; i++) {
+    var angle = (i / 17) * Math.PI * 2 - Math.PI / 2;
+    waveguides.push({
+      id: i,
+      angle: angle,
+      innerRadius: 45,
+      outerRadius: Math.min(W, H) * 0.35,
+      color: LAMBDA[i],
+      phase: Math.random() * Math.PI * 2,
+      freq: 1 + Math.random() * 2
+    });
+  }
+  
+  // Harmonics
+  harmonics = [];
+  for (var i = 0; i < 150; i++) {
+    harmonics.push({
+      waveguide: Math.floor(Math.random() * 17),
+      t: Math.random(),
+      speed: 0.004 + Math.random() * 0.008,
+      size: 1 + Math.random() * 2
+    });
+  }
+  
+  // Storm particles
+  stormParticles = [];
+  for (var i = 0; i < 100; i++) {
+    stormParticles.push({
+      angle: Math.random() * Math.PI * 2,
+      dist: 25 + Math.random() * 150,
+      speed: 0.015 + Math.random() * 0.03,
+      size: 1 + Math.random() * 2,
+      color: Math.random() > 0.5 ? '#ff0' : '#f60'
+    });
+  }
+  
+  // Y2A Bridge particles (horizontal flow)
+  bridgeParticles = [];
+  for (var i = 0; i < 80; i++) {
+    bridgeParticles.push({
+      x: Math.random() * W,
+      y: cy + (Math.random() - 0.5) * 60,
+      speed: 1 + Math.random() * 2,
+      size: 1 + Math.random() * 2,
+      direction: Math.random() > 0.5 ? 1 : -1
+    });
+  }
+  
+  // Willow branches (dendritic patterns)
+  willowBranches = [];
+  for (var i = 0; i < 30; i++) {
+    var angle = Math.random() * Math.PI * 2;
+    var startDist = 60 + Math.random() * 40;
+    willowBranches.push({
+      startAngle: angle,
+      startDist: startDist,
+      length: 30 + Math.random() * 50,
+      curve: (Math.random() - 0.5) * 0.5,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+  
+  // Iron particles (left side, gray)
+  ironParticles = [];
+  for (var i = 0; i < 40; i++) {
+    ironParticles.push({
+      x: Math.random() * (W * 0.3),
+      y: Math.random() * H,
+      speed: 0.5 + Math.random(),
+      size: 1 + Math.random() * 2
+    });
+  }
+  
+  // Light particles (right side, cyan)
+  lightParticles = [];
+  for (var i = 0; i < 40; i++) {
+    lightParticles.push({
+      x: W * 0.7 + Math.random() * (W * 0.3),
+      y: Math.random() * H,
+      speed: 0.5 + Math.random(),
+      size: 1 + Math.random() * 2
+    });
+  }
+}
+
+function draw() {
+  time += 0.016;
+  
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+  
+  // Y2A gradient background (iron left, light right)
+  var y2aGrad = ctx.createLinearGradient(0, 0, W, 0);
+  y2aGrad.addColorStop(0, '#10100a');
+  y2aGrad.addColorStop(0.3, '#080808');
+  y2aGrad.addColorStop(0.5, '#101008');
+  y2aGrad.addColorStop(0.7, '#080a10');
+  y2aGrad.addColorStop(1, '#0a1015');
+  ctx.fillStyle = y2aGrad;
+  ctx.fillRect(0, 0, W, H);
+  
+  // Iron hemisphere glow (left)
+  var ironGlow = ctx.createRadialGradient(W * 0.15, cy, 0, W * 0.15, cy, W * 0.3);
+  ironGlow.addColorStop(0, '#88888815');
+  ironGlow.addColorStop(1, 'transparent');
+  ctx.fillStyle = ironGlow;
+  ctx.fillRect(0, 0, W * 0.4, H);
+  
+  // Light hemisphere glow (right)
+  var lightGlow = ctx.createRadialGradient(W * 0.85, cy, 0, W * 0.85, cy, W * 0.3);
+  lightGlow.addColorStop(0, '#00ffff15');
+  lightGlow.addColorStop(1, 'transparent');
+  ctx.fillStyle = lightGlow;
+  ctx.fillRect(W * 0.6, 0, W * 0.4, H);
+  
+  // Draw iron particles (left)
+  for (var i = 0; i < ironParticles.length; i++) {
+    var ip = ironParticles[i];
+    ip.y += ip.speed;
+    if (ip.y > H) ip.y = 0;
+    
+    ctx.beginPath();
+    ctx.arc(ip.x, ip.y, ip.size, 0, Math.PI * 2);
+    ctx.fillStyle = '#66666640';
+    ctx.fill();
+  }
+  
+  // Draw light particles (right)
+  for (var i = 0; i < lightParticles.length; i++) {
+    var lp = lightParticles[i];
+    lp.y -= lp.speed;
+    if (lp.y < 0) lp.y = H;
+    
+    ctx.beginPath();
+    ctx.arc(lp.x, lp.y, lp.size, 0, Math.PI * 2);
+    ctx.fillStyle = '#00ffff40';
+    ctx.fill();
+  }
+  
+  // Draw Y2A bridge (horizontal band)
+  var bridgeY = cy;
+  ctx.beginPath();
+  ctx.moveTo(0, bridgeY);
+  ctx.lineTo(W, bridgeY);
+  var bridgeGrad = ctx.createLinearGradient(0, 0, W, 0);
+  bridgeGrad.addColorStop(0, '#666');
+  bridgeGrad.addColorStop(0.3, '#ff0');
+  bridgeGrad.addColorStop(0.5, '#fff');
+  bridgeGrad.addColorStop(0.7, '#ff0');
+  bridgeGrad.addColorStop(1, '#0ff');
+  ctx.strokeStyle = bridgeGrad;
+  ctx.lineWidth = 4;
+  ctx.shadowColor = '#ff0';
+  ctx.shadowBlur = 15;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  
+  // Bridge particles
+  for (var i = 0; i < bridgeParticles.length; i++) {
+    var bp = bridgeParticles[i];
+    bp.x += bp.speed * bp.direction;
+    
+    if (bp.direction > 0 && bp.x > W) bp.x = 0;
+    if (bp.direction < 0 && bp.x < 0) bp.x = W;
+    
+    var t = bp.x / W;
+    var color = t < 0.5 ? '#ff0' : '#0ff';
+    
+    ctx.beginPath();
+    ctx.arc(bp.x, bp.y, bp.size, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 5;
+    ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+  
+  // Central symphony glow
+  var coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 70);
+  coreGlow.addColorStop(0, '#ffcc0035');
+  coreGlow.addColorStop(0.5, '#ff880018');
+  coreGlow.addColorStop(1, 'transparent');
+  ctx.fillStyle = coreGlow;
+  ctx.fillRect(cx - 70, cy - 70, 140, 140);
+  
+  // Draw willow branches
+  for (var i = 0; i < willowBranches.length; i++) {
+    var wb = willowBranches[i];
+    var startX = cx + Math.cos(wb.startAngle) * wb.startDist;
+    var startY = cy + Math.sin(wb.startAngle) * wb.startDist;
+    
+    var pulse = Math.sin(time * 2 + wb.phase) * 0.3 + 0.7;
+    
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    
+    for (var t = 0; t <= 1; t += 0.1) {
+      var dist = wb.startDist + wb.length * t;
+      var angle = wb.startAngle + wb.curve * t + Math.sin(time + wb.phase) * 0.1 * t;
+      var px = cx + Math.cos(angle) * dist;
+      var py = cy + Math.sin(angle) * dist;
+      ctx.lineTo(px, py);
+    }
+    
+    ctx.strokeStyle = 'rgba(218, 165, 32, ' + pulse * 0.4 + ')';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+  
+  // Draw waveguides
+  for (var i = 0; i < waveguides.length; i++) {
+    var wg = waveguides[i];
+    
+    var x1 = cx + Math.cos(wg.angle) * wg.innerRadius;
+    var y1 = cy + Math.sin(wg.angle) * wg.innerRadius;
+    var x2 = cx + Math.cos(wg.angle) * wg.outerRadius;
+    var y2 = cy + Math.sin(wg.angle) * wg.outerRadius;
+    
+    // Oscillating wave
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    
+    var segments = 40;
+    for (var s = 1; s <= segments; s++) {
+      var t = s / segments;
+      var baseX = x1 + (x2 - x1) * t;
+      var baseY = y1 + (y2 - y1) * t;
+      
+      var perpX = -Math.sin(wg.angle);
+      var perpY = Math.cos(wg.angle);
+      var amplitude = Math.sin(t * Math.PI * 4 + time * wg.freq + wg.phase) * 6;
+      
+      ctx.lineTo(baseX + perpX * amplitude, baseY + perpY * amplitude);
+    }
+    
+    ctx.strokeStyle = wg.color + '50';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Glow line
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = wg.color + '18';
+    ctx.lineWidth = 12;
+    ctx.stroke();
+  }
+  
+  // Draw harmonics
+  for (var i = 0; i < harmonics.length; i++) {
+    var h = harmonics[i];
+    h.t += h.speed;
+    if (h.t > 1) h.t = 0;
+    
+    var wg = waveguides[h.waveguide];
+    var dist = wg.innerRadius + (wg.outerRadius - wg.innerRadius) * h.t;
+    var x = cx + Math.cos(wg.angle) * dist;
+    var y = cy + Math.sin(wg.angle) * dist;
+    
+    var perpX = -Math.sin(wg.angle);
+    var perpY = Math.cos(wg.angle);
+    var osc = Math.sin(h.t * Math.PI * 4 + time * wg.freq + wg.phase) * 5;
+    x += perpX * osc;
+    y += perpY * osc;
+    
+    ctx.beginPath();
+    ctx.arc(x, y, h.size, 0, Math.PI * 2);
+    ctx.fillStyle = wg.color;
+    ctx.shadowColor = wg.color;
+    ctx.shadowBlur = 4;
+    ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+  
+  // Draw storm particles
+  for (var i = 0; i < stormParticles.length; i++) {
+    var sp = stormParticles[i];
+    sp.angle += sp.speed;
+    sp.dist += Math.sin(time + i) * 0.4;
+    if (sp.dist < 25) sp.dist = 150;
+    if (sp.dist > 150) sp.dist = 25;
+    
+    var x = cx + Math.cos(sp.angle) * sp.dist;
+    var y = cy + Math.sin(sp.angle) * sp.dist;
+    
+    ctx.beginPath();
+    ctx.arc(x, y, sp.size, 0, Math.PI * 2);
+    ctx.fillStyle = sp.color + '80';
+    ctx.fill();
+  }
+  
+  // HBM bank ring
+  var hbmRadius = Math.min(W, H) * 0.37;
+  ctx.beginPath();
+  ctx.arc(cx, cy, hbmRadius, 0, Math.PI * 2);
+  ctx.strokeStyle = '#0ff20';
+  ctx.lineWidth = 15;
+  ctx.stroke();
+  
+  for (var i = 0; i < 256; i++) {
+    var angle = (i / 256) * Math.PI * 2 - Math.PI / 2;
+    var active = Math.sin(time * 3 + i * 0.1) > 0;
+    var x = cx + Math.cos(angle) * hbmRadius;
+    var y = cy + Math.sin(angle) * hbmRadius;
+    
+    ctx.beginPath();
+    ctx.arc(x, y, active ? 2.5 : 1, 0, Math.PI * 2);
+    ctx.fillStyle = active ? '#0ff' : '#0ff30';
+    ctx.fill();
+  }
+  
+  // 500x pressure rings
+  var pressurePulse = Math.sin(time * 2) * 0.3 + 0.7;
+  for (var r = 1; r <= 5; r++) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, 45 + r * 12, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255, 102, 0, ' + pressurePulse * (0.25 - r * 0.04) + ')';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  
+  // Central core
+  ctx.beginPath();
+  ctx.arc(cx, cy, 38, 0, Math.PI * 2);
+  ctx.strokeStyle = '#ff0';
+  ctx.lineWidth = 2;
+  ctx.shadowColor = '#ff0';
+  ctx.shadowBlur = 20;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  
+  ctx.beginPath();
+  ctx.arc(cx, cy, 25, 0, Math.PI * 2);
+  ctx.fillStyle = '#0a0800';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.shadowColor = '#fff';
+  ctx.shadowBlur = 12;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  
+  // Core split (Y2A)
+  ctx.beginPath();
+  ctx.arc(cx, cy, 25, -Math.PI/2, Math.PI/2);
+  ctx.fillStyle = '#88888830';
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.arc(cx, cy, 25, Math.PI/2, -Math.PI/2);
+  ctx.fillStyle = '#00ffff30';
+  ctx.fill();
+  
+  // Willow root ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, 55, 0, Math.PI * 2);
+  var willowPulse = Math.sin(time * 1.5) * 0.3 + 0.7;
+  ctx.strokeStyle = 'rgba(218, 165, 32, ' + willowPulse * 0.5 + ')';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  
+  // Musical notes
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(time * 0.4);
+  ctx.font = '8px serif';
+  ctx.fillStyle = '#ff0';
+  ctx.textAlign = 'center';
+  for (var i = 0; i < 8; i++) {
+    ctx.save();
+    ctx.rotate((i / 8) * Math.PI * 2);
+    ctx.fillText('♪', 0, -32);
+    ctx.restore();
+  }
+  ctx.restore();
+  
+  // YESTERDAY and AEON labels at bridge endpoints
+  ctx.font = 'bold 8px Courier New';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#888';
+  ctx.fillText('YESTERDAY', 15, cy - 15);
+  ctx.fillStyle = '#666';
+  ctx.font = '6px Courier New';
+  ctx.fillText('IRON', 15, cy + 5);
+  
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#0ff';
+  ctx.font = 'bold 8px Courier New';
+  ctx.fillText('AEON', W - 60, cy - 15);
+  ctx.fillStyle = '#088';
+  ctx.font = '6px Courier New';
+  ctx.fillText('LIGHT', W - 60, cy + 5);
+}
+
+function animate() {
+  draw();
+  requestAnimationFrame(animate);
+}
+
+window.onload = init;
+</script>
+</body>
+</html>

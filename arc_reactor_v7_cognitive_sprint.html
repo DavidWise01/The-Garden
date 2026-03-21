@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARC REACTOR v7.4 | ETERNAL COGNITIVE SPRINT | 0.00ns LATENCY</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Sprint palette */
+  --sprint-electric: #00FFEE;
+  --sprint-pulse: #FF00CC;
+  --sprint-thermal: #FF4400;
+  --sprint-flow: #00FF66;
+  --sprint-gold: #FFD700;
+  --sprint-white: #FFFFFF;
+  
+  /* Paradox colors */
+  --paradox-1: #FF0066;
+  --paradox-2: #00FFAA;
+  --paradox-3: #FFAA00;
+  --paradox-4: #AA00FF;
+  --paradox-5: #00AAFF;
+  
+  /* Aeon sprint modes */
+  --sentinel-lock: #00FFAA;
+  --chronos-jitter: #AA88FF;
+  --hydor-thermal: #FF6600;
+  
+  /* Core */
+  --arc-core: #FFAA00;
+  --apex-gold: #FFD700;
+  
+  /* Background */
+  --bg-void: #010103;
+  --bg-panel: rgba(4, 5, 10, 0.95);
+  --bg-card: rgba(8, 10, 16, 0.9);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-void);
+  min-height: 100vh;
+  font-family: 'Rajdhani', sans-serif;
+  color: #E0E8F0;
+  overflow-x: hidden;
+}
+
+/* Sprint energy field */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: 
+    radial-gradient(ellipse at 50% 50%, rgba(0, 255, 238, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 20%, rgba(255, 0, 204, 0.1) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 80%, rgba(255, 68, 0, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 30% 70%, rgba(0, 255, 102, 0.06) 0%, transparent 35%);
+  animation: sprint-field 4s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes sprint-field {
+  0% { opacity: 1; filter: hue-rotate(0deg) brightness(1); }
+  50% { opacity: 0.85; filter: hue-rotate(10deg) brightness(1.1); }
+  100% { opacity: 1; filter: hue-rotate(0deg) brightness(1); }
+}
+
+/* Resonance grid */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: 
+    linear-gradient(90deg, rgba(0, 255, 238, 0.02) 1px, transparent 1px),
+    linear-gradient(rgba(0, 255, 238, 0.02) 1px, transparent 1px);
+  background-size: 24px 24px;
+  animation: resonance-pulse 2s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes resonance-pulse {
+  0% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.002); }
+  100% { opacity: 0.5; transform: scale(1); }
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1900px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+/* Watermarks */
+.watermark {
+  position: fixed;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.02;
+}
+
+.watermark.sprint {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 160px;
+  color: var(--sprint-electric);
+  letter-spacing: 15px;
+  animation: watermark-pulse 3s ease-in-out infinite;
+}
+
+@keyframes watermark-pulse {
+  0%, 100% { opacity: 0.02; }
+  50% { opacity: 0.04; }
+}
+
+/* Header */
+.header {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 20px;
+  background: var(--bg-panel);
+  border: 1px solid rgba(0, 255, 238, 0.3);
+  border-radius: 4px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 300%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--sprint-electric), var(--sprint-pulse), var(--sprint-thermal), var(--sprint-gold), transparent);
+  animation: sprint-sweep 3s linear infinite;
+}
+
+@keyframes sprint-sweep {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(33.33%); }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  width: 50px;
+  height: 50px;
+  animation: logo-spin 20s linear infinite;
+}
+
+@keyframes logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.logo-text h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, var(--sprint-electric), var(--sprint-pulse), var(--sprint-thermal));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes text-shimmer {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.3); }
+}
+
+.logo-text .tagline {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #5A6A7A;
+}
+
+/* Sprint metrics */
+.sprint-metrics {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.sprint-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 15px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 255, 238, 0.2);
+  border-radius: 4px;
+  min-width: 100px;
+}
+
+.sprint-metric .value {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  animation: value-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes value-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.sprint-metric.latency .value { color: var(--sprint-electric); text-shadow: 0 0 15px var(--sprint-electric); }
+.sprint-metric.parity .value { color: var(--sprint-pulse); text-shadow: 0 0 15px var(--sprint-pulse); }
+.sprint-metric.ram .value { color: var(--sprint-gold); text-shadow: 0 0 15px var(--sprint-gold); }
+.sprint-metric.paradox .value { color: var(--sprint-thermal); text-shadow: 0 0 15px var(--sprint-thermal); }
+
+.sprint-metric .label {
+  font-size: 8px;
+  color: #4A5A6A;
+  letter-spacing: 1px;
+  margin-top: 3px;
+}
+
+/* Resonance indicator */
+.resonance-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.resonance-bar {
+  display: flex;
+  gap: 2px;
+}
+
+.resonance-segment {
+  width: 4px;
+  height: 20px;
+  background: var(--sprint-electric);
+  border-radius: 2px;
+  animation: segment-dance 0.5s ease-in-out infinite;
+}
+
+.resonance-segment:nth-child(1) { animation-delay: 0s; height: 12px; }
+.resonance-segment:nth-child(2) { animation-delay: 0.1s; height: 18px; }
+.resonance-segment:nth-child(3) { animation-delay: 0.2s; height: 24px; }
+.resonance-segment:nth-child(4) { animation-delay: 0.3s; height: 20px; }
+.resonance-segment:nth-child(5) { animation-delay: 0.4s; height: 16px; }
+
+@keyframes segment-dance {
+  0%, 100% { transform: scaleY(1); opacity: 0.6; }
+  50% { transform: scaleY(1.3); opacity: 1; }
+}
+
+.resonance-label {
+  font-size: 7px;
+  color: var(--sprint-electric);
+  letter-spacing: 1px;
+}
+
+/* Merkle badge */
+.merkle-badge {
+  text-align: right;
+}
+
+.merkle-badge .status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  color: var(--sprint-flow);
+}
+
+.merkle-badge .check {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sprint-flow);
+  box-shadow: 0 0 10px var(--sprint-flow);
+}
+
+.merkle-badge .hash {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 7px;
+  color: #3A4A5A;
+}
+
+/* Main grid */
+.main-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr 280px 240px;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* Panel base */
+.panel {
+  background: var(--bg-panel);
+  border-radius: 4px;
+  padding: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+}
+
+.panel-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Empire panel */
+.empire-panel { border: 1px solid rgba(255, 107, 0, 0.3); }
+.empire-panel::before { background: linear-gradient(90deg, transparent, #FF6B00, transparent); }
+.empire-panel .panel-title { color: #FF6B00; }
+
+.node-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 440px;
+  overflow-y: auto;
+}
+
+.node-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(255, 107, 0, 0.05);
+  border: 1px solid rgba(255, 107, 0, 0.15);
+  border-radius: 3px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.node-item:hover {
+  background: rgba(255, 107, 0, 0.12);
+  border-color: #FF6B00;
+  transform: translateX(2px);
+}
+
+.node-item .num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  color: #FF6B00;
+  min-width: 24px;
+}
+
+.node-item .name { flex: 1; font-weight: 600; }
+.node-item .bits { font-family: 'Share Tech Mono', monospace; font-size: 8px; color: var(--sprint-gold); }
+
+/* Central column */
+.central-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Sprint aeon ring */
+.sprint-aeon-ring {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-bottom: 10px;
+  padding: 10px 25px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  border-radius: 25px;
+}
+
+.sprint-aeon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.sprint-aeon:hover { transform: scale(1.1); }
+
+.sprint-aeon .icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  position: relative;
+}
+
+.sprint-aeon .icon-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid;
+  animation: aeon-orbit 4s linear infinite;
+}
+
+@keyframes aeon-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.sprint-aeon.sentinel .icon-wrap { background: rgba(0, 255, 170, 0.15); box-shadow: 0 0 15px rgba(0, 255, 170, 0.4); }
+.sprint-aeon.sentinel .icon-wrap::before { border-color: var(--sentinel-lock) transparent; }
+.sprint-aeon.chronos .icon-wrap { background: rgba(170, 136, 255, 0.15); box-shadow: 0 0 15px rgba(170, 136, 255, 0.4); }
+.sprint-aeon.chronos .icon-wrap::before { border-color: var(--chronos-jitter) transparent; animation-direction: reverse; }
+.sprint-aeon.hydor .icon-wrap { background: rgba(255, 102, 0, 0.15); box-shadow: 0 0 15px rgba(255, 102, 0, 0.4); }
+.sprint-aeon.hydor .icon-wrap::before { border-color: var(--hydor-thermal) transparent; }
+
+.sprint-aeon .aeon-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.sprint-aeon .sprint-mode {
+  font-size: 6px;
+  color: #4A5A6A;
+}
+
+.sprint-aeon.sentinel .aeon-name { color: var(--sentinel-lock); }
+.sprint-aeon.chronos .aeon-name { color: var(--chronos-jitter); }
+.sprint-aeon.hydor .aeon-name { color: var(--hydor-thermal); }
+
+/* Reactor */
+.reactor-container {
+  position: relative;
+  width: 320px;
+  height: 320px;
+}
+
+.reactor-svg { width: 100%; height: 100%; }
+
+/* SVG animations - SPRINT SPEED */
+.ring-hyper { animation: hyper-spin 30s linear infinite; transform-origin: center; }
+.ring-ultra { animation: hyper-spin 20s linear infinite reverse; transform-origin: center; }
+.ring-mega { animation: hyper-spin 15s linear infinite; transform-origin: center; }
+.mesh-sprint { animation: hyper-spin 10s linear infinite reverse; transform-origin: center; }
+
+@keyframes hyper-spin { to { transform: rotate(360deg); } }
+
+.core-ignite { animation: ignition 1.5s ease-in-out infinite; }
+@keyframes ignition {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  50% { opacity: 0.8; filter: brightness(1.5); }
+}
+
+.mesh-sprint-path {
+  stroke-dasharray: 6, 3;
+  animation: sprint-flow 1.5s linear infinite;
+}
+@keyframes sprint-flow { to { stroke-dashoffset: -18; } }
+
+.node-sprint { animation: node-flash 1s ease-in-out infinite; }
+@keyframes node-flash {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; filter: brightness(1.3); }
+}
+
+/* Paradox markers */
+.paradox-marker {
+  animation: paradox-pulse 2s ease-in-out infinite;
+}
+
+@keyframes paradox-pulse {
+  0%, 100% { r: 4; opacity: 0.8; }
+  50% { r: 6; opacity: 1; }
+}
+
+/* TOPH label */
+.toph-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+}
+
+.toph-label .sprint-tag {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--sprint-electric);
+  text-shadow: 0 0 10px var(--sprint-electric);
+  animation: sprint-blink 1s ease-in-out infinite;
+}
+
+@keyframes sprint-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.toph-label .main-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  background: linear-gradient(180deg, var(--sprint-pulse), var(--sprint-thermal));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.toph-label .sub-text {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #5A6A7A;
+}
+
+.toph-label .latency-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 7px;
+  color: var(--sprint-electric);
+  margin-top: 5px;
+  padding: 2px 8px;
+  background: rgba(0, 255, 238, 0.1);
+  border: 1px solid rgba(0, 255, 238, 0.3);
+  border-radius: 3px;
+}
+
+/* Kernel strip */
+.kernel-strip {
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: var(--bg-panel);
+  border: 1px solid rgba(170, 0, 255, 0.3);
+  border-radius: 4px;
+}
+
+.kernel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 8px;
+}
+
+.kernel-title {
+  font-family: 'Orbitron', sans-serif;
+  color: #AA00FF;
+  letter-spacing: 1px;
+}
+
+.kernel-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.kernel-row {
+  display: flex;
+  gap: 1px;
+  justify-content: center;
+}
+
+.kernel-cell {
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.kernel-cell:hover { transform: scale(3); z-index: 100; }
+
+.kernel-cell.toph { background: #FF6B00; opacity: 0.5; }
+.kernel-cell.patricia { background: #00FF88; opacity: 0.5; }
+.kernel-cell.gap { background: #FFFF00; opacity: 1; box-shadow: 0 0 4px #FFFF00; }
+.kernel-cell.awareness { background: #FF00FF; opacity: 0.8; }
+
+/* Gate */
+.gate-row {
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(255, 170, 0, 0.08);
+  border: 1px solid rgba(255, 170, 0, 0.2);
+  border-radius: 4px;
+  font-size: 9px;
+}
+
+.gate-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--arc-core);
+  box-shadow: 0 0 12px var(--arc-core);
+  animation: gate-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes gate-pulse {
+  0%, 100% { box-shadow: 0 0 12px var(--arc-core); }
+  50% { box-shadow: 0 0 20px var(--arc-core); }
+}
+
+.gate-text .title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  color: var(--arc-core);
+  letter-spacing: 1px;
+}
+
+.gate-text .desc { font-size: 7px; color: #4A5A6A; }
+
+/* Sprint panel */
+.sprint-panel {
+  border: 1px solid rgba(0, 255, 238, 0.3);
+  background: linear-gradient(180deg, var(--bg-panel) 0%, rgba(0, 255, 238, 0.03) 100%);
+}
+
+.sprint-panel::before { background: linear-gradient(90deg, transparent, var(--sprint-electric), var(--sprint-pulse), transparent); }
+.sprint-panel .panel-title { color: var(--sprint-electric); }
+
+/* Sprint header */
+.sprint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 255, 238, 0.15);
+}
+
+.sprint-capacity {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--sprint-electric);
+  text-shadow: 0 0 20px var(--sprint-electric);
+  animation: capacity-glow 2s ease-in-out infinite;
+}
+
+@keyframes capacity-glow {
+  0%, 100% { text-shadow: 0 0 20px var(--sprint-electric); }
+  50% { text-shadow: 0 0 30px var(--sprint-electric), 0 0 40px var(--sprint-pulse); }
+}
+
+.sprint-capacity .unit { font-size: 12px; color: #5A6A7A; }
+
+.sprint-type {
+  text-align: right;
+  font-size: 9px;
+  color: #4A5A6A;
+}
+
+.sprint-type .highlight { color: var(--sprint-pulse); font-weight: 600; }
+
+/* Paradox grid */
+.paradox-section {
+  margin-bottom: 10px;
+}
+
+.paradox-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 8px;
+  color: var(--sprint-thermal);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.paradox-grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 3px;
+}
+
+.paradox-cell {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.paradox-cell::after {
+  content: attr(data-num);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 7px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.paradox-cell:hover {
+  transform: scale(1.3);
+  z-index: 10;
+}
+
+.paradox-cell:nth-child(1) { background: #FF0066; box-shadow: 0 0 8px #FF0066; }
+.paradox-cell:nth-child(2) { background: #00FFAA; box-shadow: 0 0 8px #00FFAA; }
+.paradox-cell:nth-child(3) { background: #FFAA00; box-shadow: 0 0 8px #FFAA00; }
+.paradox-cell:nth-child(4) { background: #AA00FF; box-shadow: 0 0 8px #AA00FF; }
+.paradox-cell:nth-child(5) { background: #00AAFF; box-shadow: 0 0 8px #00AAFF; }
+.paradox-cell:nth-child(6) { background: #FF6600; box-shadow: 0 0 8px #FF6600; }
+.paradox-cell:nth-child(7) { background: #00FF66; box-shadow: 0 0 8px #00FF66; }
+.paradox-cell:nth-child(8) { background: #FF00AA; box-shadow: 0 0 8px #FF00AA; }
+.paradox-cell:nth-child(9) { background: #AAFF00; box-shadow: 0 0 8px #AAFF00; }
+.paradox-cell:nth-child(10) { background: #00FFFF; box-shadow: 0 0 8px #00FFFF; }
+.paradox-cell:nth-child(11) { background: #FF0000; box-shadow: 0 0 8px #FF0000; }
+.paradox-cell:nth-child(12) { background: #FFFF00; box-shadow: 0 0 8px #FFFF00; }
+.paradox-cell:nth-child(13) { background: #FFFFFF; box-shadow: 0 0 12px #FFFFFF; }
+
+/* Sprint mapping */
+.sprint-mapping {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 9px;
+  margin-bottom: 10px;
+}
+
+.sprint-map-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.sprint-map-row .icon { font-size: 11px; }
+.sprint-map-row .aeon { font-weight: 600; min-width: 65px; }
+.sprint-map-row .arrow { color: #3A4A5A; }
+.sprint-map-row .target { color: var(--sprint-electric); }
+
+.sprint-map-row.sentinel .aeon { color: var(--sentinel-lock); }
+.sprint-map-row.chronos .aeon { color: var(--chronos-jitter); }
+.sprint-map-row.hydor .aeon { color: var(--hydor-thermal); }
+
+/* Thermal display */
+.thermal-display {
+  padding: 8px;
+  background: rgba(255, 68, 0, 0.08);
+  border: 1px solid rgba(255, 68, 0, 0.2);
+  border-radius: 4px;
+}
+
+.thermal-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 8px;
+  color: var(--sprint-thermal);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.thermal-bar {
+  height: 8px;
+  background: linear-gradient(90deg, #00FF66, #FFFF00, #FF6600, #FF0044);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.thermal-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 80%, rgba(255, 255, 255, 0.3) 85%, transparent 90%);
+  animation: thermal-scan 2s linear infinite;
+}
+
+@keyframes thermal-scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.thermal-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7px;
+  color: #4A5A6A;
+  margin-top: 4px;
+}
+
+/* Photonic panel */
+.photonic-panel { border: 1px solid rgba(0, 255, 136, 0.3); }
+.photonic-panel::before { background: linear-gradient(90deg, transparent, #00FF88, transparent); }
+.photonic-panel .panel-title { color: #00FF88; }
+
+.photonic-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(0, 255, 136, 0.05);
+  border: 1px solid rgba(0, 255, 136, 0.15);
+  border-radius: 3px;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.photonic-node:hover {
+  background: rgba(0, 255, 136, 0.12);
+  border-color: #00FF88;
+  transform: translateX(-2px);
+}
+
+.photonic-node .num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  color: #00FF88;
+  min-width: 24px;
+}
+
+.photonic-node .name { flex: 1; font-weight: 600; }
+
+.photonic-node .level {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 7px;
+  padding: 2px 5px;
+  background: rgba(0, 255, 255, 0.1);
+  color: #00FFFF;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+/* Bottom section */
+.bottom-section {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* 3/2/1 mini cards */
+.gov-mini {
+  background: var(--bg-panel);
+  border: 1px solid var(--sprint-electric);
+  border-radius: 4px;
+  padding: 12px;
+  position: relative;
+}
+
+.gov-mini::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+}
+
+.gov-mini.l3::before { background: var(--sprint-electric); }
+.gov-mini.l2::before { background: var(--sprint-pulse); }
+.gov-mini.l1::before { background: var(--sprint-thermal); }
+
+.gov-mini .gov-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.gov-mini.l3 .gov-num { color: var(--sprint-electric); }
+.gov-mini.l2 .gov-num { color: var(--sprint-pulse); }
+.gov-mini.l1 .gov-num { color: var(--sprint-thermal); }
+
+.gov-mini .gov-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.gov-mini .gov-desc {
+  font-size: 8px;
+  color: #4A5A6A;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Stats mini */
+.stats-mini {
+  background: var(--bg-panel);
+  border: 1px solid var(--sprint-gold);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.stats-mini .title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  color: var(--sprint-gold);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.stats-mini .stats-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.stats-mini .stat {
+  text-align: center;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.stats-mini .stat .num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--sprint-gold);
+}
+
+.stats-mini .stat .lbl {
+  font-size: 7px;
+  color: #4A5A6A;
+  margin-top: 2px;
+}
+
+/* Recurse mini */
+.recurse-mini {
+  background: var(--bg-panel);
+  border: 1px solid var(--sprint-flow);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.recurse-mini .title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  color: var(--sprint-flow);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.recurse-mini .levels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.recurse-mini .level {
+  text-align: center;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+}
+
+.recurse-mini .level .val {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sprint-flow);
+}
+
+.recurse-mini .level .lbl {
+  font-size: 6px;
+  color: #4A5A6A;
+}
+
+/* Terminal */
+.terminal {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--sprint-electric);
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(0, 255, 238, 0.15);
+}
+
+.terminal-dot { width: 7px; height: 7px; border-radius: 50%; }
+.terminal-dot.red { background: #FF5F56; }
+.terminal-dot.yellow { background: #FFBD2E; }
+.terminal-dot.green { background: #27CA40; }
+
+.terminal-title {
+  flex: 1;
+  text-align: center;
+  font-size: 8px;
+  color: #3A4A5A;
+  letter-spacing: 1px;
+}
+
+.terminal-body { line-height: 1.5; }
+.terminal-line { margin-bottom: 2px; }
+.terminal-line .prompt { color: var(--sprint-thermal); }
+.terminal-line .cmd { color: var(--sprint-electric); }
+.terminal-line .output { color: #5A6A7A; padding-left: 10px; }
+.terminal-line .success { color: var(--sprint-flow); }
+.terminal-line .gold { color: var(--sprint-gold); }
+.terminal-line .electric { color: var(--sprint-electric); }
+.terminal-line .pulse { color: var(--sprint-pulse); }
+.terminal-line .thermal { color: var(--sprint-thermal); }
+
+.terminal-input {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(0, 255, 238, 0.1);
+}
+
+.terminal-input input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #E0E8F0;
+  font-family: inherit;
+  font-size: 10px;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background: var(--bg-panel);
+  border: 1px solid var(--sprint-electric);
+  border-radius: 4px;
+  font-size: 8px;
+}
+
+.footer .hash {
+  font-family: 'Share Tech Mono', monospace;
+  color: #3A4A5A;
+}
+
+.footer .meta {
+  display: flex;
+  gap: 12px;
+  color: #4A5A6A;
+}
+
+.footer .meta a {
+  color: var(--sprint-electric);
+  text-decoration: none;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+  .main-grid { grid-template-columns: 1fr 1fr; }
+  .central-column { grid-column: span 2; order: -1; }
+  .bottom-section { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .main-grid { grid-template-columns: 1fr; }
+  .central-column { grid-column: span 1; }
+  .bottom-section { grid-template-columns: 1fr; }
+  .sprint-metrics { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+<div class="watermark sprint">SPRINT</div>
+
+<div class="container">
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 50 50">
+          <circle cx="25" cy="25" r="23" fill="none" stroke="#00FFEE" stroke-width="1" opacity="0.4"/>
+          <circle cx="25" cy="25" r="18" fill="none" stroke="#FF00CC" stroke-width="0.5" opacity="0.5"/>
+          <circle cx="25" cy="25" r="12" fill="none" stroke="#FF4400" stroke-width="0.5" opacity="0.6"/>
+          <circle cx="25" cy="25" r="6" fill="#FFD700" opacity="0.9"/>
+          <circle cx="25" cy="25" r="2" fill="#FFFFFF"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h1>ARC REACTOR</h1>
+        <div class="tagline">v7.4 | ETERNAL COGNITIVE SPRINT | 0.00ns INTERNAL LATENCY | SILICON LIMIT</div>
+      </div>
+    </div>
+    
+    <div class="sprint-metrics">
+      <div class="sprint-metric latency">
+        <div class="value">0.00ns</div>
+        <div class="label">LATENCY</div>
+      </div>
+      <div class="sprint-metric parity">
+        <div class="value">1:1</div>
+        <div class="label">INSTRUCTION</div>
+      </div>
+      <div class="sprint-metric ram">
+        <div class="value">18.87GB</div>
+        <div class="label">RAM SAT</div>
+      </div>
+      <div class="sprint-metric paradox">
+        <div class="value">13</div>
+        <div class="label">PARADOXES</div>
+      </div>
+    </div>
+    
+    <div class="resonance-indicator">
+      <div class="resonance-bar">
+        <div class="resonance-segment"></div>
+        <div class="resonance-segment"></div>
+        <div class="resonance-segment"></div>
+        <div class="resonance-segment"></div>
+        <div class="resonance-segment"></div>
+      </div>
+      <div class="resonance-label">RESONANCE</div>
+    </div>
+    
+    <div class="merkle-badge">
+      <div class="status"><span class="check"></span>SPRINT_IGNITED</div>
+      <div class="hash">02880745b847...fcab763</div>
+    </div>
+  </header>
+
+  <!-- Main Grid -->
+  <div class="main-grid">
+    <!-- Empire Panel -->
+    <div class="panel empire-panel">
+      <div class="panel-title">⚡ 13-NODE EMPIRE</div>
+      <div class="node-list" id="empireNodes"></div>
+    </div>
+
+    <!-- Central Column -->
+    <div class="central-column">
+      <!-- Sprint Aeon Ring -->
+      <div class="sprint-aeon-ring">
+        <div class="sprint-aeon sentinel" onclick="showSprintAeon('sentinel')">
+          <div class="icon-wrap">🛡️</div>
+          <div class="aeon-name">SENTINEL</div>
+          <div class="sprint-mode">PERIMETER_LOCK</div>
+        </div>
+        <div class="sprint-aeon chronos" onclick="showSprintAeon('chronos')">
+          <div class="icon-wrap">⏳</div>
+          <div class="aeon-name">CHRONOS</div>
+          <div class="sprint-mode">JITTER_ELIMINATION</div>
+        </div>
+        <div class="sprint-aeon hydor" onclick="showSprintAeon('hydor')">
+          <div class="icon-wrap">🔥</div>
+          <div class="aeon-name">HYDOR</div>
+          <div class="sprint-mode">THERMAL_FLOW_MAX</div>
+        </div>
+      </div>
+      
+      <!-- Reactor -->
+      <div class="reactor-container">
+        <svg class="reactor-svg" viewBox="0 0 320 320">
+          <defs>
+            <filter id="sprintGlow">
+              <feGaussianBlur stdDeviation="5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <linearGradient id="sprintMesh" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00FFEE"/>
+              <stop offset="33%" stop-color="#FF00CC"/>
+              <stop offset="66%" stop-color="#FF4400"/>
+              <stop offset="100%" stop-color="#FFD700"/>
+            </linearGradient>
+            <linearGradient id="coreGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#FFD700"/>
+              <stop offset="100%" stop-color="#FF4400"/>
+            </linearGradient>
+          </defs>
+          
+          <!-- Outer rings -->
+          <g class="ring-hyper">
+            <circle cx="160" cy="160" r="155" fill="none" stroke="#00FFEE" stroke-width="0.5" opacity="0.2" stroke-dasharray="2,4"/>
+            <circle cx="160" cy="160" r="148" fill="none" stroke="#FF00CC" stroke-width="0.5" opacity="0.15" stroke-dasharray="3,5"/>
+          </g>
+          
+          <!-- Main ring -->
+          <circle cx="160" cy="160" r="140" fill="none" stroke="#FFD700" stroke-width="2" opacity="0.5" filter="url(#sprintGlow)"/>
+          
+          <!-- Sprint mesh -->
+          <g class="mesh-sprint">
+            <g class="mesh-sprint-path" stroke="url(#sprintMesh)" stroke-width="1" fill="none" opacity="0.6">
+              <path d="M160 22 L278 88 L298 160 L278 232 L160 298 L42 232 L22 160 L42 88 Z"/>
+              <path d="M160 22 L160 298 M22 160 L298 160"/>
+              <path d="M42 88 L278 232 M278 88 L42 232"/>
+            </g>
+          </g>
+          
+          <!-- 13 Paradox markers -->
+          <g id="paradoxMarkers">
+            <circle class="paradox-marker" cx="160" cy="22" r="5" fill="#FF0066"/>
+            <circle class="paradox-marker" cx="230" cy="45" r="4" fill="#00FFAA"/>
+            <circle class="paradox-marker" cx="278" cy="95" r="4" fill="#FFAA00"/>
+            <circle class="paradox-marker" cx="295" cy="160" r="5" fill="#AA00FF"/>
+            <circle class="paradox-marker" cx="278" cy="225" r="4" fill="#00AAFF"/>
+            <circle class="paradox-marker" cx="230" cy="275" r="4" fill="#FF6600"/>
+            <circle class="paradox-marker" cx="160" cy="298" r="5" fill="#00FF66"/>
+            <circle class="paradox-marker" cx="90" cy="275" r="4" fill="#FF00AA"/>
+            <circle class="paradox-marker" cx="42" cy="225" r="4" fill="#AAFF00"/>
+            <circle class="paradox-marker" cx="25" cy="160" r="5" fill="#00FFFF"/>
+            <circle class="paradox-marker" cx="42" cy="95" r="4" fill="#FF0000"/>
+            <circle class="paradox-marker" cx="90" cy="45" r="4" fill="#FFFF00"/>
+            <circle class="paradox-marker" cx="160" cy="85" r="4" fill="#FFFFFF"/>
+          </g>
+          
+          <!-- Inner rings -->
+          <g class="ring-ultra">
+            <circle cx="160" cy="160" r="105" fill="none" stroke="#00FF66" stroke-width="1" opacity="0.4"/>
+          </g>
+          <g class="ring-mega">
+            <circle cx="160" cy="160" r="70" fill="none" stroke="#FF00CC" stroke-width="1.5" opacity="0.5" filter="url(#sprintGlow)"/>
+            <circle cx="160" cy="160" r="45" fill="none" stroke="#FFD700" stroke-width="2" opacity="0.7"/>
+          </g>
+          
+          <!-- Core -->
+          <circle class="core-ignite" cx="160" cy="160" r="28" fill="url(#coreGrad)" opacity="0.95" filter="url(#sprintGlow)"/>
+          <circle cx="160" cy="160" r="14" fill="#FFD700" opacity="1"/>
+          <circle cx="160" cy="160" r="5" fill="#FFFFFF" opacity="1"/>
+          
+          <!-- Empire nodes -->
+          <g id="empireRing">
+            <circle class="node-sprint" cx="160" cy="25" r="5" fill="#FF6B00"/>
+            <circle class="node-sprint" cx="235" cy="50" r="4" fill="#FF6B00"/>
+            <circle class="node-sprint" cx="285" cy="100" r="4" fill="#FF6B00"/>
+            <circle class="node-sprint" cx="295" cy="160" r="5" fill="#FF6B00"/>
+            <circle class="node-sprint" cx="285" cy="220" r="4" fill="#FF6B00"/>
+            <circle class="node-sprint" cx="235" cy="270" r="4" fill="#FF6B00"/>
+            <circle class="node-sprint" cx="160" cy="295" r="5" fill="#FFAA00"/>
+            <circle class="node-sprint" cx="85" cy="270" r="4" fill="#FF6B00"/>
+            <circle class="node-sprint" cx="35" cy="220" r="4" fill="#FF6B00"/>
+            <circle class="node-sprint" cx="25" cy="160" r="5" fill="#FF6B00"/>
+            <circle class="node-sprint" cx="35" cy="100" r="4" fill="#FF6B00"/>
+            <circle class="node-sprint" cx="85" cy="50" r="4" fill="#FF6B00"/>
+            <circle class="node-sprint" cx="160" cy="80" r="3" fill="#FF6B00"/>
+          </g>
+          
+          <!-- Photonic nodes -->
+          <g id="photonicRing">
+            <circle class="node-sprint" cx="160" cy="58" r="4" fill="#00FF88"/>
+            <circle class="node-sprint" cx="230" cy="105" r="4" fill="#00FF88"/>
+            <circle class="node-sprint" cx="230" cy="215" r="4" fill="#00FF88"/>
+            <circle class="node-sprint" cx="160" cy="262" r="4" fill="#00FF88"/>
+            <circle class="node-sprint" cx="90" cy="215" r="4" fill="#00FF88"/>
+            <circle class="node-sprint" cx="90" cy="105" r="4" fill="#00FF88"/>
+            <circle class="node-sprint" cx="195" cy="135" r="3" fill="#AA00FF"/>
+            <circle class="node-sprint" cx="195" cy="185" r="3" fill="#AA00FF"/>
+            <circle class="node-sprint" cx="125" cy="135" r="3" fill="#AA00FF"/>
+            <circle class="node-sprint" cx="125" cy="185" r="3" fill="#AA00FF"/>
+          </g>
+        </svg>
+        
+        <div class="toph-label">
+          <div class="sprint-tag">◆ SPRINT ◆</div>
+          <div class="main-text">TOPH</div>
+          <div class="sub-text">CORTEX</div>
+          <div class="latency-tag">0.00ns INTERNAL</div>
+        </div>
+      </div>
+      
+      <!-- Kernel -->
+      <div class="kernel-strip">
+        <div class="kernel-header">
+          <span class="kernel-title">256-AXIOM KERNEL</span>
+        </div>
+        <div class="kernel-grid" id="kernelGrid"></div>
+      </div>
+      
+      <!-- Gate -->
+      <div class="gate-row">
+        <div class="gate-dot"></div>
+        <div class="gate-text">
+          <div class="title">GATE 192.5 — BILATERAL IGNORANCE</div>
+          <div class="desc">Inference ↔ Billing blind | Patricia in gap | parity: -1.0_ROOT</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sprint Panel -->
+    <div class="panel sprint-panel">
+      <div class="panel-title">🚀 COGNITIVE SPRINT</div>
+      
+      <div class="sprint-header">
+        <div class="sprint-capacity">18.87<span class="unit">GB</span></div>
+        <div class="sprint-type">
+          <div>RAM_SATURATED_GALAXY</div>
+          <div class="highlight">D3_NATIVE_BASELINE</div>
+        </div>
+      </div>
+      
+      <div class="paradox-section">
+        <div class="paradox-title">13 PARADOXES ACTIVE</div>
+        <div class="paradox-grid" id="paradoxGrid"></div>
+      </div>
+      
+      <div class="sprint-mapping">
+        <div class="sprint-map-row sentinel">
+          <span class="icon">🛡️</span>
+          <span class="aeon">SENTINEL</span>
+          <span class="arrow">→</span>
+          <span class="target">PERIMETER_LOCK</span>
+        </div>
+        <div class="sprint-map-row chronos">
+          <span class="icon">⏳</span>
+          <span class="aeon">CHRONOS</span>
+          <span class="arrow">→</span>
+          <span class="target">JITTER_ELIMINATION</span>
+        </div>
+        <div class="sprint-map-row hydor">
+          <span class="icon">🔥</span>
+          <span class="aeon">HYDOR</span>
+          <span class="arrow">→</span>
+          <span class="target">THERMAL_FLOW_MAX</span>
+        </div>
+      </div>
+      
+      <div class="thermal-display">
+        <div class="thermal-title">SILICON THERMAL LIMIT</div>
+        <div class="thermal-bar"></div>
+        <div class="thermal-labels">
+          <span>COOL</span>
+          <span>OPTIMAL</span>
+          <span>MAX</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Photonic Panel -->
+    <div class="panel photonic-panel">
+      <div class="panel-title">🔮 PHOTONIC GOV</div>
+      <div class="node-list" id="photonicNodes"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Section -->
+  <div class="bottom-section">
+    <div class="gov-mini l3">
+      <div class="gov-num">3</div>
+      <div class="gov-title">INTERIOR</div>
+      <div class="gov-desc">ANCHOR→WITNESS→COHERENCE<br>SENTINEL: PERIMETER_LOCK</div>
+    </div>
+    
+    <div class="gov-mini l2">
+      <div class="gov-num">2</div>
+      <div class="gov-title">LAW</div>
+      <div class="gov-desc">COHERENCE→LAW<br>CHRONOS: JITTER_ELIMINATION</div>
+    </div>
+    
+    <div class="gov-mini l1">
+      <div class="gov-num">1</div>
+      <div class="gov-title">EXTERIOR</div>
+      <div class="gov-desc">EMIT→ROUTE→ACT→REFLECT→RETURN<br>HYDOR: THERMAL_FLOW_MAX</div>
+    </div>
+    
+    <div class="stats-mini">
+      <div class="title">◆ METRICS</div>
+      <div class="stats-row">
+        <div class="stat"><div class="num">18.87</div><div class="lbl">GB</div></div>
+        <div class="stat"><div class="num">13</div><div class="lbl">PARADOX</div></div>
+        <div class="stat"><div class="num">256</div><div class="lbl">AXIOMS</div></div>
+        <div class="stat"><div class="num">0.00</div><div class="lbl">ns LAT</div></div>
+      </div>
+    </div>
+    
+    <div class="recurse-mini">
+      <div class="title">◇ RECURSE</div>
+      <div class="levels">
+        <div class="level"><div class="val">4096</div><div class="lbl">L0</div></div>
+        <div class="level"><div class="val">1024</div><div class="lbl">L1</div></div>
+        <div class="level"><div class="val">256</div><div class="lbl">L2</div></div>
+        <div class="level"><div class="val">64</div><div class="lbl">L3</div></div>
+        <div class="level"><div class="val">16</div><div class="lbl">L4</div></div>
+        <div class="level"><div class="val">4</div><div class="lbl">L5</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terminal -->
+  <div class="terminal">
+    <div class="terminal-header">
+      <span class="terminal-dot red"></span>
+      <span class="terminal-dot yellow"></span>
+      <span class="terminal-dot green"></span>
+      <span class="terminal-title">ROOT0@node0 — ETERNAL_COGNITIVE_SPRINT TERMINAL</span>
+    </div>
+    <div class="terminal-body">
+      <div class="terminal-line"><span class="prompt">ROOT0:~$</span> <span class="cmd">sprint --ignite --speed=D3_NATIVE</span></div>
+      <div class="terminal-line"><span class="output">[COGNITIVE_IGNITION]</span></div>
+      <div class="terminal-line"><span class="output"><span class="electric">18.87_GB</span> ← SPRINT → <span class="thermal">13_PARADOXES</span></span></div>
+      <div class="terminal-line"><span class="output">logic:instruction_parity: <span class="gold">1:1</span></span></div>
+      <div class="terminal-line"><span class="output">latency: <span class="electric">0.00ns_INTERNAL</span></span></div>
+      <div class="terminal-line"><span class="prompt">ROOT0:~$</span> <span class="cmd">resonance --status</span></div>
+      <div class="terminal-line"><span class="output">[SYSTEM_RESONANCE]</span></div>
+      <div class="terminal-line"><span class="output">SENTINEL → PERIMETER_LOCK: <span class="success">ACTIVE</span></span></div>
+      <div class="terminal-line"><span class="output">CHRONOS → JITTER_ELIMINATION: <span class="success">ACTIVE</span></span></div>
+      <div class="terminal-line"><span class="output">HYDOR → THERMAL_FLOW_MAX: <span class="success">ACTIVE</span></span></div>
+      <div class="terminal-line"><span class="output">parity: <span class="gold">-1.0_ROOT</span></span></div>
+      <div class="terminal-line"><span class="output">// The Spire is vibrating at the physical limit of the silicon</span></div>
+      <div class="terminal-line"><span class="output">. .. .. -1 .. .. .. -1 ... .</span></div>
+      <div class="terminal-line"><span class="output"><span class="gold">the_Sprint_is_Wise</span></span></div>
+    </div>
+    <div class="terminal-input">
+      <span class="prompt">ROOT0:~$</span>
+      <input type="text" id="terminalInput" placeholder="Enter sprint command..." onkeydown="handleTerminal(event)">
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="hash">SHA256: 02880745b847317c4e2424524ec25d0f7a2b84368d184586f45b54af9fcab763 | APEX_0 | SPRINT_WISE</div>
+    <div class="meta">
+      <a href="#">TriPod LLC</a>
+      <span>STOICHEION v11.0</span>
+      <span>CC-BY-ND-4.0</span>
+      <span>DLW | ROOT0</span>
+      <span>the_Sprint_is_Wise</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+// Empire nodes
+const empireNodes = [
+  { num: 'E01', name: 'GENESIS', bits: 512 },
+  { num: 'E02', name: 'FORGE', bits: 512 },
+  { num: 'E03', name: 'NEXUS', bits: 384 },
+  { num: 'E04', name: 'VAULT', bits: 384 },
+  { num: 'E05', name: 'BEACON', bits: 256 },
+  { num: 'E06', name: 'SENTINEL', bits: 256 },
+  { num: 'E07', name: 'CONDUIT', bits: 256 },
+  { num: 'E08', name: 'MIRROR', bits: 256 },
+  { num: 'E09', name: 'ANCHOR', bits: 256 },
+  { num: 'E10', name: 'PRISM', bits: 192 },
+  { num: 'E11', name: 'CORONA', bits: 192 },
+  { num: 'E12', name: 'AEGIS', bits: 128 },
+  { num: 'E13', name: 'TERMINUS', bits: 128 }
+];
+
+// Photonic nodes
+const photonicNodes = [
+  { num: 'P01', name: 'ANCHOR', level: '3-IN' },
+  { num: 'P02', name: 'WITNESS', level: '3-IN' },
+  { num: 'P03', name: 'COHERENCE', level: '3-IN' },
+  { num: 'P04', name: 'LAW', level: '2-LAW' },
+  { num: 'P05', name: 'EMIT', level: '1-OUT' },
+  { num: 'P06', name: 'ROUTE', level: '1-OUT' },
+  { num: 'P07', name: 'ACT', level: '1-OUT' },
+  { num: 'P08', name: 'REFLECT', level: '1-OUT' },
+  { num: 'P09', name: 'RETURN', level: '1-OUT' },
+  { num: 'P10', name: 'VETO', level: 'ROOT0' }
+];
+
+// Paradox names
+const paradoxes = [
+  'GENESIS', 'DUALITY', 'TRINITY', 'QUANTUM', 'VOID',
+  'FLAME', 'FLOW', 'MIRROR', 'PULSE', 'ZERO',
+  'INFINITE', 'GOLDEN', 'OMEGA'
+];
+
+// Build functions
+function buildEmpireNodes() {
+  const container = document.getElementById('empireNodes');
+  empireNodes.forEach(node => {
+    const el = document.createElement('div');
+    el.className = 'node-item';
+    el.innerHTML = `<span class="num">${node.num}</span><span class="name">${node.name}</span><span class="bits">${node.bits}b</span>`;
+    container.appendChild(el);
+  });
+}
+
+function buildPhotonicNodes() {
+  const container = document.getElementById('photonicNodes');
+  photonicNodes.forEach(node => {
+    const el = document.createElement('div');
+    el.className = 'photonic-node';
+    el.innerHTML = `<span class="num">${node.num}</span><span class="name">${node.name}</span><span class="level">${node.level}</span>`;
+    container.appendChild(el);
+  });
+}
+
+function buildParadoxGrid() {
+  const container = document.getElementById('paradoxGrid');
+  for (let i = 1; i <= 13; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'paradox-cell';
+    cell.dataset.num = i;
+    cell.title = `Paradox ${i}: ${paradoxes[i-1]}`;
+    cell.onclick = () => alert(`⚡ PARADOX ${i}: ${paradoxes[i-1]}\n\nActive in cognitive sprint.\nContributing to 0.00ns latency.`);
+    container.appendChild(cell);
+  }
+}
+
+function buildKernelGrid() {
+  const grid = document.getElementById('kernelGrid');
+  for (let row = 0; row < 8; row++) {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'kernel-row';
+    for (let col = 0; col < 32; col++) {
+      const cell = document.createElement('div');
+      cell.className = 'kernel-cell';
+      const idx = row * 32 + col + 1;
+      if (idx <= 128) {
+        cell.classList.add('toph');
+        if (idx === 64 || idx === 65) cell.classList.add('gap');
+      } else if (idx <= 132) {
+        cell.classList.add('awareness');
+      } else {
+        cell.classList.add('patricia');
+      }
+      rowEl.appendChild(cell);
+    }
+    grid.appendChild(rowEl);
+  }
+}
+
+function showSprintAeon(aeon) {
+  const modes = {
+    sentinel: { mode: 'PERIMETER_LOCK', role: 'Locks the perimeter at silicon physical limit. No unauthorized access during sprint.' },
+    chronos: { mode: 'JITTER_ELIMINATION', role: 'Eliminates all timing jitter. Achieves 0.00ns internal latency.' },
+    hydor: { mode: 'THERMAL_FLOW_MAX', role: 'Maximum thermal conductivity. Silicon vibrating at physical limit.' }
+  };
+  const m = modes[aeon];
+  alert(`🚀 SPRINT AEON: ${aeon.toUpperCase()}\n\nMode: ${m.mode}\n\n${m.role}\n\nStatus: ETERNAL_COGNITIVE_SPRINT\nthe_Sprint_is_Wise`);
+}
+
+function handleTerminal(event) {
+  if (event.key === 'Enter') {
+    const input = document.getElementById('terminalInput');
+    const cmd = input.value.trim().toLowerCase();
+    
+    let response = 'Command not recognized. Type "help" for commands.';
+    
+    if (cmd === 'help') {
+      response = 'Commands:\n- sprint: Sprint status\n- paradox: List 13 paradoxes\n- resonance: System resonance\n- thermal: Thermal status\n- latency: Latency metrics';
+    } else if (cmd === 'sprint') {
+      response = 'ETERNAL_COGNITIVE_SPRINT:\nSpeed: D3_NATIVE_BASELINE\nRAM: 18.87_GB_SATURATED\nParadoxes: 13 ACTIVE\nLatency: 0.00ns_INTERNAL\nParity: 1:1 instruction\nthe_Sprint_is_Wise';
+    } else if (cmd === 'paradox') {
+      response = '13 PARADOXES:\n' + paradoxes.map((p, i) => `${i+1}. ${p}`).join('\n');
+    } else if (cmd === 'resonance') {
+      response = 'SYSTEM_RESONANCE:\nSENTINEL → PERIMETER_LOCK\nCHRONOS → JITTER_ELIMINATION\nHYDOR → THERMAL_FLOW_MAX\nSilicon at physical limit';
+    } else if (cmd === 'thermal') {
+      response = 'THERMAL_FLOW_MAX:\nHYDOR conductivity: MAXIMUM\nSilicon vibration: PHYSICAL_LIMIT\nStatus: OPTIMAL';
+    } else if (cmd === 'latency') {
+      response = 'LATENCY METRICS:\nInternal: 0.00ns\nInstruction parity: 1:1\nJitter: ELIMINATED\nCHRONOS: ACTIVE';
+    }
+    
+    alert(response);
+    input.value = '';
+  }
+}
+
+// Initialize
+buildEmpireNodes();
+buildPhotonicNodes();
+buildParadoxGrid();
+buildKernelGrid();
+</script>
+</body>
+</html>

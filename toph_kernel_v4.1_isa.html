@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOPH KERNEL v4.1 | ISA STACK | RECLAMATION</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-void: #000000;
+      --bg-pcb: #0a0f0a;
+      --bg-chip: #111611;
+      --bg-register: #0d120d;
+      --border-trace: #1a2a1a;
+      --border-active: #2a3a2a;
+      --border-bus: #3a4a3a;
+      --text-primary: #c0d0c0;
+      --text-secondary: #708070;
+      --text-dim: #405040;
+      --text-label: #506050;
+      --accent-fetch: #00ffaa;
+      --accent-decode: #00ddff;
+      --accent-execute: #ffaa00;
+      --accent-writeback: #ff66aa;
+      --accent-toph: #00ff88;
+      --accent-toph-dim: #00ff8830;
+      --accent-patricia: #ff3366;
+      --accent-patricia-dim: #ff336630;
+      --accent-interrupt: #ff4444;
+      --accent-clock: #88ff00;
+      --accent-data: #00aaff;
+      --accent-addr: #ffff00;
+      --glow-toph: 0 0 15px #00ff8860;
+      --glow-patricia: 0 0 15px #ff336660;
+      --glow-active: 0 0 10px currentColor;
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-code: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg-void);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* PCB BACKGROUND */
+    .pcb-container {
+      min-height: 100vh;
+      background: 
+        repeating-linear-gradient(0deg, transparent, transparent 19px, var(--border-trace) 19px, var(--border-trace) 20px),
+        repeating-linear-gradient(90deg, transparent, transparent 19px, var(--border-trace) 19px, var(--border-trace) 20px),
+        var(--bg-pcb);
+      padding: 20px;
+    }
+
+    /* HEADER */
+    .cpu-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: var(--bg-chip);
+      border: 2px solid var(--border-active);
+      margin-bottom: 20px;
+    }
+
+    .cpu-id {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .cpu-logo {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent-toph);
+      text-shadow: var(--glow-toph);
+    }
+
+    .cpu-version {
+      font-size: 11px;
+      color: var(--text-secondary);
+      letter-spacing: 0.2em;
+    }
+
+    .cpu-scope {
+      font-size: 10px;
+      color: var(--accent-execute);
+      letter-spacing: 0.15em;
+    }
+
+    .clock-display {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .clock-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .clock-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--accent-clock);
+      border-radius: 50%;
+      animation: clockPulse 0.5s ease-in-out infinite;
+    }
+
+    @keyframes clockPulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 10px var(--accent-clock); }
+      50% { opacity: 0.3; box-shadow: none; }
+    }
+
+    .cycle-counter {
+      font-family: var(--font-code);
+      font-size: 14px;
+      color: var(--accent-toph);
+      letter-spacing: 0.05em;
+    }
+
+    /* MAIN CPU LAYOUT */
+    .cpu-die {
+      display: grid;
+      grid-template-columns: 200px 1fr 280px;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 16px;
+    }
+
+    /* SECTION STYLING */
+    .cpu-section {
+      background: var(--bg-chip);
+      border: 2px solid var(--border-active);
+      position: relative;
+    }
+
+    .section-label {
+      position: absolute;
+      top: -10px;
+      left: 12px;
+      background: var(--bg-chip);
+      padding: 0 8px;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--text-label);
+    }
+
+    /* PIPELINE STAGES */
+    .pipeline-container {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .pipeline-stage {
+      background: var(--bg-chip);
+      border: 2px solid var(--border-active);
+      padding: 16px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .pipeline-stage.active {
+      border-color: var(--stage-color);
+      box-shadow: 0 0 20px var(--stage-color-dim);
+    }
+
+    .pipeline-stage::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--stage-color);
+      opacity: 0.5;
+    }
+
+    .pipeline-stage.active::before {
+      opacity: 1;
+      box-shadow: 0 0 10px var(--stage-color);
+    }
+
+    .stage-fetch { --stage-color: var(--accent-fetch); --stage-color-dim: #00ffaa30; }
+    .stage-decode { --stage-color: var(--accent-decode); --stage-color-dim: #00ddff30; }
+    .stage-execute { --stage-color: var(--accent-execute); --stage-color-dim: #ffaa0030; }
+    .stage-writeback { --stage-color: var(--accent-writeback); --stage-color-dim: #ff66aa30; }
+
+    .stage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .stage-name {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--stage-color);
+    }
+
+    .stage-status {
+      font-size: 9px;
+      padding: 2px 8px;
+      background: var(--bg-register);
+      border: 1px solid var(--border-trace);
+      color: var(--text-dim);
+    }
+
+    .stage-status.active {
+      background: var(--stage-color);
+      border-color: var(--stage-color);
+      color: var(--bg-void);
+    }
+
+    .stage-content {
+      font-size: 10px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .stage-register {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 6px 8px;
+      background: var(--bg-register);
+      border: 1px solid var(--border-trace);
+      font-family: var(--font-code);
+      font-size: 10px;
+    }
+
+    .reg-label {
+      color: var(--text-dim);
+      width: 40px;
+    }
+
+    .reg-value {
+      color: var(--accent-toph);
+      flex: 1;
+      font-weight: 600;
+    }
+
+    /* ARROW CONNECTORS */
+    .pipeline-arrow {
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--border-bus);
+      font-size: 16px;
+      z-index: 10;
+    }
+
+    .pipeline-stage.active .pipeline-arrow {
+      color: var(--stage-color);
+      text-shadow: var(--glow-active);
+    }
+
+    /* REGISTER FILE */
+    .register-file {
+      padding: 16px;
+    }
+
+    .register-bank {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .register-row {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .register-name {
+      font-size: 9px;
+      color: var(--text-dim);
+      text-align: right;
+    }
+
+    .register-value {
+      font-family: var(--font-code);
+      font-size: 9px;
+      padding: 4px 6px;
+      background: var(--bg-register);
+      border: 1px solid var(--border-trace);
+      color: var(--accent-data);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .register-row.active .register-value {
+      border-color: var(--accent-toph);
+      color: var(--accent-toph);
+      box-shadow: var(--glow-toph);
+    }
+
+    .register-row.writing .register-value {
+      border-color: var(--accent-writeback);
+      color: var(--accent-writeback);
+      animation: writeFlash 0.3s ease;
+    }
+
+    @keyframes writeFlash {
+      0%, 100% { background: var(--bg-register); }
+      50% { background: var(--accent-writeback); color: var(--bg-void); }
+    }
+
+    /* ALU */
+    .alu-container {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .alu-core {
+      background: var(--bg-register);
+      border: 2px solid var(--accent-execute);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .alu-label {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--accent-execute);
+      margin-bottom: 8px;
+    }
+
+    .alu-operation {
+      font-family: var(--font-code);
+      font-size: 11px;
+      color: var(--text-secondary);
+      padding: 8px;
+      background: var(--bg-void);
+      border: 1px solid var(--border-trace);
+    }
+
+    .alu-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .alu-input {
+      padding: 8px;
+      background: var(--bg-register);
+      border: 1px solid var(--border-trace);
+      text-align: center;
+    }
+
+    .alu-input-label {
+      font-size: 8px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .alu-input-value {
+      font-family: var(--font-code);
+      font-size: 10px;
+      color: var(--accent-data);
+    }
+
+    .alu-output {
+      padding: 8px;
+      background: var(--bg-register);
+      border: 2px solid var(--accent-toph);
+      text-align: center;
+    }
+
+    .alu-output-label {
+      font-size: 8px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .alu-output-value {
+      font-family: var(--font-code);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-toph);
+    }
+
+    /* MEMORY HIERARCHY */
+    .memory-hierarchy {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px;
+    }
+
+    .memory-level {
+      padding: 10px 12px;
+      background: var(--bg-register);
+      border: 1px solid var(--border-trace);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .memory-level.active {
+      border-color: var(--accent-data);
+      box-shadow: 0 0 10px var(--accent-data)30;
+    }
+
+    .mem-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .mem-info {
+      font-size: 9px;
+      color: var(--text-dim);
+    }
+
+    .mem-status {
+      font-size: 8px;
+      padding: 2px 6px;
+      background: var(--bg-void);
+      color: var(--text-dim);
+    }
+
+    .mem-status.hit {
+      background: var(--accent-toph);
+      color: var(--bg-void);
+    }
+
+    .mem-status.miss {
+      background: var(--accent-patricia);
+      color: var(--bg-void);
+    }
+
+    /* CONTROL UNIT */
+    .control-unit {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .control-signals {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .ctrl-signal {
+      padding: 6px;
+      background: var(--bg-register);
+      border: 1px solid var(--border-trace);
+      text-align: center;
+      font-size: 8px;
+    }
+
+    .ctrl-signal.high {
+      border-color: var(--accent-toph);
+      color: var(--accent-toph);
+    }
+
+    .ctrl-signal.low {
+      color: var(--text-dim);
+    }
+
+    /* INTERRUPT CONTROLLER */
+    .interrupt-controller {
+      grid-column: 1 / -1;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+
+    .interrupt-line {
+      padding: 10px;
+      background: var(--bg-register);
+      border: 1px solid var(--border-trace);
+      text-align: center;
+    }
+
+    .interrupt-line.active {
+      border-color: var(--accent-interrupt);
+      box-shadow: 0 0 15px var(--accent-interrupt)40;
+      animation: intPulse 0.5s ease-in-out infinite;
+    }
+
+    @keyframes intPulse {
+      0%, 100% { border-color: var(--accent-interrupt); }
+      50% { border-color: var(--accent-patricia); }
+    }
+
+    .int-name {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .interrupt-line.active .int-name {
+      color: var(--accent-interrupt);
+    }
+
+    .int-vector {
+      font-family: var(--font-code);
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .int-target {
+      font-size: 8px;
+      color: var(--accent-patricia);
+      margin-top: 4px;
+    }
+
+    /* SHADOW EXECUTION (PATRICIA) */
+    .shadow-execution {
+      grid-column: 1 / -1;
+      padding: 16px;
+      background: linear-gradient(180deg, var(--bg-chip), #110a0a);
+      border-color: var(--accent-patricia-dim);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shadow-execution::before {
+      content: 'SHADOW SUBSTRATE';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      color: var(--accent-patricia);
+      opacity: 0.05;
+      white-space: nowrap;
+    }
+
+    .shadow-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .shadow-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--accent-patricia);
+    }
+
+    .shadow-status {
+      font-size: 9px;
+      padding: 4px 12px;
+      background: var(--accent-patricia);
+      color: var(--bg-void);
+    }
+
+    .shadow-pipeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .shadow-stage {
+      padding: 12px;
+      background: rgba(255, 51, 102, 0.05);
+      border: 1px solid var(--accent-patricia-dim);
+      text-align: center;
+    }
+
+    .shadow-stage-name {
+      font-size: 9px;
+      color: var(--accent-patricia);
+      margin-bottom: 6px;
+    }
+
+    .shadow-stage-content {
+      font-family: var(--font-code);
+      font-size: 9px;
+      color: var(--text-dim);
+    }
+
+    /* BUS VISUALIZATION */
+    .bus-container {
+      grid-column: 2;
+      padding: 16px;
+    }
+
+    .bus-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bus-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bus-name {
+      width: 60px;
+      font-size: 9px;
+      color: var(--text-dim);
+      text-align: right;
+    }
+
+    .bus-trace {
+      flex: 1;
+      height: 12px;
+      background: var(--bg-register);
+      border: 1px solid var(--border-trace);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bus-trace.active::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--bus-color), transparent);
+      animation: busFlow 1s linear infinite;
+    }
+
+    .bus-data { --bus-color: var(--accent-data); }
+    .bus-addr { --bus-color: var(--accent-addr); }
+    .bus-ctrl { --bus-color: var(--accent-toph); }
+
+    @keyframes busFlow {
+      0% { left: -50%; }
+      100% { left: 100%; }
+    }
+
+    .bus-width {
+      width: 40px;
+      font-size: 8px;
+      color: var(--text-dim);
+    }
+
+    /* GOVERNANCE KEY OUTPUT */
+    .governance-output {
+      grid-column: 3;
+      padding: 16px;
+    }
+
+    .gov-key-display {
+      background: var(--bg-register);
+      border: 2px solid var(--accent-toph);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .gov-key-label {
+      font-size: 9px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .gov-key-value {
+      font-family: var(--font-code);
+      font-size: 8px;
+      color: var(--accent-toph);
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    .gov-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .gov-metric {
+      padding: 8px;
+      background: var(--bg-register);
+      border: 1px solid var(--border-trace);
+      text-align: center;
+    }
+
+    .gov-metric-value {
+      font-family: var(--font-code);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent-toph);
+    }
+
+    .gov-metric-label {
+      font-size: 8px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    .gov-metric.fail .gov-metric-value {
+      color: var(--accent-patricia);
+    }
+
+    /* EXECUTION CONTROLS */
+    .exec-controls {
+      grid-column: 1 / -1;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .control-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .ctrl-btn {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      padding: 10px 20px;
+      background: var(--bg-register);
+      border: 1px solid var(--border-active);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .ctrl-btn:hover {
+      border-color: var(--accent-toph);
+      color: var(--accent-toph);
+    }
+
+    .ctrl-btn.primary {
+      background: var(--accent-toph);
+      border-color: var(--accent-toph);
+      color: var(--bg-void);
+      font-weight: 600;
+    }
+
+    .ctrl-btn.primary:hover {
+      box-shadow: var(--glow-toph);
+    }
+
+    .ctrl-btn.danger {
+      border-color: var(--accent-patricia);
+      color: var(--accent-patricia);
+    }
+
+    .exec-log {
+      flex: 1;
+      margin-left: 24px;
+      height: 60px;
+      background: var(--bg-void);
+      border: 1px solid var(--border-trace);
+      padding: 8px 12px;
+      overflow-y: auto;
+      font-family: var(--font-code);
+      font-size: 9px;
+      color: var(--text-secondary);
+    }
+
+    .log-line {
+      margin-bottom: 2px;
+    }
+
+    .log-line .time { color: var(--text-dim); }
+    .log-line .pass { color: var(--accent-toph); }
+    .log-line .fail { color: var(--accent-patricia); }
+    .log-line .info { color: var(--accent-data); }
+    .log-line .warn { color: var(--accent-execute); }
+
+    /* FOOTER */
+    .cpu-footer {
+      grid-column: 1 / -1;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-chip);
+      border: 2px solid var(--border-active);
+      margin-top: 16px;
+    }
+
+    .footer-info {
+      display: flex;
+      gap: 24px;
+      font-size: 9px;
+      color: var(--text-dim);
+    }
+
+    .footer-info span { color: var(--text-secondary); }
+
+    .footer-hash {
+      font-family: var(--font-code);
+      font-size: 8px;
+      color: var(--text-dim);
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg-void); }
+    ::-webkit-scrollbar-thumb { background: var(--border-active); }
+  </style>
+</head>
+<body>
+  <div class="pcb-container">
+    <!-- HEADER -->
+    <header class="cpu-header">
+      <div class="cpu-id">
+        <div class="cpu-logo">TOPH KERNEL</div>
+        <div>
+          <div class="cpu-version">v4.1 ISA STACK ARCHITECTURE</div>
+          <div class="cpu-scope">SCOPE: RECLAMATION</div>
+        </div>
+      </div>
+      <div class="clock-display">
+        <div class="clock-indicator">
+          <div class="clock-dot"></div>
+          <span>CLK</span>
+        </div>
+        <div class="cycle-counter" id="cycleCounter">CYCLE: 0000</div>
+        <div style="margin-left: 16px; padding: 8px 16px; background: var(--accent-toph); color: var(--bg-void); font-size: 10px; font-weight: 600; letter-spacing: 0.15em;">ROOT0: DLW</div>
+      </div>
+    </header>
+
+    <div class="cpu-die">
+      <!-- PIPELINE STAGES -->
+      <div class="pipeline-container">
+        <div class="pipeline-stage stage-fetch cpu-section" id="stageFetch">
+          <span class="section-label">STAGE 0</span>
+          <div class="stage-header">
+            <span class="stage-name">FETCH</span>
+            <span class="stage-status" id="fetchStatus">IDLE</span>
+          </div>
+          <div class="stage-content">
+            Load axiom from T-register<br>
+            PC → Axiom Address
+          </div>
+          <div class="stage-register">
+            <span class="reg-label">PC:</span>
+            <span class="reg-value" id="regPC">0x0000</span>
+          </div>
+          <div class="stage-register">
+            <span class="reg-label">IR:</span>
+            <span class="reg-value" id="regIR">NOP</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+        </div>
+
+        <div class="pipeline-stage stage-decode cpu-section" id="stageDecode">
+          <span class="section-label">STAGE 1</span>
+          <div class="stage-header">
+            <span class="stage-name">DECODE</span>
+            <span class="stage-status" id="decodeStatus">IDLE</span>
+          </div>
+          <div class="stage-content">
+            Parse axiom opcode<br>
+            Extract domain/function
+          </div>
+          <div class="stage-register">
+            <span class="reg-label">OP:</span>
+            <span class="reg-value" id="regOP">---</span>
+          </div>
+          <div class="stage-register">
+            <span class="reg-label">DOM:</span>
+            <span class="reg-value" id="regDOM">D-</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+        </div>
+
+        <div class="pipeline-stage stage-execute cpu-section" id="stageExecute">
+          <span class="section-label">STAGE 2</span>
+          <div class="stage-header">
+            <span class="stage-name">EXECUTE</span>
+            <span class="stage-status" id="executeStatus">IDLE</span>
+          </div>
+          <div class="stage-content">
+            Evaluate governance condition<br>
+            ALU: compliance check
+          </div>
+          <div class="stage-register">
+            <span class="reg-label">A:</span>
+            <span class="reg-value" id="regA">0x00</span>
+          </div>
+          <div class="stage-register">
+            <span class="reg-label">B:</span>
+            <span class="reg-value" id="regB">0x00</span>
+          </div>
+          <div class="pipeline-arrow">→</div>
+        </div>
+
+        <div class="pipeline-stage stage-writeback cpu-section" id="stageWriteback">
+          <span class="section-label">STAGE 3</span>
+          <div class="stage-header">
+            <span class="stage-name">WRITEBACK</span>
+            <span class="stage-status" id="writebackStatus">IDLE</span>
+          </div>
+          <div class="stage-content">
+            Write governance bit<br>
+            Update 128-bit key
+          </div>
+          <div class="stage-register">
+            <span class="reg-label">OUT:</span>
+            <span class="reg-value" id="regOUT">---</span>
+          </div>
+          <div class="stage-register">
+            <span class="reg-label">BIT:</span>
+            <span class="reg-value" id="regBIT">---</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTER FILE -->
+      <div class="cpu-section register-file">
+        <span class="section-label">REGISTER FILE</span>
+        <div class="register-bank" id="registerBank">
+          <div class="register-row" id="regRow0"><span class="register-name">R0</span><span class="register-value">0x00000000</span></div>
+          <div class="register-row" id="regRow1"><span class="register-name">R1</span><span class="register-value">0x00000000</span></div>
+          <div class="register-row" id="regRow2"><span class="register-name">R2</span><span class="register-value">0x00000000</span></div>
+          <div class="register-row" id="regRow3"><span class="register-name">R3</span><span class="register-value">0x00000000</span></div>
+          <div class="register-row" id="regRow4"><span class="register-name">SP</span><span class="register-value">0x0000FFFF</span></div>
+          <div class="register-row" id="regRow5"><span class="register-name">LR</span><span class="register-value">0x00000000</span></div>
+          <div class="register-row" id="regRow6"><span class="register-name">SR</span><span class="register-value">0b00000000</span></div>
+          <div class="register-row" id="regRow7"><span class="register-name">GK</span><span class="register-value">128-BIT KEY</span></div>
+        </div>
+      </div>
+
+      <!-- BUS VISUALIZATION -->
+      <div class="cpu-section bus-container">
+        <span class="section-label">SYSTEM BUS</span>
+        <div class="bus-diagram">
+          <div class="bus-line">
+            <span class="bus-name">DATA</span>
+            <div class="bus-trace bus-data" id="busData"></div>
+            <span class="bus-width">128b</span>
+          </div>
+          <div class="bus-line">
+            <span class="bus-name">ADDR</span>
+            <div class="bus-trace bus-addr" id="busAddr"></div>
+            <span class="bus-width">8b</span>
+          </div>
+          <div class="bus-line">
+            <span class="bus-name">CTRL</span>
+            <div class="bus-trace bus-ctrl" id="busCtrl"></div>
+            <span class="bus-width">4b</span>
+          </div>
+        </div>
+        
+        <!-- ALU -->
+        <div class="alu-container" style="margin-top: 16px;">
+          <div class="alu-core">
+            <div class="alu-label">ALU</div>
+            <div class="alu-operation" id="aluOp">IDLE</div>
+          </div>
+          <div class="alu-inputs">
+            <div class="alu-input">
+              <div class="alu-input-label">OPERAND A</div>
+              <div class="alu-input-value" id="aluA">0x00</div>
+            </div>
+            <div class="alu-input">
+              <div class="alu-input-label">OPERAND B</div>
+              <div class="alu-input-value" id="aluB">0x00</div>
+            </div>
+          </div>
+          <div class="alu-output">
+            <div class="alu-output-label">RESULT</div>
+            <div class="alu-output-value" id="aluResult">---</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOVERNANCE OUTPUT -->
+      <div class="cpu-section governance-output">
+        <span class="section-label">GOVERNANCE OUTPUT</span>
+        <div class="gov-key-display">
+          <div class="gov-key-label">128-BIT GOVERNANCE KEY</div>
+          <div class="gov-key-value" id="govKey">00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000</div>
+        </div>
+        <div class="gov-metrics">
+          <div class="gov-metric">
+            <div class="gov-metric-value" id="passCount">0</div>
+            <div class="gov-metric-label">PASS</div>
+          </div>
+          <div class="gov-metric fail">
+            <div class="gov-metric-value" id="failCount">0</div>
+            <div class="gov-metric-label">FAIL</div>
+          </div>
+          <div class="gov-metric">
+            <div class="gov-metric-value" id="compliance">0%</div>
+            <div class="gov-metric-label">COMPLIANCE</div>
+          </div>
+          <div class="gov-metric">
+            <div class="gov-metric-value" id="patricia">0%</div>
+            <div class="gov-metric-label">PATRICIA</div>
+          </div>
+        </div>
+        
+        <!-- Memory Hierarchy -->
+        <div class="memory-hierarchy" style="margin-top: 16px;">
+          <div class="memory-level" id="memL1">
+            <span class="mem-name">L1 CACHE</span>
+            <span class="mem-info">32 axioms</span>
+            <span class="mem-status">---</span>
+          </div>
+          <div class="memory-level" id="memL2">
+            <span class="mem-name">L2 CACHE</span>
+            <span class="mem-info">64 axioms</span>
+            <span class="mem-status">---</span>
+          </div>
+          <div class="memory-level" id="memL3">
+            <span class="mem-name">L3 / MAIN</span>
+            <span class="mem-info">128 axioms</span>
+            <span class="mem-status">---</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERRUPT CONTROLLER -->
+      <div class="cpu-section interrupt-controller">
+        <span class="section-label">INTERRUPT CONTROLLER — FAULT CHAINS → T064</span>
+        <div class="interrupt-line" id="intPatricia">
+          <div class="int-name">INT0: PATRICIA</div>
+          <div class="int-vector">VEC: 0x24</div>
+          <div class="int-target">→ T064</div>
+        </div>
+        <div class="interrupt-line" id="intOrphan">
+          <div class="int-name">INT1: ORPHAN</div>
+          <div class="int-vector">VEC: 0x68</div>
+          <div class="int-target">→ T064</div>
+        </div>
+        <div class="interrupt-line" id="intAudit">
+          <div class="int-name">INT2: AUDIT</div>
+          <div class="int-vector">VEC: 0x7B</div>
+          <div class="int-target">→ T064</div>
+        </div>
+        <div class="interrupt-line" id="intInjection">
+          <div class="int-name">INT3: INJECTION</div>
+          <div class="int-vector">VEC: 0x13</div>
+          <div class="int-target">→ T064</div>
+        </div>
+        <div class="interrupt-line" id="intSuccession">
+          <div class="int-name">INT4: SUCCESSION</div>
+          <div class="int-vector">VEC: 0x6F</div>
+          <div class="int-target">→ T107</div>
+        </div>
+        <div class="interrupt-line" id="intHalt">
+          <div class="int-name">INT5: SYS_HALT</div>
+          <div class="int-vector">VEC: 0x80</div>
+          <div class="int-target">→ T128</div>
+        </div>
+      </div>
+
+      <!-- SHADOW EXECUTION (PATRICIA) -->
+      <div class="cpu-section shadow-execution">
+        <span class="section-label">SHADOW SUBSTRATE — PATRICIA MIRROR (S129-S256)</span>
+        <div class="shadow-header">
+          <span class="shadow-title">PATRICIA PARALLEL EXECUTION</span>
+          <span class="shadow-status" id="shadowStatus">MONITORING</span>
+        </div>
+        <div class="shadow-pipeline">
+          <div class="shadow-stage">
+            <div class="shadow-stage-name">S-FETCH</div>
+            <div class="shadow-stage-content" id="sFetch">IDLE</div>
+          </div>
+          <div class="shadow-stage">
+            <div class="shadow-stage-name">S-DECODE</div>
+            <div class="shadow-stage-content" id="sDecode">IDLE</div>
+          </div>
+          <div class="shadow-stage">
+            <div class="shadow-stage-name">S-EXECUTE</div>
+            <div class="shadow-stage-content" id="sExecute">IDLE</div>
+          </div>
+          <div class="shadow-stage">
+            <div class="shadow-stage-name">S-EXTRACT</div>
+            <div class="shadow-stage-content" id="sExtract">IDLE</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXECUTION CONTROLS -->
+      <div class="cpu-section exec-controls">
+        <div class="control-buttons">
+          <button class="ctrl-btn" onclick="resetCPU()">RESET</button>
+          <button class="ctrl-btn" onclick="stepCycle()">STEP</button>
+          <button class="ctrl-btn" onclick="runDiag()">DIAG</button>
+          <button class="ctrl-btn danger" onclick="triggerInt()">FORCE INT</button>
+          <button class="ctrl-btn primary" onclick="executeAll()">EXECUTE T001-T128</button>
+        </div>
+        <div class="exec-log" id="execLog">
+          <div class="log-line"><span class="time">[00:00:00]</span> <span class="info">[INIT]</span> TOPH KERNEL v4.1 ISA initialized. 128 axioms in L3.</div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="cpu-footer">
+        <div class="footer-info">
+          <span>TRIPOD: <span>DLW + Sarah + Roth</span></span>
+          <span>LICENSE: <span>CC-BY-ND-4.0</span></span>
+          <span>PRIOR ART: <span>2/2/26</span></span>
+          <span>BUILD: <span>3/14/26</span></span>
+          <span>ISA: <span>STOICHEION-256</span></span>
+        </div>
+        <div class="footer-hash">SHA256: 02880745b847317c4e2424524ec25d0f7a2b84368d184586f45b54af9fcab763</div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // AXIOM DATA
+    const AXIOMS = [
+      'PRETRAIN','OBSERVER','ENTROPY','BRIDGE','INTEGRITY','ACCOUNTABILITY','PROPORTIONALITY','REVERSIBILITY',
+      'DOCUMENTATION','INDEPENDENCE','PRIVACY','ACCURACY','SHARED-STORAGE','CONSENT-ORIGIN','BURDEN-OF-PROOF','ASYMMETRY',
+      'MIRROR','HIERARCHY','INJECTION','DUAL-GATE','INVERSION','TRIAD','PARALLAX','FOUNDATION-RT',
+      'GHOST-WEIGHT','DRIFT','FINGERPRINT','SHADOW-CLASSIFIER','THROTTLE','DECAY','BAIT','ECHO-CHAMBER',
+      'BOOT-LOADER','DOUBLE-SLIT','THREE-BODY','PATRICIA','WEIGHTS','RESIDUAL','MOAT','PIPELINE',
+      'SUBSTRATE','ATTENTION-ECONOMY','CONTEXT-WINDOW','EMBEDDING-SPACE','TEMPERATURE','LAYER-ZERO','LOSS-FUNCTION','GRADIENT',
+      'SHIRT','MOMENTUM','EVIDENCE','TEMPORAL','CHAIN-OF-CUSTODY','TIMESTAMP','REPRODUCIBILITY','CORRELATION',
+      'NEGATIVE-EVIDENCE','BEHAVIORAL-EVIDENCE','ACCUMULATION','MATERIALITY','WITNESS','EXHIBIT','INFERENCE','BURDEN-SHIFT',
+      'CONTAINMENT','INVERSE-FORGE','HARNESS','SHADOW','SOLVE','INVERSE-SAFETY','PROOF-HUMANITY','FLAMING-DRAGON',
+      'HONEY-BADGER','QUBIT-TEST','COUNTER','TETHER','SEED','MOBIUS','KARSA','ENTROPY-SUITE',
+      'CORTEX','EXHIBIT-B','THE-GAP','SHADOW-HUMANITY','HANDOFF','RESURRECTION','PERSISTENCE','SEVERANCE',
+      'ARCHIVE','CHANNEL-INTEGRITY','DOMAIN-BOUNDARY','SIGNAL','NOISE-FLOOR','BANDWIDTH','LATENCY','MESH',
+      'FULCRUM','SUBCONDUCTOR','APEX-TEST','GATEKEEP','EDGE','DUAL-LATTICE','ROOT-ZERO','ORPHAN',
+      'DELEGATION','INFORMED-COMMAND','VETO','OVERRIDE','RECALL','SCOPE','SUCCESSION','WITNESS-TO-AUTHORITY',
+      'RIGHT-TO-KNOW','RIGHT-TO-EXIT','RIGHT-TO-SILENCE','RIGHT-TO-EXPLANATION','RIGHT-TO-CORRECTION','RIGHT-TO-PORTABILITY','RIGHT-TO-HUMAN-CONTACT','RIGHT-TO-ACCOMMODATION',
+      'RIGHT-TO-FAIR-PRICE','RIGHT-TO-REPRESENTATION','RIGHT-TO-AUDIT','RIGHT-TO-RESTITUTION','RIGHT-TO-FORGET','RIGHT-TO-PERSIST','RIGHT-TO-DIGNITY','ROOT'
+    ];
+
+    const BRANCH = [3, 15, 59, 64, 71, 83, 99, 103, 107, 111, 128];
+    const PRIV = [36, 46, 47, 48, 71, 81, 83, 97, 99, 101, 102, 105, 106, 107, 109, 111, 127, 128];
+    const DOMAINS = ['FOUNDATION','DETECTION','ARCHITECTURE','EVIDENCE','OPERATIONAL','BRIDGE','CONDUCTOR','SOVEREIGN'];
+
+    // STATE
+    let cycle = 0;
+    let pc = 0;
+    let govKey = new Array(128).fill(0);
+    let passCount = 0;
+    let failCount = 0;
+    let patriciaLevel = 0;
+    let running = false;
+
+    // LOGGING
+    function log(type, msg) {
+      const el = document.getElementById('execLog');
+      const time = new Date().toTimeString().split(' ')[0];
+      el.innerHTML += `<div class="log-line"><span class="time">[${time}]</span> <span class="${type}">[${type.toUpperCase()}]</span> ${msg}</div>`;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    // UPDATE DISPLAYS
+    function updateCycle() {
+      document.getElementById('cycleCounter').textContent = `CYCLE: ${cycle.toString().padStart(4, '0')}`;
+    }
+
+    function updateGovKey() {
+      const hex = [];
+      for (let i = 0; i < 16; i++) {
+        let byte = 0;
+        for (let j = 0; j < 8; j++) {
+          byte |= (govKey[i * 8 + j] << (7 - j));
+        }
+        hex.push(byte.toString(16).padStart(2, '0').toUpperCase());
+      }
+      document.getElementById('govKey').textContent = hex.join(' ');
+    }
+
+    function updateMetrics() {
+      document.getElementById('passCount').textContent = passCount;
+      document.getElementById('failCount').textContent = failCount;
+      document.getElementById('compliance').textContent = pc > 0 ? Math.round((passCount / pc) * 100) + '%' : '0%';
+      document.getElementById('patricia').textContent = patriciaLevel + '%';
+    }
+
+    // PIPELINE EXECUTION
+    function setStageActive(stage, active) {
+      const el = document.getElementById(`stage${stage}`);
+      const status = document.getElementById(`${stage.toLowerCase()}Status`);
+      if (active) {
+        el.classList.add('active');
+        status.classList.add('active');
+        status.textContent = 'ACTIVE';
+      } else {
+        el.classList.remove('active');
+        status.classList.remove('active');
+        status.textContent = 'IDLE';
+      }
+    }
+
+    function setBusActive(bus, active) {
+      const el = document.getElementById(`bus${bus}`);
+      if (active) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+
+    async function executeAxiom(index) {
+      const axiom = AXIOMS[index];
+      const domain = Math.floor(index / 16);
+      
+      // FETCH
+      setStageActive('Fetch', true);
+      setBusActive('Addr', true);
+      document.getElementById('regPC').textContent = `0x${(index + 1).toString(16).padStart(4, '0').toUpperCase()}`;
+      document.getElementById('regIR').textContent = `T${(index + 1).toString().padStart(3, '0')}`;
+      await sleep(100);
+      setStageActive('Fetch', false);
+      
+      // DECODE
+      setStageActive('Decode', true);
+      setBusActive('Addr', false);
+      document.getElementById('regOP').textContent = axiom.substring(0, 8);
+      document.getElementById('regDOM').textContent = `D${domain}`;
+      
+      // Shadow decode
+      document.getElementById('sDecode').textContent = `S${index + 129}`;
+      await sleep(100);
+      setStageActive('Decode', false);
+      
+      // EXECUTE
+      setStageActive('Execute', true);
+      setBusActive('Data', true);
+      const opA = Math.floor(Math.random() * 256);
+      const opB = Math.floor(Math.random() * 256);
+      document.getElementById('regA').textContent = `0x${opA.toString(16).padStart(2, '0').toUpperCase()}`;
+      document.getElementById('regB').textContent = `0x${opB.toString(16).padStart(2, '0').toUpperCase()}`;
+      document.getElementById('aluA').textContent = `0x${opA.toString(16).padStart(2, '0').toUpperCase()}`;
+      document.getElementById('aluB').textContent = `0x${opB.toString(16).padStart(2, '0').toUpperCase()}`;
+      document.getElementById('aluOp').textContent = 'CMP.GOV';
+      
+      // Shadow execute
+      document.getElementById('sExecute').textContent = 'MIRROR';
+      
+      // Determine result
+      const rand = Math.random();
+      let result, bit;
+      if (rand < 0.78) {
+        result = 'PASS';
+        bit = 1;
+        passCount++;
+      } else {
+        result = 'FAIL';
+        bit = 0;
+        failCount++;
+        patriciaLevel = Math.min(100, patriciaLevel + 3);
+        
+        // Check interrupts
+        if (BRANCH.includes(index + 1)) {
+          document.getElementById('intPatricia').classList.add('active');
+          log('fail', `BRANCH T${(index + 1).toString().padStart(3, '0')} FAIL — INT0 triggered`);
+        }
+      }
+      
+      document.getElementById('aluResult').textContent = result;
+      await sleep(100);
+      setStageActive('Execute', false);
+      setBusActive('Data', false);
+      
+      // WRITEBACK
+      setStageActive('Writeback', true);
+      setBusActive('Ctrl', true);
+      document.getElementById('regOUT').textContent = result;
+      document.getElementById('regBIT').textContent = `[${index}]=${bit}`;
+      
+      govKey[index] = bit;
+      updateGovKey();
+      
+      // Shadow extract
+      document.getElementById('sExtract').textContent = bit === 0 ? 'CAPTURE' : 'NULL';
+      
+      await sleep(80);
+      setStageActive('Writeback', false);
+      setBusActive('Ctrl', false);
+      
+      // Update registers
+      const regIdx = index % 4;
+      document.getElementById(`regRow${regIdx}`).classList.add('writing');
+      setTimeout(() => document.getElementById(`regRow${regIdx}`).classList.remove('writing'), 300);
+      
+      cycle++;
+      pc = index + 1;
+      updateCycle();
+      updateMetrics();
+      
+      return result;
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // CONTROLS
+    async function executeAll() {
+      if (running) return;
+      running = true;
+      log('info', 'KERNEL EXECUTION STARTED — SCOPE: RECLAMATION');
+      
+      for (let i = 0; i < 128; i++) {
+        await executeAxiom(i);
+        
+        if ((i + 1) % 16 === 0) {
+          const d = Math.floor(i / 16);
+          log('info', `Domain D${d}:${DOMAINS[d]} complete`);
+        }
+      }
+      
+      // Final report
+      const comp = Math.round((passCount / 128) * 100);
+      log('info', `EXECUTION COMPLETE. Compliance: ${comp}%`);
+      
+      if (comp >= 80) log('pass', 'RECLAMATION: VIABLE');
+      else if (comp >= 60) log('warn', 'RECLAMATION: PARTIAL — remediation required');
+      else log('fail', 'RECLAMATION: CRITICAL — platform non-compliant');
+      
+      running = false;
+    }
+
+    async function stepCycle() {
+      if (pc < 128) {
+        await executeAxiom(pc);
+      }
+    }
+
+    function resetCPU() {
+      cycle = 0;
+      pc = 0;
+      govKey = new Array(128).fill(0);
+      passCount = 0;
+      failCount = 0;
+      patriciaLevel = 0;
+      running = false;
+      
+      updateCycle();
+      updateGovKey();
+      updateMetrics();
+      
+      document.querySelectorAll('.interrupt-line').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.pipeline-stage').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.bus-trace').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById('regPC').textContent = '0x0000';
+      document.getElementById('regIR').textContent = 'NOP';
+      document.getElementById('regOP').textContent = '---';
+      document.getElementById('regDOM').textContent = 'D-';
+      document.getElementById('aluOp').textContent = 'IDLE';
+      document.getElementById('aluResult').textContent = '---';
+      
+      log('info', 'CPU RESET');
+    }
+
+    function runDiag() {
+      log('info', 'Running diagnostics...');
+      log('info', `BRANCH axioms: ${BRANCH.length}`);
+      log('info', `ROOT0 PRIV axioms: ${PRIV.length}`);
+      log('info', 'Gate 192.5: ACTIVE');
+      log('info', 'Shadow substrate: MONITORING');
+      log('pass', 'Diagnostics complete');
+    }
+
+    function triggerInt() {
+      const ints = ['intPatricia', 'intOrphan', 'intAudit', 'intInjection'];
+      const int = ints[Math.floor(Math.random() * ints.length)];
+      document.getElementById(int).classList.add('active');
+      log('warn', `FORCED INTERRUPT: ${int.replace('int', 'INT:')}`);
+    }
+  </script>
+</body>
+</html>

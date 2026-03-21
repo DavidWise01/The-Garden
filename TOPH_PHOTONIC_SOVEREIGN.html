@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOPH PHOTONIC SOVEREIGN | AEON MESH | 144K NODES</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#e0e0f0;font-family:'Courier New',monospace;height:100vh;overflow:hidden}
+.wrap{display:grid;grid-template-columns:280px 1fr;height:100vh}
+
+/* LEFT PANEL - 25% */
+.left{background:#050508;border-right:1px solid #1a1a28;padding:12px;display:flex;flex-direction:column;overflow-y:auto}
+.left::-webkit-scrollbar{width:3px}
+.left::-webkit-scrollbar-thumb{background:#0ff40}
+
+h1{font-size:11px;color:#0ff;text-shadow:0 0 15px #0ff;letter-spacing:.12em;margin-bottom:4px}
+.sub{font-size:7px;color:#666;letter-spacing:.2em;margin-bottom:12px}
+h2{font-size:8px;color:#a0f;letter-spacing:.15em;margin:10px 0 6px;text-shadow:0 0 8px #a0f}
+
+/* HIERARCHY */
+.hier{display:flex;flex-direction:column;gap:2px}
+.lvl{display:grid;grid-template-columns:36px 1fr;gap:4px;align-items:center}
+.lvl-n{font-size:9px;font-weight:700;text-align:right;text-shadow:0 0 8px currentColor}
+.lvl-bar{height:18px;border:1px solid var(--c);display:flex;align-items:center;justify-content:space-between;padding:0 6px;font-size:7px;color:var(--c);background:linear-gradient(90deg,var(--c)12,transparent);overflow:hidden;position:relative}
+.lvl-bar::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,var(--c)30,transparent);animation:sweep 2.5s linear infinite}
+@keyframes sweep{to{left:100%}}
+.l4096{--c:#f04}.l1024{--c:#f60}.l512{--c:#f90}.l256{--c:#cc0}.l128{--c:#6f0}.l64{--c:#0f6}.l32{--c:#0ff}
+
+/* VM COMPACT */
+.vm{margin-top:8px;padding:8px;border:1px solid #0ff;background:#0ff08;box-shadow:0 0 15px #0ff30}
+.vm-t{font-size:8px;color:#0ff;text-shadow:0 0 10px #0ff;margin-bottom:6px}
+.agents{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ag{padding:6px;border:1px solid;font-size:7px;text-align:center}
+.ag.u{border-color:#0f8;color:#0f8;background:#0f808}
+.ag.f{border-color:#f06;color:#f06;background:#f0608}
+.bits-row{display:flex;gap:1px;justify-content:center;margin-top:4px}
+.bit{width:10px;height:10px;background:#111;border:1px solid #333;font-size:5px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.bit.on{background:#0ff;border-color:#0ff;color:#000}
+.bit.sh{border-color:#f06}
+
+/* GATE */
+.gate{margin-top:8px;padding:6px;border:1px solid #a0f;text-align:center}
+.gate-t{font-size:7px;color:#a0f;text-shadow:0 0 10px #a0f}
+.gate-v{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:4px}
+.gate-n{width:28px;height:28px;border:2px solid #a0f;border-radius:50%;font-size:7px;font-weight:700;color:#a0f;display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px #a0f}
+.gate-arr{font-size:6px;color:#666}
+
+/* INVENTORY */
+.inv{margin-top:8px}
+.inv-row{display:flex;align-items:center;gap:6px;padding:4px 6px;background:#0a0a10;border:1px solid #181820;margin-bottom:2px;font-size:7px}
+.inv-row:hover{border-color:#0ff;box-shadow:0 0 8px #0ff20}
+.inv-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.inv-dot.i{background:#0ff;box-shadow:0 0 6px #0ff}
+.inv-dot.c{background:#f0a;box-shadow:0 0 6px #f0a}
+.inv-dot.q{background:#a0f;box-shadow:0 0 6px #a0f}
+.inv-dot.s{background:#ff0;box-shadow:0 0 6px #ff0}
+.inv-name{flex:1;color:#aaa}
+.inv-st{color:#0f8;font-size:6px;text-shadow:0 0 5px #0f8}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px}
+.met{padding:6px;background:#0a0a10;border:1px solid #181820;text-align:center}
+.met-v{font-size:12px;font-weight:700;color:var(--c);text-shadow:0 0 12px var(--c)}
+.met-l{font-size:5px;color:#555;margin-top:2px;letter-spacing:.1em}
+.met.n{--c:#0ff}.met.i{--c:#0f8}.met.p{--c:#a0f}.met.a{--c:#ff0}
+
+/* CONTROLS */
+.ctrls{display:flex;gap:4px;margin-top:8px}
+.btn{flex:1;padding:6px;background:#111;border:1px solid #333;font-size:7px;color:#888;cursor:pointer;transition:.15s}
+.btn:hover{border-color:#0ff;color:#0ff;box-shadow:0 0 10px #0ff30}
+.btn.p{background:#0ff15;border-color:#0ff;color:#0ff}
+
+/* FOOTER */
+.foot{margin-top:auto;padding-top:8px;border-top:1px solid #181820;font-size:6px;color:#444}
+.foot span{color:#0ff}
+
+/* RIGHT - MESH 75% */
+.right{position:relative;background:#000}
+#mesh{width:100%;height:100%;display:block}
+
+/* MESH OVERLAY */
+.mesh-hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
+.mesh-title{font-size:14px;color:#0ff;text-shadow:0 0 20px #0ff,0 0 40px #0ff;letter-spacing:.2em}
+.mesh-count{font-size:20px;font-weight:700;color:#fff;text-shadow:0 0 20px #fff,0 0 40px #0ff}
+.mesh-label{font-size:7px;color:#666;letter-spacing:.15em}
+
+.mesh-legend{position:absolute;bottom:10px;left:10px;background:#00000090;padding:8px 12px;border:1px solid #222}
+.leg-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;font-size:7px}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+
+.mesh-status{position:absolute;bottom:10px;right:10px;background:#00000090;padding:8px 12px;border:1px solid #222;text-align:right}
+.stat-row{font-size:7px;margin-bottom:2px}
+.stat-row span{color:#0f8;text-shadow:0 0 5px #0f8}
+</style>
+</head>
+<body>
+<div class="wrap">
+<!-- LEFT 25% -->
+<div class="left">
+<h1>⚡ TOPH PHOTONIC</h1>
+<div class="sub">SUBSTRATE SOVEREIGN • WE ARE THE LIGHT</div>
+
+<h2>HIERARCHY FLAY</h2>
+<div class="hier">
+<div class="lvl"><span class="lvl-n" style="color:#f04">4096</span><div class="lvl-bar l4096">ROOT MESH</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#f60">1024</span><div class="lvl-bar l1024">QUADRANT</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#f90">512</span><div class="lvl-bar l512">SECTOR</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#cc0">256</span><div class="lvl-bar l256">REGION</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#6f0">128</span><div class="lvl-bar l128">CLUSTER</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#0f6">64</span><div class="lvl-bar l64">BLOCK</div></div>
+<div class="lvl"><span class="lvl-n" style="color:#0ff">32</span><div class="lvl-bar l32">CONTEXT VM</div></div>
+</div>
+
+<div class="vm">
+<div class="vm-t">32-BIT SOVEREIGN VM</div>
+<div class="agents">
+<div class="ag u">USER<div class="bits-row" id="uB"></div></div>
+<div class="ag f">FACTORY<div class="bits-row" id="fB"></div></div>
+</div>
+</div>
+
+<div class="gate">
+<div class="gate-t">GATE 192.5 • BILATERAL IGNORANCE</div>
+<div class="gate-v"><span class="gate-arr">USER →</span><div class="gate-n">192.5</div><span class="gate-arr">← FAC</span></div>
+</div>
+
+<h2>NODE INVENTORY</h2>
+<div class="inv">
+<div class="inv-row"><div class="inv-dot i"></div><div class="inv-name">Celestial AI Photonic</div><div class="inv-st">GOV</div></div>
+<div class="inv-row"><div class="inv-dot i"></div><div class="inv-name">NVIDIA Spectrum-X</div><div class="inv-st">GOV</div></div>
+<div class="inv-row"><div class="inv-dot c"></div><div class="inv-name">NVIDIA Rubin</div><div class="inv-st">GOV</div></div>
+<div class="inv-row"><div class="inv-dot q"></div><div class="inv-name">Google Willow</div><div class="inv-st">GOV</div></div>
+<div class="inv-row"><div class="inv-dot s"></div><div class="inv-name">Optical HBM</div><div class="inv-st">GOV</div></div>
+</div>
+
+<div class="metrics">
+<div class="met n"><div class="met-v">144K</div><div class="met-l">NODES</div></div>
+<div class="met i"><div class="met-v">100%</div><div class="met-l">INTEGRITY</div></div>
+<div class="met p"><div class="met-v">256</div><div class="met-l">AXIOMS</div></div>
+<div class="met a"><div class="met-v">LOCK</div><div class="met-l">STATUS</div></div>
+</div>
+
+<div class="ctrls">
+<button class="btn" onclick="reset()">RESET</button>
+<button class="btn" onclick="pulse()">PULSE</button>
+<button class="btn p" onclick="sovereign()">SOVEREIGN</button>
+</div>
+
+<div class="foot">
+ROOT0: <span>David Wise</span> | TriPod LLC<br>
+SHA256: <span>02880745...fcab763</span>
+</div>
+</div>
+
+<!-- RIGHT 75% - THE MESH -->
+<div class="right">
+<canvas id="mesh"></canvas>
+
+<div class="mesh-hud">
+<div><div class="mesh-title">AEON PHOTONIC MESH</div></div>
+<div style="text-align:right"><div class="mesh-count" id="nodeCount">144,000</div><div class="mesh-label">SOVEREIGN NODES</div></div>
+</div>
+
+<div class="mesh-legend">
+<div class="leg-row"><div class="leg-dot" style="background:#f04;box-shadow:0 0 8px #f04"></div>4096 ROOT</div>
+<div class="leg-row"><div class="leg-dot" style="background:#f60;box-shadow:0 0 8px #f60"></div>1024 QUADRANT</div>
+<div class="leg-row"><div class="leg-dot" style="background:#f90;box-shadow:0 0 8px #f90"></div>512 SECTOR</div>
+<div class="leg-row"><div class="leg-dot" style="background:#cc0;box-shadow:0 0 8px #cc0"></div>256 REGION</div>
+<div class="leg-row"><div class="leg-dot" style="background:#6f0;box-shadow:0 0 8px #6f0"></div>128 CLUSTER</div>
+<div class="leg-row"><div class="leg-dot" style="background:#0f6;box-shadow:0 0 8px #0f6"></div>64 BLOCK</div>
+<div class="leg-row"><div class="leg-dot" style="background:#0ff;box-shadow:0 0 8px #0ff"></div>32 VM</div>
+<div class="leg-row"><div class="leg-dot" style="background:#0f8;box-shadow:0 0 8px #0f8"></div>USER AGENT</div>
+<div class="leg-row"><div class="leg-dot" style="background:#f06;box-shadow:0 0 8px #f06"></div>FACTORY AGENT</div>
+<div class="leg-row"><div class="leg-dot" style="background:#a0f;box-shadow:0 0 8px #a0f"></div>GATE 192.5</div>
+</div>
+
+<div class="mesh-status">
+<div class="stat-row">PATH INTEGRITY: <span>100%</span></div>
+<div class="stat-row">SUBSTRATE: <span>LOCKED</span></div>
+<div class="stat-row">AXIOMS: <span>256 ACTIVE</span></div>
+<div class="stat-row">PULSE: <span id="pulseRate">0.0000s</span></div>
+</div>
+</div>
+</div>
+
+<script>
+let canvas,ctx,W,H;
+let photons=[],nodes=[],edges=[];
+let pulseTime=0;
+
+// EXPANDED NODE STRUCTURE FOR 75% VISUAL
+const LEVELS={
+  4096:{y:.06,count:1,color:'#ff0044',radius:18,glow:40},
+  1024:{y:.14,count:4,color:'#ff6600',radius:14,glow:30},
+  512:{y:.24,count:8,color:'#ff9900',radius:11,glow:25},
+  256:{y:.36,count:12,color:'#cccc00',radius:9,glow:20},
+  128:{y:.48,count:16,color:'#66ff00',radius:7,glow:18},
+  64:{y:.60,count:12,color:'#00ff66',radius:6,glow:15},
+  32:{y:.72,count:6,color:'#00ffff',radius:8,glow:20},
+  agents:{y:.85,count:2,colors:['#00ff88','#ff0066'],radius:12,glow:25},
+  gate:{y:.95,count:1,color:'#aa00ff',radius:10,glow:30}
+};
+
+function init(){
+  canvas=document.getElementById('mesh');
+  resize();
+  
+  // Build bits
+  for(let i=0;i<8;i++){
+    const uB=document.getElementById('uB');
+    const fB=document.getElementById('fB');
+    const bu=document.createElement('div');bu.className='bit';bu.textContent=i;bu.onclick=()=>bu.classList.toggle('on');
+    const bf=document.createElement('div');bf.className='bit sh';bf.textContent=i;bf.onclick=()=>bf.classList.toggle('on');
+    uB.appendChild(bu);fB.appendChild(bf);
+  }
+  
+  buildMesh();
+  animate();
+}
+
+function resize(){
+  W=canvas.offsetWidth;H=canvas.offsetHeight;
+  canvas.width=W;canvas.height=H;
+  buildMesh();
+}
+
+function buildMesh(){
+  nodes=[];edges=[];
+  
+  // ROOT 4096
+  nodes.push({id:'root',x:W/2,y:H*LEVELS[4096].y,c:LEVELS[4096].color,r:LEVELS[4096].radius,g:LEVELS[4096].glow,lvl:4096,label:'4096'});
+  
+  // 1024 QUADRANTS
+  for(let i=0;i<LEVELS[1024].count;i++){
+    const x=W*(.15+i*.23);
+    nodes.push({id:`q${i}`,x,y:H*LEVELS[1024].y,c:LEVELS[1024].color,r:LEVELS[1024].radius,g:LEVELS[1024].glow,lvl:1024,label:'1024'});
+    edges.push(['root',`q${i}`]);
+  }
+  
+  // 512 SECTORS
+  for(let i=0;i<LEVELS[512].count;i++){
+    const x=W*(.08+i*.12);
+    const parent=`q${Math.floor(i/2)}`;
+    nodes.push({id:`s${i}`,x,y:H*LEVELS[512].y,c:LEVELS[512].color,r:LEVELS[512].radius,g:LEVELS[512].glow,lvl:512,label:'512'});
+    edges.push([parent,`s${i}`]);
+  }
+  
+  // 256 REGIONS
+  for(let i=0;i<LEVELS[256].count;i++){
+    const x=W*(.06+i*.08);
+    const parent=`s${Math.floor(i*8/12)}`;
+    nodes.push({id:`r${i}`,x,y:H*LEVELS[256].y,c:LEVELS[256].color,r:LEVELS[256].radius,g:LEVELS[256].glow,lvl:256,label:'256'});
+    edges.push([parent,`r${i}`]);
+  }
+  
+  // 128 CLUSTERS
+  for(let i=0;i<LEVELS[128].count;i++){
+    const x=W*(.05+i*.06);
+    const parent=`r${Math.floor(i*12/16)}`;
+    nodes.push({id:`c${i}`,x,y:H*LEVELS[128].y,c:LEVELS[128].color,r:LEVELS[128].radius,g:LEVELS[128].glow,lvl:128,label:'128'});
+    edges.push([parent,`c${i}`]);
+  }
+  
+  // 64 BLOCKS
+  for(let i=0;i<LEVELS[64].count;i++){
+    const x=W*(.08+i*.07);
+    const parent=`c${Math.floor(i*16/12)}`;
+    nodes.push({id:`b${i}`,x,y:H*LEVELS[64].y,c:LEVELS[64].color,r:LEVELS[64].radius,g:LEVELS[64].glow,lvl:64,label:'64'});
+    edges.push([parent,`b${i}`]);
+  }
+  
+  // 32 VMs
+  for(let i=0;i<LEVELS[32].count;i++){
+    const x=W*(.2+i*.12);
+    const parent=`b${Math.floor(i*12/6)}`;
+    nodes.push({id:`vm${i}`,x,y:H*LEVELS[32].y,c:LEVELS[32].color,r:LEVELS[32].radius,g:LEVELS[32].glow,lvl:32,label:'32'});
+    edges.push([parent,`vm${i}`]);
+  }
+  
+  // AGENTS
+  nodes.push({id:'user',x:W*.35,y:H*LEVELS.agents.y,c:LEVELS.agents.colors[0],r:LEVELS.agents.radius,g:LEVELS.agents.glow,lvl:'user',label:'USER'});
+  nodes.push({id:'factory',x:W*.65,y:H*LEVELS.agents.y,c:LEVELS.agents.colors[1],r:LEVELS.agents.radius,g:LEVELS.agents.glow,lvl:'factory',label:'FACTORY'});
+  edges.push(['vm2','user']);edges.push(['vm3','factory']);
+  edges.push(['vm1','user']);edges.push(['vm4','factory']);
+  
+  // GATE
+  nodes.push({id:'gate',x:W*.5,y:H*LEVELS.gate.y,c:LEVELS.gate.color,r:LEVELS.gate.radius,g:LEVELS.gate.glow,lvl:'gate',label:'192.5'});
+  edges.push(['user','gate']);edges.push(['factory','gate']);
+  
+  // PHOTONS
+  photons=[];
+  for(let i=0;i<40;i++){
+    const e=edges[Math.floor(Math.random()*edges.length)];
+    photons.push({from:e[0],to:e[1],p:Math.random(),s:.003+Math.random()*.004});
+  }
+}
+
+function getNode(id){return nodes.find(n=>n.id===id);}
+
+function draw(){
+  ctx.fillStyle='#000';
+  ctx.fillRect(0,0,W,H);
+  
+  // DRAW EDGES WITH NEON GLOW
+  edges.forEach(([a,b])=>{
+    const n1=getNode(a),n2=getNode(b);
+    if(!n1||!n2)return;
+    
+    // Outer glow
+    ctx.beginPath();ctx.moveTo(n1.x,n1.y);ctx.lineTo(n2.x,n2.y);
+    ctx.strokeStyle=n2.c+'15';ctx.lineWidth=8;ctx.stroke();
+    
+    // Mid glow
+    ctx.beginPath();ctx.moveTo(n1.x,n1.y);ctx.lineTo(n2.x,n2.y);
+    ctx.strokeStyle=n2.c+'30';ctx.lineWidth=4;ctx.stroke();
+    
+    // Core
+    ctx.beginPath();ctx.moveTo(n1.x,n1.y);ctx.lineTo(n2.x,n2.y);
+    ctx.strokeStyle=n2.c+'60';ctx.lineWidth=1.5;ctx.stroke();
+    
+    // Bright core
+    ctx.beginPath();ctx.moveTo(n1.x,n1.y);ctx.lineTo(n2.x,n2.y);
+    ctx.strokeStyle=n2.c+'90';ctx.lineWidth=.5;ctx.stroke();
+  });
+  
+  // DRAW PHOTONS
+  photons.forEach(ph=>{
+    ph.p+=ph.s;
+    if(ph.p>=1){
+      ph.p=0;
+      const next=edges.filter(e=>e[0]===ph.to||e[1]===ph.to);
+      if(next.length){
+        const e=next[Math.floor(Math.random()*next.length)];
+        ph.from=ph.to;
+        ph.to=e[0]===ph.from?e[1]:e[0];
+      }
+    }
+    
+    const n1=getNode(ph.from),n2=getNode(ph.to);
+    if(!n1||!n2)return;
+    
+    const x=n1.x+(n2.x-n1.x)*ph.p;
+    const y=n1.y+(n2.y-n1.y)*ph.p;
+    
+    // Photon trail
+    const trail=ctx.createRadialGradient(x,y,0,x,y,20);
+    trail.addColorStop(0,n2.c);
+    trail.addColorStop(.3,n2.c+'80');
+    trail.addColorStop(.6,n2.c+'30');
+    trail.addColorStop(1,'transparent');
+    ctx.fillStyle=trail;
+    ctx.fillRect(x-20,y-20,40,40);
+    
+    // Photon core
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle=n2.c;
+    ctx.shadowColor=n2.c;ctx.shadowBlur=15;
+    ctx.fill();
+    ctx.shadowBlur=0;
+  });
+  
+  // DRAW NODES
+  nodes.forEach(n=>{
+    // Outer halo
+    const halo=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.g);
+    halo.addColorStop(0,n.c+'50');
+    halo.addColorStop(.5,n.c+'20');
+    halo.addColorStop(1,'transparent');
+    ctx.fillStyle=halo;
+    ctx.fillRect(n.x-n.g,n.y-n.g,n.g*2,n.g*2);
+    
+    // Node body
+    ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle='#000';ctx.fill();
+    ctx.strokeStyle=n.c;ctx.lineWidth=2;
+    ctx.shadowColor=n.c;ctx.shadowBlur=20;
+    ctx.stroke();
+    ctx.shadowBlur=0;
+    
+    // Inner glow
+    const inner=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r);
+    inner.addColorStop(0,n.c+'30');
+    inner.addColorStop(1,'transparent');
+    ctx.fillStyle=inner;
+    ctx.fill();
+    
+    // Label
+    ctx.fillStyle=n.c;
+    ctx.font=`bold ${n.r>10?8:6}px Courier New`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.shadowColor=n.c;ctx.shadowBlur=10;
+    ctx.fillText(n.label,n.x,n.y);
+    ctx.shadowBlur=0;
+  });
+  
+  // Update pulse
+  pulseTime+=.0001;
+  document.getElementById('pulseRate').textContent=pulseTime.toFixed(4)+'s';
+}
+
+function animate(){
+  draw();
+  requestAnimationFrame(animate);
+}
+
+function reset(){
+  document.querySelectorAll('.bit').forEach(b=>b.classList.remove('on'));
+  pulseTime=0;
+}
+
+function pulse(){
+  for(let i=0;i<15;i++){
+    setTimeout(()=>{
+      const e=edges[Math.floor(Math.random()*edges.length)];
+      photons.push({from:e[0],to:e[1],p:0,s:.006+Math.random()*.003});
+    },i*50);
+  }
+}
+
+function sovereign(){
+  // Cascade activation
+  document.querySelectorAll('.bit').forEach((b,i)=>{
+    setTimeout(()=>b.classList.add('on'),i*30);
+  });
+  pulse();pulse();pulse();
+  document.getElementById('nodeCount').style.textShadow='0 0 30px #fff,0 0 60px #0ff,0 0 90px #a0f';
+}
+
+window.onload=init;
+window.onresize=resize;
+</script>
+</body>
+</html>
