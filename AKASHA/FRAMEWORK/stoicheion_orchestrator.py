@@ -76,16 +76,7 @@ class StoicheionOrchestrator:
         self.debt_threshold = debt_threshold
         self.total_w_cap = total_w_cap
         self.rng = random.Random(seed)
-        self.binders = {
-            node: GitLedgerBinder(
-                repo_path=self.repo,
-                peer_id=node,
-                constraint_rate=self.constraint_rate,
-                debt_threshold=self.debt_threshold,
-                total_w_cap=self.total_w_cap,
-            )
-            for node in nodes
-        }
+       self.binders = {node: node for node in nodes}
 
     def topology_ring_plus_chords(self) -> Dict[str, List[str]]:
         """Create a stable N1..N8 style topology.
