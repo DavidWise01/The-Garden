@@ -1,6 +1,27 @@
 #!/usr/bin/env python3
 """
-STOICHEION Multi-Node Orchestrator v1.1
+STOICHEION Multi-Node Orchestrator v1.2
+
+Purpose:
+- Drive coordinated N1..N8 node ticks on top of stoicheion_git_ledger.py.
+- Support sync and async stepping.
+- Apply simple resonance, transfer, and ethics-block rules.
+- Persist each node through the function-based Git ledger module.
+
+Expected repo usage:
+- Place this file alongside stoicheion_git_ledger.py.
+
+Example:
+    python stoicheion_orchestrator.py init-cluster --repo /path/to/repo --nodes N1 N2 N3 N4 N5 N6 N7 N8
+
+    python stoicheion_orchestrator.py tick-cluster \
+        --repo /path/to/repo \
+        --nodes N1 N2 N3 N4 N5 N6 N7 N8 \
+        --mode sync
+
+    python stoicheion_orchestrator.py rehydrate-cluster \
+        --repo /path/to/repo \
+        --nodes N1 N2 N3 N4 N5 N6 N7 N8
 """
 
 from __future__ import annotations
@@ -86,13 +107,11 @@ class StoicheionOrchestrator:
             ledger = Ledger()
 
         self._state_set(state, "peer_id", self._state_get(state, "peer_id", peer_id))
-        self._state_set(state, "tick", self._state_get(state, "tick", 0))
+        self._state_set(state, "cycle", self._state_get(state, "cycle", 0))
         self._state_set(state, "status", self._state_get(state, "status", "ACTIVE"))
-        self._state_set(state, "active_axioms", self._state_get(state, "active_axioms", []))
+        self._state_set(state, "axioms_active", self._state_get(state, "axioms_active", []))
         self._state_set(state, "links", self._state_get(state, "links", []))
-        self._state_set(state, "resonance", self._state_get(state, "resonance", False))
-        self._state_set(state, "metadata", self._state_get(state, "metadata", {}))
-
+        self._state_set(state, "timestamp", self._state_get(state, "timestamp", ""))
         return state, ledger
 
     def _persist_state_ledger(
@@ -106,6 +125,13 @@ class StoicheionOrchestrator:
         return write_node(node_path, state, ledger, trace_entry)
 
     def topology_ring_plus_chords(self) -> Dict[str, List[str]]:
+        """Create a stable N1..N8 style topology.
+
+        Each node links to:
+        - previous node
+        - next node
+        - opposite node (when possible)
+        """
         ordered = self.nodes[:]
         n = len(ordered)
         topo: Dict[str, List[str]] = {}
@@ -126,14 +152,21 @@ class StoicheionOrchestrator:
         for node in self.nodes:
             state, ledger = self._load_state_ledger(node)
             self._state_set(state, "links", topology[node])
-            self._state_set(state, "active_axioms", ["T023", "T051", "T053", "T092"])
-            self._state_set(state, "metadata", {"cluster_initialized": True})
+            self._state_set(state, "axioms_active", ["T023", "T051", "T053", "T092"])
 
             state_hash = self._persist_state_ledger(
                 node,
                 state,
                 ledger,
-                json.dumps({"event": "init_cluster", "node": node}),
+                json.dumps(
+                    {
+                        "event": "init_cluster",
+                        "node": node,
+                        "links": topology[node],
+                        "commit_requested": do_commit,
+                        "push_requested": do_push,
+                    }
+                ),
             )
 
             out["nodes"][node] = {
@@ -146,7 +179,7 @@ class StoicheionOrchestrator:
 
         return out
 
-    def _default_axioms_for_node(self, node: str, tick_seed: int) -> List[str]:
+    def _default_axioms_for_node(self, node: str, cycle_seed: int) -> List[str]:
         presets = [
             ["T023", "T051", "T053", "T081"],
             ["T009", "T013", "T099", "T104"],
@@ -157,16 +190,20 @@ class StoicheionOrchestrator:
             ["T018", "T024", "T089", "T091"],
             ["T048", "T062", "T106", "T122"],
         ]
-        idx = (sum(ord(c) for c in node) + tick_seed) % len(presets)
+        idx = (sum(ord(c) for c in node) + cycle_seed) % len(presets)
         return presets[idx]
 
     def _plan_cluster(self, mode: str) -> Dict[str, NodePlan]:
         topology = self.topology_ring_plus_chords()
-        tick_seed = sum(int(self._state_get(self._load_state_ledger(node)[0], "tick", 0)) for node in self.nodes) + 1
+        cycle_seed = sum(
+            int(self._state_get(self._load_state_ledger(node)[0], "cycle", 0))
+            for node in self.nodes
+        ) + 1
+
         plans: Dict[str, NodePlan] = {}
 
         for node in self.nodes:
-            active_axioms = self._default_axioms_for_node(node, tick_seed)
+            active_axioms = self._default_axioms_for_node(node, cycle_seed)
             gen = DEFAULT_GEN
             cons = DEFAULT_CONS
 
@@ -189,6 +226,7 @@ class StoicheionOrchestrator:
         return plans
 
     def _apply_resonance(self, plans: Dict[str, NodePlan]) -> None:
+        """Resonance when neighbors share at least 2 axioms."""
         for node, plan in plans.items():
             for neighbor in plan.links:
                 shared = set(plan.active_axioms) & set(plans[neighbor].active_axioms)
@@ -199,6 +237,7 @@ class StoicheionOrchestrator:
                     break
 
     def _apply_ethics_gate(self, plans: Dict[str, NodePlan]) -> None:
+        """Block execution-heavy plans when ethics axioms are absent."""
         for plan in plans.values():
             has_execution = bool(DEFAULT_EXEC_AXIOMS & set(plan.active_axioms))
             has_ethics = bool(ETHICAL_DOMAIN & set(plan.active_axioms))
@@ -209,6 +248,7 @@ class StoicheionOrchestrator:
                 plan.cons = round(max(plan.cons, DEFAULT_CONS), 2)
 
     def _apply_transfers(self, plans: Dict[str, NodePlan]) -> None:
+        """Transfer a fraction of generation to the first linked node."""
         for node, plan in plans.items():
             if not plan.links or plan.blocked_by_ethics:
                 continue
@@ -253,12 +293,10 @@ class StoicheionOrchestrator:
             plan = plans[node]
             state, ledger = self._load_state_ledger(node)
 
-            current_tick = int(self._state_get(state, "tick", 0))
-            self._state_set(state, "tick", current_tick + 1)
-            self._state_set(state, "active_axioms", plan.active_axioms)
+            current_cycle = int(self._state_get(state, "cycle", 0))
+            self._state_set(state, "cycle", current_cycle + 1)
+            self._state_set(state, "axioms_active", plan.active_axioms)
             self._state_set(state, "links", plan.links)
-            self._state_set(state, "resonance", plan.resonance)
-            self._state_set(state, "metadata", plan.metadata)
 
             ledger.apply_tick(
                 gen=plan.gen,
@@ -281,19 +319,25 @@ class StoicheionOrchestrator:
                         "event": "tick_cluster",
                         "node": node,
                         "mode": mode,
+                        "cycle": int(self._state_get(state, "cycle", 0)),
+                        "axioms_active": plan.active_axioms,
+                        "links": plan.links,
                         "gen": plan.gen,
                         "cons": plan.cons,
                         "resonance": plan.resonance,
                         "blocked_by_ethics": plan.blocked_by_ethics,
                         "transfer_out_W": plan.transfer_out_W,
                         "transfer_in_W": round(plan.transfer_in_W, 2),
+                        "commit_requested": do_commit,
+                        "push_requested": do_push,
+                        "metadata": plan.metadata,
                     }
                 ),
             )
 
             result = {
                 "peer_id": node,
-                "tick": int(self._state_get(state, "tick", 0)),
+                "cycle": int(self._state_get(state, "cycle", 0)),
                 "status": self._state_get(state, "status", "ACTIVE"),
                 "hash": state_hash,
                 "ledger": ledger.to_dict(),
@@ -302,7 +346,7 @@ class StoicheionOrchestrator:
 
             results["nodes"][node] = {
                 **result,
-                "active_axioms": plan.active_axioms,
+                "axioms_active": plan.active_axioms,
                 "links": plan.links,
                 "blocked_by_ethics": plan.blocked_by_ethics,
                 "transfer_out_W": plan.transfer_out_W,
@@ -331,7 +375,7 @@ class StoicheionOrchestrator:
             state, ledger = self._load_state_ledger(node)
             out["nodes"][node] = {
                 "peer_id": node,
-                "tick": int(self._state_get(state, "tick", 0)),
+                "cycle": int(self._state_get(state, "cycle", 0)),
                 "status": self._state_get(state, "status", "ACTIVE"),
                 "state": state.to_dict(),
                 "ledger": ledger.to_dict(),
