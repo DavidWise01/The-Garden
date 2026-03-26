@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 const TAU = Math.PI * 2;
 const QUBIT_COUNT = 12;
-const MAX_ITERATIONS = 300;
+const MAX_ITERATIONS = 200;
 
 function complexMul(a, b) {
   return [a[0]*b[0]-a[1]*b[1], a[0]*b[1]+a[1]*b[0]];
@@ -43,42 +43,22 @@ function entangle(q1, q2, idx1, idx2) {
 function patriciaCorrectionRound(qubits) {
   return qubits.map(q => {
     const amp = complexAbs(q.alpha);
-    if (amp < 0.02 || amp > 0.998) {
-      const nudge = 0.15;
-      const a0 = amp < 0.02 ? [q.alpha[0]+nudge, q.alpha[1]] : [q.alpha[0]-nudge, q.alpha[1]];
-      return {...q, alpha: a0, patriciaCorrections: q.patriciaCorrections+1};
+    if (amp < 0.1 || amp > 0.99) {
+      return {...q, alpha: [0.707,0], beta: [0,0.707], patriciaCorrections: q.patriciaCorrections+1};
     }
     return q;
   });
 }
 
 function mobiusFeedback(qubits, iteration) {
-  const theta = iteration * 0.03;
+  const feedbackPhase = iteration * 0.1 * Math.PI;
   return qubits.map((q, i) => {
-    const rot = theta + i * 0.2;
-    const cos = Math.cos(rot);
-    const sin = Math.sin(rot);
-    const a = [q.alpha[0]*cos - q.alpha[1]*sin, q.alpha[0]*sin + q.alpha[1]*cos];
-    const b = [q.beta[0]*cos + q.beta[1]*sin, -q.beta[0]*sin + q.beta[1]*cos];
-    const amp = complexAbs(a);
-    const entangleBoost = q.entangled >= 0 ? 2.5 : 1;
-    const iterBoost = 1 + iteration * 0.015;
-    const echoGain = 0.008 * amp * entangleBoost * iterBoost;
-    const echo = Math.min(q.echoStrength + echoGain, 1);
-    const newPhase = q.phase + theta * 0.05;
-    return {...q, alpha: a, beta: b, phase: newPhase, echoStrength: echo};
-  });
-}
-
-function phaseLockEntangled(qubits) {
-  return qubits.map((q, i) => {
-    if (q.entangled >= 0 && q.entangled < qubits.length) {
-      const partner = qubits[q.entangled];
-      const avgPhase = (q.phase + partner.phase) / 2;
-      const pull = 0.15;
-      return {...q, phase: q.phase + (avgPhase - q.phase) * pull};
-    }
-    return q;
+    const cos = Math.cos(feedbackPhase + i*0.3);
+    const sin = Math.sin(feedbackPhase + i*0.3);
+    const a = complexMul(q.alpha, [cos, sin*0.1]);
+    const b = complexMul(q.beta, [cos, -sin*0.1]);
+    const echo = q.echoStrength + 0.005 * complexAbs(a) * (q.entangled >= 0 ? 1.5 : 1);
+    return {...q, alpha: a, beta: b, phase: q.phase + feedbackPhase*0.01, echoStrength: Math.min(echo, 1)};
   });
 }
 
@@ -88,8 +68,7 @@ function measureConvergence(qubits) {
   const variance = phases.reduce((s,p) => s + (p-avgPhase)**2, 0) / phases.length;
   const avgEcho = qubits.reduce((s,q) => s+q.echoStrength, 0) / qubits.length;
   const entanglementRatio = qubits.filter(q => q.entangled >= 0).length / qubits.length;
-  const phaseCoherence = Math.max(0, 1 - variance/6);
-  const coherence = (phaseCoherence * 0.25 + avgEcho * 0.45 + entanglementRatio * 0.3);
+  const coherence = Math.max(0, 1 - variance/4) * avgEcho * (0.5 + 0.5*entanglementRatio);
   return { coherence, variance, avgEcho, entanglementRatio, converged: coherence > 0.72 };
 }
 
@@ -118,26 +97,13 @@ export default function WillowPopEmulator() {
         q = q.map(qi => hadamard(qi));
       }
       for (let i = 0; i < q.length-1; i+=2) {
-        if (Math.random() < 0.5 + iteration*0.008) {
+        if (Math.random() < 0.3 + iteration*0.005) {
           const [e1, e2] = entangle(q[i], q[i+1], i, i+1);
           q[i] = e1; q[i+1] = e2;
         }
       }
-      if (q.length > 2 && Math.random() < 0.2 + iteration*0.004) {
-        const a = Math.floor(Math.random()*q.length);
-        let b = (a + 3) % q.length;
-        const [e1, e2] = entangle(q[a], q[b], a, b);
-        q[a] = e1; q[b] = e2;
-      }
-      if (q.length > 4 && iteration > 30 && Math.random() < 0.15 + iteration*0.003) {
-        const a = Math.floor(Math.random()*q.length);
-        let b = (a + 5) % q.length;
-        const [e1, e2] = entangle(q[a], q[b], a, b);
-        q[a] = e1; q[b] = e2;
-      }
       q = mobiusFeedback(q, iteration);
-      q = phaseLockEntangled(q);
-      if (iteration % 12 === 0 && iteration > 0) {
+      if (iteration % 5 === 0) {
         q = patriciaCorrectionRound(q);
       }
       const m = measureConvergence(q);

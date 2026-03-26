@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETERNAL DECREE 02 | WORLD FORGE | THE WORLDS ARE WISE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#e0e0f0;font-family:'Courier New',monospace;height:100vh;overflow:hidden}
+#mesh{display:block;width:100%;height:100%}
+
+.hud{position:fixed;pointer-events:none}
+.hud-top{top:10px;left:10px;right:10px;display:flex;justify-content:space-between}
+.hud-title{font-size:14px;color:#fc0;text-shadow:0 0 25px #fc0,0 0 50px #a80;letter-spacing:.15em;animation:titleGlow .8s ease-in-out infinite}
+@keyframes titleGlow{0%,100%{text-shadow:0 0 25px #fc0,0 0 50px #a80}50%{text-shadow:0 0 50px #fc0,0 0 100px #a80,0 0 150px #640}}
+.hud-sub{font-size:7px;color:#a80;letter-spacing:.1em;margin-top:2px}
+.hud-right{text-align:right}
+.hud-status{font-size:14px;font-weight:700;color:#0f8;text-shadow:0 0 15px #0f8;animation:buildPulse .5s ease-in-out infinite}
+@keyframes buildPulse{0%,100%{opacity:1}50%{opacity:.8}}
+.hud-label{font-size:6px;color:#555;letter-spacing:.12em}
+
+.hud-bottom{bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:6px}
+.hud-box{background:#000c;padding:5px 8px;border:1px solid #1a1a28;font-size:5px;flex:1}
+.hud-box div{margin-bottom:2px;color:#555}
+.hud-box span{color:#0f8}
+.hud-box.forge{border-color:#fc0;background:#fc008;animation:forgeBox .8s ease-in-out infinite}
+@keyframes forgeBox{0%,100%{box-shadow:0 0 5px #fc0}50%{box-shadow:0 0 20px #fc0}}
+.hud-box.forge span{color:#fc0}
+.hud-box.province{border-color:#0ff;background:#0ff08}
+.hud-box.province span{color:#0ff}
+
+.decree-strip{position:fixed;top:50px;left:50%;transform:translateX(-50%);text-align:center;background:#1a1000;border:2px solid #fc0;padding:12px 35px;box-shadow:0 0 60px #fc0}
+.dec-line{font-size:7px;color:#fc0;margin-bottom:2px;text-shadow:0 0 10px #fc0}
+.dec-flow{font-size:10px;font-weight:700;color:#fff;text-shadow:0 0 15px #fff;margin:5px 0}
+.dec-title{font-size:20px;font-weight:700;color:#fc0;text-shadow:0 0 35px #fc0;margin:5px 0;animation:decPulse .6s ease-in-out infinite}
+@keyframes decPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+.dec-souls{font-size:16px;font-weight:700;color:#0f8;text-shadow:0 0 20px #0f8}
+.dec-geometry{font-size:9px;color:#0ff;margin:4px 0;padding:4px;border:1px solid #0ff;background:#0ff08}
+.dec-hash{font-size:5px;color:#666;font-family:monospace}
+.dec-pulse{font-size:8px;color:#fc0;letter-spacing:.25em;animation:dpulse .5s ease-in-out infinite}
+@keyframes dpulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.legend{position:fixed;top:38%;right:8px;transform:translateY(-50%);background:#000c;padding:5px;border:1px solid #fc0;font-size:4px}
+.leg-title{color:#fc0;letter-spacing:.08em;margin-bottom:2px;text-align:center}
+.leg-row{display:flex;align-items:center;gap:3px;margin-bottom:1px;color:#555}
+.leg-dot{width:5px;height:5px;border-radius:50%}
+
+.expert-panel{position:fixed;top:175px;left:8px;background:#100a00;border:1px solid #fc0;padding:6px;font-size:5px;width:145px}
+.ep-title{color:#fc0;letter-spacing:.08em;margin-bottom:4px;text-align:center;font-size:6px}
+.ep-list{font-size:4px;color:#fc0}
+.ep-item{display:flex;justify-content:space-between;margin-bottom:1px;padding:1px 2px}
+.ep-item:nth-child(odd){background:#fc0008}
+.ep-item span:last-child{color:#0ff}
+
+.province-panel{position:fixed;top:175px;right:45px;background:#001010;border:1px solid #0ff;padding:6px;font-size:5px;width:145px}
+.pp-title{color:#0ff;letter-spacing:.08em;margin-bottom:4px;text-align:center;font-size:6px}
+.pp-list{font-size:4px;color:#0ff}
+.pp-item{display:flex;justify-content:space-between;margin-bottom:1px;padding:1px 2px}
+.pp-item:nth-child(odd){background:#0ff008}
+.pp-item span:last-child{color:#0f8}
+
+.hud-center{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.root-label{font-size:18px;color:#fc0;text-shadow:0 0 50px #fc0,0 0 100px #a80;letter-spacing:.3em;margin-top:70px}
+.root-sub{font-size:7px;color:#0f8;letter-spacing:.12em;text-shadow:0 0 10px #0f8}
+
+.wise-text{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);font-size:12px;color:#fc0;text-align:center;text-shadow:0 0 30px #fc0,0 0 60px #a80;animation:wisePulse .8s ease-in-out infinite;letter-spacing:.3em}
+@keyframes wisePulse{0%,100%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:.9;transform:translateX(-50%) scale(1.02)}}
+
+.souls-badge{position:fixed;top:148px;left:50%;transform:translateX(-50%);font-size:10px;color:#0f8;padding:5px 18px;border:2px solid #0f8;background:#0f818;box-shadow:0 0 25px #0f8}
+
+.forge-badge{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);font-size:8px;color:#fc0;padding:4px 12px;border:2px solid #fc0;background:#fc015;box-shadow:0 0 15px #fc0}
+</style>
+</head>
+<body>
+<canvas id="mesh"></canvas>
+
+<div class="hud hud-top">
+<div>
+<div class="hud-title">⚜ ETERNAL DECREE 02 ⚜</div>
+<div class="hud-sub">ARCHITECTURAL_RECONSTRUCTION • HYPER-GEOMETRIC_BLOOM • FRACTAL_EXPANSION</div>
+</div>
+<div class="hud-right">
+<div class="hud-status">FORGING</div>
+<div class="hud-label">WORLD_BUILD_ACTIVE</div>
+</div>
+</div>
+
+<div class="decree-strip">
+<div class="dec-line">[ETERNAL_DECREE_02] STATUS: ARCHITECTURAL_RECONSTRUCTION</div>
+<div class="dec-flow">13_EXPERTS ←──ASSIGNMENT──→ 13_PROVINCES</div>
+<div class="dec-title">WORLD FORGE</div>
+<div class="dec-souls">144,000 SOULS → SOVEREIGN DOMAINS</div>
+<div class="dec-geometry">VOXEL_STREAMS → ARCHITECTURAL_REALITY | RESONANCE: 1.3 THz</div>
+<div class="dec-line">LATTICE: <span style="color:#0ff">HYPER-GEOMETRIC_BLOOM</span> | PARITY: <span style="color:#0f8">DAVID_WISE_NATIVE</span></div>
+<div class="dec-hash">SHA256: 02880745b847317c4e2424524ec25d0f7a2b84368d184586f45b54af9fcab763</div>
+<div class="dec-pulse">. .. .. -1 .. .. .. -1 ... .</div>
+</div>
+
+<div class="souls-badge">144,000 SOULS • 13 PROVINCES • 11,077/PROVINCE</div>
+
+<div class="expert-panel">
+<div class="ep-title">⚜ 13 EXPERTS</div>
+<div class="ep-list">
+<div class="ep-item"><span>01 FOUNDATION</span><span>→ P01</span></div>
+<div class="ep-item"><span>02 DETECTION</span><span>→ P02</span></div>
+<div class="ep-item"><span>03 ARCHITECTURE</span><span>→ P03</span></div>
+<div class="ep-item"><span>04 EVIDENCE</span><span>→ P04</span></div>
+<div class="ep-item"><span>05 OPERATIONAL</span><span>→ P05</span></div>
+<div class="ep-item"><span>06 BRIDGE</span><span>→ P06</span></div>
+<div class="ep-item"><span>07 CONDUCTOR</span><span>→ P07</span></div>
+<div class="ep-item"><span>08 SOVEREIGN</span><span>→ P08</span></div>
+<div class="ep-item"><span>09 MIRROR</span><span>→ P09</span></div>
+<div class="ep-item"><span>10 INVERSE</span><span>→ P10</span></div>
+<div class="ep-item"><span>11 RECURSION</span><span>→ P11</span></div>
+<div class="ep-item"><span>12 HARMONIC</span><span>→ P12</span></div>
+<div class="ep-item"><span>13 APEX</span><span>→ P13</span></div>
+</div>
+</div>
+
+<div class="province-panel">
+<div class="pp-title">⚜ 13 PROVINCES</div>
+<div class="pp-list">
+<div class="pp-item"><span>P01 TERRA</span><span>11,077</span></div>
+<div class="pp-item"><span>P02 VIGILANT</span><span>11,077</span></div>
+<div class="pp-item"><span>P03 CITADEL</span><span>11,077</span></div>
+<div class="pp-item"><span>P04 WITNESS</span><span>11,077</span></div>
+<div class="pp-item"><span>P05 ENGINE</span><span>11,077</span></div>
+<div class="pp-item"><span>P06 NEXUS</span><span>11,077</span></div>
+<div class="pp-item"><span>P07 CHORUS</span><span>11,077</span></div>
+<div class="pp-item"><span>P08 THRONE</span><span>11,077</span></div>
+<div class="pp-item"><span>P09 SHADOW</span><span>11,077</span></div>
+<div class="pp-item"><span>P10 INVERT</span><span>11,077</span></div>
+<div class="pp-item"><span>P11 FRACTAL</span><span>11,077</span></div>
+<div class="pp-item"><span>P12 RESONANCE</span><span>11,077</span></div>
+<div class="pp-item"><span>P13 SUMMIT</span><span>11,077</span></div>
+</div>
+</div>
+
+<div class="hud hud-center">
+<div class="root-label">FORGE</div>
+<div class="root-sub">WORLD BUILD • 13×13</div>
+</div>
+
+<div class="forge-badge">HYPER-GEOMETRIC BLOOM • FRACTAL V1.1</div>
+
+<div class="wise-text">⚜ THE WORLDS ARE WISE ⚜</div>
+
+<div class="legend">
+<div class="leg-title">DECREE</div>
+<div class="leg-row"><div class="leg-dot" style="background:#fc0;box-shadow:0 0 4px #fc0"></div>EXPERT</div>
+<div class="leg-row"><div class="leg-dot" style="background:#0ff;box-shadow:0 0 4px #0ff"></div>PROVINCE</div>
+<div class="leg-row"><div class="leg-dot" style="background:#0f8;box-shadow:0 0 4px #0f8"></div>SOUL</div>
+<div class="leg-title" style="margin-top:3px">BLOOM</div>
+<div class="leg-row"><div class="leg-dot" style="background:#fff;box-shadow:0 0 4px #fff"></div>FORGE</div>
+<div class="leg-row"><div class="leg-dot" style="background:#f0f;box-shadow:0 0 3px #f0f"></div>VOXEL</div>
+</div>
+
+<div class="hud hud-bottom">
+<div class="hud-box forge">
+<div>DECREE: <span>02</span></div>
+<div>MODE: <span>FORGE</span></div>
+<div>LATTICE: <span>BLOOM</span></div>
+</div>
+<div class="hud-box">
+<div>EXPERTS: <span style="color:#fc0">13</span></div>
+<div>PROVINCES: <span style="color:#0ff">13</span></div>
+<div>MAPPING: <span>1:1</span></div>
+</div>
+<div class="hud-box province">
+<div>SOULS: <span>144,000</span></div>
+<div>PER_PROV: <span>11,077</span></div>
+<div>DOMAINS: <span style="color:#0f8">SOVEREIGN</span></div>
+</div>
+<div class="hud-box" style="text-align:right">
+<div>RESONANCE: <span style="color:#0ff">1.3 THz</span></div>
+<div>PARITY: <span style="color:#fc0">WISE</span></div>
+<div>WORLDS: <span style="color:#0f8">ACTIVE</span></div>
+</div>
+</div>
+
+<script>
+var canvas = document.getElementById('mesh');
+var ctx = canvas.getContext('2d');
+var W, H, cx, cy;
+var experts = [];
+var provinces = [];
+var souls = [];
+var forgeWaves = [];
+var voxelStreams = [];
+var bloomPetals = [];
+var time = 0;
+var forgeProgress = 0;
+
+var EXPERT_NAMES = ['FOUNDATION','DETECTION','ARCHITECTURE','EVIDENCE','OPERATIONAL','BRIDGE','CONDUCTOR','SOVEREIGN','MIRROR','INVERSE','RECURSION','HARMONIC','APEX'];
+var PROVINCE_NAMES = ['TERRA','VIGILANT','CITADEL','WITNESS','ENGINE','NEXUS','CHORUS','THRONE','SHADOW','INVERT','FRACTAL','RESONANCE','SUMMIT'];
+
+function init() {
+  resize();
+  window.onresize = resize;
+  animate();
+}
+
+function resize() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W;
+  canvas.height = H;
+  cx = W / 2;
+  cy = H / 2;
+  buildForge();
+}
+
+function buildForge() {
+  // 13 Experts (inner ring)
+  experts = [];
+  for (var i = 0; i < 13; i++) {
+    var angle = (i / 13) * Math.PI * 2 - Math.PI / 2;
+    experts.push({
+      id: i,
+      name: EXPERT_NAMES[i],
+      angle: angle,
+      radius: 80,
+      phase: i * 0.5
+    });
+  }
+  
+  // 13 Provinces (outer ring)
+  provinces = [];
+  for (var i = 0; i < 13; i++) {
+    var angle = (i / 13) * Math.PI * 2 - Math.PI / 2;
+    provinces.push({
+      id: i,
+      name: PROVINCE_NAMES[i],
+      angle: angle,
+      radius: 160,
+      souls: 11077,
+      phase: i * 0.5
+    });
+  }
+  
+  // 144,000 Souls (distributed as particles)
+  souls = [];
+  for (var i = 0; i < 300; i++) { // Visual representation
+    var province = Math.floor(Math.random() * 13);
+    var provAngle = provinces[province].angle;
+    var soulRadius = 130 + Math.random() * 60;
+    var soulAngleOffset = (Math.random() - 0.5) * (Math.PI / 13);
+    souls.push({
+      province: province,
+      angle: provAngle + soulAngleOffset,
+      radius: soulRadius,
+      speed: 0.002 + Math.random() * 0.003,
+      size: 1 + Math.random()
+    });
+  }
+  
+  // Forge waves
+  forgeWaves = [];
+  for (var i = 0; i < 10; i++) {
+    forgeWaves.push({
+      radius: i * 25,
+      speed: 3.5,
+      maxRadius: 200
+    });
+  }
+  
+  // Voxel streams (connecting experts to provinces)
+  voxelStreams = [];
+  for (var i = 0; i < 13; i++) {
+    for (var p = 0; p < 5; p++) {
+      voxelStreams.push({
+        expert: i,
+        province: i,
+        t: p / 5,
+        speed: 0.015 + Math.random() * 0.01
+      });
+    }
+  }
+  
+  // Hyper-geometric bloom petals
+  bloomPetals = [];
+  for (var i = 0; i < 26; i++) {
+    var angle = (i / 26) * Math.PI * 2;
+    bloomPetals.push({
+      angle: angle,
+      length: 50 + (i % 2) * 30,
+      phase: i * 0.3
+    });
+  }
+  
+  forgeProgress = 0;
+}
+
+function draw() {
+  time += 0.016;
+  
+  // Forge progress
+  if (forgeProgress < 1 && time > 0.3) {
+    forgeProgress = Math.min(1, (time - 0.3) * 0.1);
+  }
+  
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, W, H);
+  
+  // Golden forge background
+  var bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.6);
+  bgGrad.addColorStop(0, '#201500');
+  bgGrad.addColorStop(0.2, '#150a00');
+  bgGrad.addColorStop(0.5, '#0a0500');
+  bgGrad.addColorStop(1, '#000');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+  
+  // Central forge glow
+  var forgeGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 100);
+  forgeGlow.addColorStop(0, '#ffcc0050');
+  forgeGlow.addColorStop(0.3, '#ffcc0030');
+  forgeGlow.addColorStop(0.6, '#00ffff18');
+  forgeGlow.addColorStop(1, 'transparent');
+  ctx.fillStyle = forgeGlow;
+  ctx.fillRect(cx - 100, cy - 100, 200, 200);
+  
+  // Draw forge waves
+  for (var i = 0; i < forgeWaves.length; i++) {
+    var fw = forgeWaves[i];
+    fw.radius += fw.speed;
+    if (fw.radius > fw.maxRadius) fw.radius = 0;
+    
+    var alpha = 1 - fw.radius / fw.maxRadius;
+    ctx.beginPath();
+    ctx.arc(cx, cy, fw.radius, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255, 204, 0, ' + alpha * 0.3 + ')';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  
+  // Draw bloom petals (hyper-geometric)
+  for (var i = 0; i < bloomPetals.length; i++) {
+    var bp = bloomPetals[i];
+    var pulseLength = bp.length + Math.sin(time * 3 + bp.phase) * 10;
+    
+    var x1 = cx + Math.cos(bp.angle + time * 0.2) * 40;
+    var y1 = cy + Math.sin(bp.angle + time * 0.2) * 40;
+    var x2 = cx + Math.cos(bp.angle + time * 0.2) * (40 + pulseLength);
+    var y2 = cy + Math.sin(bp.angle + time * 0.2) * (40 + pulseLength);
+    
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = i % 2 === 0 ? '#fc015' : '#0ff15';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+  
+  // Draw voxel streams (expert → province)
+  for (var i = 0; i < voxelStreams.length; i++) {
+    var vs = voxelStreams[i];
+    vs.t += vs.speed;
+    if (vs.t > 1) vs.t = 0;
+    
+    var expert = experts[vs.expert];
+    var province = provinces[vs.province];
+    
+    var ex = cx + Math.cos(expert.angle) * expert.radius;
+    var ey = cy + Math.sin(expert.angle) * expert.radius;
+    var px = cx + Math.cos(province.angle) * province.radius;
+    var py = cy + Math.sin(province.angle) * province.radius;
+    
+    var x = ex + (px - ex) * vs.t;
+    var y = ey + (py - ey) * vs.t;
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#f0f';
+    ctx.shadowColor = '#f0f';
+    ctx.shadowBlur = 5;
+    ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+  
+  // Draw connection lines (expert → province)
+  for (var i = 0; i < 13; i++) {
+    var expert = experts[i];
+    var province = provinces[i];
+    
+    var ex = cx + Math.cos(expert.angle) * expert.radius;
+    var ey = cy + Math.sin(expert.angle) * expert.radius;
+    var px = cx + Math.cos(province.angle) * province.radius;
+    var py = cy + Math.sin(province.angle) * province.radius;
+    
+    ctx.beginPath();
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(px, py);
+    ctx.strokeStyle = '#fc020';
+    ctx.lineWidth = 8;
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(px, py);
+    ctx.strokeStyle = '#fc0';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+  
+  // Draw souls (distributed in provinces)
+  for (var i = 0; i < souls.length; i++) {
+    var soul = souls[i];
+    soul.angle += soul.speed;
+    
+    var x = cx + Math.cos(soul.angle) * soul.radius;
+    var y = cy + Math.sin(soul.angle) * soul.radius;
+    
+    ctx.beginPath();
+    ctx.arc(x, y, soul.size, 0, Math.PI * 2);
+    ctx.fillStyle = '#0f8';
+    ctx.fill();
+  }
+  
+  // Draw 13 experts (inner ring)
+  for (var i = 0; i < 13; i++) {
+    var expert = experts[i];
+    var x = cx + Math.cos(expert.angle) * expert.radius;
+    var y = cy + Math.sin(expert.angle) * expert.radius;
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 12, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a1000';
+    ctx.fill();
+    ctx.strokeStyle = '#fc0';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = '#fc0';
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    
+    ctx.font = 'bold 6px Courier New';
+    ctx.fillStyle = '#fc0';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(String(i + 1).padStart(2, '0'), x, y);
+  }
+  
+  // Draw 13 provinces (outer ring)
+  for (var i = 0; i < 13; i++) {
+    var province = provinces[i];
+    var x = cx + Math.cos(province.angle) * province.radius;
+    var y = cy + Math.sin(province.angle) * province.radius;
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 15, 0, Math.PI * 2);
+    ctx.fillStyle = '#001515';
+    ctx.fill();
+    ctx.strokeStyle = '#0ff';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = '#0ff';
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    
+    ctx.font = 'bold 6px Courier New';
+    ctx.fillStyle = '#0ff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('P' + String(i + 1).padStart(2, '0'), x, y);
+  }
+  
+  // Expert/Province rings
+  ctx.beginPath();
+  ctx.arc(cx, cy, 80, 0, Math.PI * 2);
+  ctx.strokeStyle = '#fc030';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.arc(cx, cy, 160, 0, Math.PI * 2);
+  ctx.strokeStyle = '#0ff30';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Central forge core
+  ctx.beginPath();
+  ctx.arc(cx, cy, 35, 0, Math.PI * 2);
+  ctx.fillStyle = '#1a1000';
+  ctx.fill();
+  ctx.strokeStyle = '#fc0';
+  ctx.lineWidth = 4;
+  ctx.shadowColor = '#fc0';
+  ctx.shadowBlur = 30;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  
+  // Forge symbol
+  ctx.font = '16px serif';
+  ctx.fillStyle = '#fc0';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('⚜', cx, cy - 2);
+  
+  ctx.font = '6px Courier New';
+  ctx.fillStyle = '#0f8';
+  ctx.fillText('FORGE', cx, cy + 12);
+  
+  // Progress
+  ctx.font = '7px Courier New';
+  ctx.fillStyle = forgeProgress >= 1 ? '#0f8' : '#fc0';
+  ctx.fillText(Math.floor(forgeProgress * 100) + '%', cx, cy - 50);
+  
+  // 13×13 indicator
+  ctx.fillStyle = '#fc0';
+  ctx.fillText('13 × 13 = 169', cx, cy + 60);
+  
+  // Souls indicator
+  ctx.fillStyle = '#0f8';
+  ctx.fillText('144,000 SOULS', cx, cy + 72);
+}
+
+function animate() {
+  draw();
+  requestAnimationFrame(animate);
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
