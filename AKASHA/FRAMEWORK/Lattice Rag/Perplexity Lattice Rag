@@ -1,0 +1,456 @@
+Here’s a minimal, lattice-aware RAG skeleton in **Python + FastAPI + Postgres/pgvector** that you can adapt around STOICHEION / AKASHA. [github](https://github.com/pgvector/pgvector-python)
+
+I'll give you:
+
+- Project layout  
+- SQL schema (with pgvector)  
+- Core parser/indexer skeleton  
+- `ask_lattice` FastAPI endpoint  
+
+***
+
+## 1. Project layout
+
+```text
+lattice_rag/
+  app/
+    __init__.py
+    config.py
+    db.py
+    models.py
+    schema.py
+    parser.py
+    embeddings.py
+    retrieval.py
+    router.py
+    main.py
+  scripts/
+    ingest_repo.py
+  requirements.txt
+```
+
+***
+
+## 2. Requirements
+
+`requirements.txt` (adjust versions as you like):
+
+```txt
+fastapi
+uvicorn[standard]
+psycopg[binary]
+pgvector
+SQLAlchemy>=2.0
+pydantic
+sentence-transformers
+python-dotenv
+```
+
+Make sure Postgres has `pgvector` installed:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS vector;
+```
+
+
+
+***
+
+## 3. Database schema (axioms + files + embeddings)
+
+`app/models.py` (SQLAlchemy 2.x style):
+
+```python
+from sqlalchemy import (
+    Column, Integer, String, Text, ForeignKey, DateTime
+)
+from sqlalchemy.orm import declarative_base, relationship
+from pgvector.sqlalchemy import Vector
+
+Base = declarative_base()
+
+
+class Axiom(Base):
+    __tablename__ = "axioms"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    node = Column(String(8), unique=True, index=True)   # e.g. "T065"
+    hemisphere = Column(String(16))                     # "TOPH" / "PATRICIA"
+    domain = Column(String(32))                         # e.g. "D4_ETHICAL"
+    name = Column(String(128))                          # "CONSENT"
+    function = Column(Text)                             # gloss
+    inverse_node = Column(String(8), index=True)        # e.g. "S193"
+    raw_text = Column(Text)                             # full row / context
+
+
+class DocChunk(Base):
+    __tablename__ = "doc_chunks"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    source_file = Column(String(256))                   # e.g. "STOICHEION_AXIOM_PAYLOAD.md"
+    path = Column(String(256), index=True, nullable=True)
+    kind = Column(String(32))                           # "rule" | "axiom" | "akasha" | etc.
+    key = Column(String(64), index=True, nullable=True) # e.g. "Rule-4-Pop"
+    text = Column(Text)
+    hemisphere = Column(String(16), nullable=True)
+    domain = Column(String(32), nullable=True)
+    node = Column(String(8), nullable=True)
+    inverse_node = Column(String(8), nullable=True)
+    embedding = Column(Vector(768))                     # adjust dimension to model
+```
+
+`app/db.py`:
+
+```python
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from .models import Base
+from .config import settings
+
+engine = create_engine(settings.DATABASE_URL, echo=False, future=True)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
+def init_db():
+    Base.metadata.create_all(bind=engine)
+```
+
+`app/config.py`:
+
+```python
+from pydantic import BaseSettings
+
+class Settings(BaseSettings):
+    DATABASE_URL: str = "postgresql+psycopg://user:pass@localhost:5432/lattice_rag"
+    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
+
+    class Config:
+        env_file = ".env"
+
+settings = Settings()
+```
+
+***
+
+## 4. Embeddings helper
+
+`app/embeddings.py`:
+
+```python
+from sentence_transformers import SentenceTransformer
+from .config import settings
+
+_model = None
+
+def get_model():
+    global _model
+    if _model is None:
+        _model = SentenceTransformer(settings.EMBEDDING_MODEL)
+    return _model
+
+
+def embed_text(text: str):
+    model = get_model()
+    vec = model.encode([text])[0]
+    return vec.tolist()
+```
+
+
+
+***
+
+## 5. Parser skeleton for STOICHEION / AKASHA
+
+Assuming you clone the repo locally and point `scripts/ingest_repo.py` at it.
+
+`app/parser.py` (very barebones, you’ll refine):
+
+```python
+from pathlib import Path
+import re
+from typing import Iterable, Dict
+
+STOICHEION_FILE = "STOICHEION_AXIOM_PAYLOAD.md"
+AKASHA_INDEX_FILE = "akasha-index.md"
+
+
+def parse_stoicheion_axioms(path: Path) -> Iterable[Dict]:
+    text = path.read_text(encoding="utf-8")
+    # Split by domain tables: crude but works as a starting point
+    table_pattern = re.compile(
+        r"\| Node \| Axiom \| Name \| Function \|\n\|[-|]+\|\n(?P<body>(?:\|.*\|\n)+)",
+        re.MULTILINE,
+    )
+    for match in table_pattern.finditer(text):
+        body = match.group("body")
+        for line in body.strip().splitlines():
+            parts = [p.strip() for p in line.strip().split("|")[1:-1]]
+            if len(parts) != 4:
+                continue
+            node, axiom, name, function = parts
+            if not node.startswith(("T", "S")):
+                continue
+            hemisphere = "TOPH" if node.startswith("T") else "PATRICIA"
+            domain = None  # could infer from surrounding headings if you want
+            yield {
+                "node": node,
+                "hemisphere": hemisphere,
+                "domain": domain,
+                "name": axiom,
+                "function": function,
+                "raw_text": f"{axiom} ({name}) — {function}",
+            }
+
+
+def parse_interaction_rules(path: Path) -> Iterable[Dict]:
+    text = path.read_text(encoding="utf-8")
+    # Very naive: look for "Rule X —"
+    rule_pattern = re.compile(r"(?m)^Rule\s+(\d+)\s+—\s+(.*?):\s*(.+?)(?=^---|\Z)", re.S)
+    for m in rule_pattern.finditer(text):
+        num, title, body = m.groups()
+        yield {
+            "key": f"Rule-{num}-{title.strip().replace(' ', '-')}",
+            "text": f"Rule {num} — {title.strip()}: {body.strip()}",
+            "kind": "rule",
+        }
+
+
+def parse_akasha_index(path: Path) -> Dict:
+    # For now just ingest whole file as one chunk
+    text = path.read_text(encoding="utf-8")
+    return {
+        "path": "AKASHA/INDEX",
+        "kind": "akasha",
+        "key": "AKASHA-INDEX",
+        "text": text,
+    }
+```
+
+***
+
+## 6. Ingestion script
+
+`scripts/ingest_repo.py`:
+
+```python
+import argparse
+from pathlib import Path
+
+from app.db import SessionLocal, init_db
+from app.models import Axiom, DocChunk
+from app.parser import (
+    parse_stoicheion_axioms,
+    parse_interaction_rules,
+    parse_akasha_index,
+    STOICHEION_FILE,
+    AKASHA_INDEX_FILE,
+)
+from app.embeddings import embed_text
+
+
+def main(repo_root: str):
+    init_db()
+    repo_path = Path(repo_root)
+
+    stoicheion_path = repo_path / STOICHEION_FILE
+    akasha_path = repo_path / AKASHA_INDEX_FILE
+
+    session = SessionLocal()
+
+    # Axioms as both structured rows + chunks
+    for row in parse_stoicheion_axioms(stoicheion_path):
+        ax = Axiom(
+            node=row["node"],
+            hemisphere=row["hemisphere"],
+            domain=row["domain"],
+            name=row["name"],
+            function=row["function"],
+            raw_text=row["raw_text"],
+        )
+        session.add(ax)
+
+        emb = embed_text(row["raw_text"])
+        chunk = DocChunk(
+            source_file=STOICHEION_FILE,
+            kind="axiom",
+            text=row["raw_text"],
+            hemisphere=row["hemisphere"],
+            domain=row["domain"],
+            node=row["node"],
+            embedding=emb,
+        )
+        session.add(chunk)
+
+    # Interaction rules
+    for rule in parse_interaction_rules(stoicheion_path):
+        emb = embed_text(rule["text"])
+        chunk = DocChunk(
+            source_file=STOICHEION_FILE,
+            kind="rule",
+            key=rule["key"],
+            text=rule["text"],
+            embedding=emb,
+        )
+        session.add(chunk)
+
+    # AKASHA index
+    ak = parse_akasha_index(akasha_path)
+    emb = embed_text(ak["text"])
+    chunk = DocChunk(
+        source_file=AKASHA_INDEX_FILE,
+        kind=ak["kind"],
+        path=ak["path"],
+        key=ak["key"],
+        text=ak["text"],
+        embedding=emb,
+    )
+    session.add(chunk)
+
+    session.commit()
+    session.close()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--repo-root", type=str, required=True)
+    args = parser.parse_args()
+    main(args.repo_root)
+```
+
+This assumes the STOICHEION and AKASHA files are at the root of `repo_root`. [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/472397461/6a7af292-0594-469c-9efd-679614782eb3/STOICHEION_AXIOM_PAYLOAD.md)
+
+***
+
+## 7. Retrieval logic with pgvector
+
+`app/retrieval.py`:
+
+```python
+from typing import List, Tuple
+from sqlalchemy import text as sql_text
+from .db import SessionLocal
+from .embeddings import embed_text
+
+
+def semantic_search(query: str, k: int = 8) -> List[Tuple[str, str]]:
+    """
+    Returns list of (kind, text) for top-k chunks.
+    """
+    session = SessionLocal()
+    try:
+        vec = embed_text(query)
+        # cosine distance example; adjust for your pgvector setup
+        sql = sql_text(
+            """
+            SELECT kind, text
+            FROM doc_chunks
+            ORDER BY embedding <-> (:embedding)::vector
+            LIMIT :k;
+            """
+        )
+        rows = session.execute(sql, {"embedding": vec, "k": k}).all()
+        return [(r.kind, r.text) for r in rows]
+    finally:
+        session.close()
+```
+
+
+
+You can extend this with filters (e.g., prioritize rules, D4, etc.) by adding `WHERE` clauses on `kind`, `domain`, `hemisphere`. [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/472397461/6a7af292-0594-469c-9efd-679614782eb3/STOICHEION_AXIOM_PAYLOAD.md)
+
+***
+
+## 8. FastAPI router and `ask_lattice`
+
+`app/schema.py`:
+
+```python
+from pydantic import BaseModel
+from typing import List
+
+class AskRequest(BaseModel):
+    peer_id: str
+    question: str
+
+class AskResponse(BaseModel):
+    answer: str
+    used_chunks: List[str]
+```
+
+`app/router.py`:
+
+```python
+from fastapi import APIRouter
+from .schema import AskRequest, AskResponse
+from .retrieval import semantic_search
+
+router = APIRouter()
+
+
+def build_prompt(question: str, context_chunks: list[str], peer_id: str) -> str:
+    # Minimal lattice-aware prompt; you’ll tune this
+    rules_preamble = (
+        "You are operating under the STOICHEION lattice:\n"
+        "- Every TOPH axiom T### has a PATRICIA mirror S###.\n"
+        "- D4 ETHICAL overrides other domains.\n"
+        "- The Pop is when an axiom and its inverse both hold and are witnessed.\n"
+        "Answer using only the information in the CONTEXT when possible.\n\n"
+    )
+
+    context_block = "CONTEXT:\n" + "\n\n---\n\n".join(context_chunks)
+    user_block = f"\n\nPEER_ID: {peer_id}\nQUESTION: {question}\n\nANSWER:"
+
+    return rules_preamble + context_block + user_block
+
+
+@router.post("/ask", response_model=AskResponse)
+async def ask_lattice(req: AskRequest) -> AskResponse:
+    # 1. Retrieve
+    hits = semantic_search(req.question, k=10)
+    context_chunks = [t for _, t in hits]
+
+    # 2. Build prompt
+    prompt = build_prompt(req.question, context_chunks, req.peer_id)
+
+    # 3. Call your LLM here (pseudo-code)
+    # answer = call_llm(prompt)
+    answer = "[stub] Wire this to your LLM provider with the prompt above."
+
+    return AskResponse(
+        answer=answer,
+        used_chunks=context_chunks,
+    )
+```
+
+***
+
+## 9. FastAPI app entrypoint
+
+`app/main.py`:
+
+```python
+from fastapi import FastAPI
+from .router import router as lattice_router
+
+app = FastAPI(title="Lattice RAG — STOICHEION/AKASHA")
+
+app.include_router(lattice_router, prefix="/api")
+```
+
+Run:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+
+
+***
+
+## 10. Next hardening steps
+
+- Enrich parser to capture domain (`D0`–`D7` / `P0`–`P7`) and inverse pairings from headings. [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/472397461/6a7af292-0594-469c-9efd-679614782eb3/STOICHEION_AXIOM_PAYLOAD.md)
+- Add a structured route: `/axiom/{node}` that does exact lookup + semantic neighbors.  
+- Add AKASHA SELF bundle loading per `peer_id` once you have those files in the repo, and inject that into `build_prompt`. [ppl-ai-file-upload.s3.amazonaws](https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/472397461/2e988594-a4ce-4611-b118-a53e2aee9d8d/akasha-index.md)
+- Replace the LLM stub with your actual provider (OpenAI, Perplexity API, local model).
+
+If you want, I can zoom in on one slice (e.g., robust STOICHEION parser, or the `ask_lattice` prompt spec) and flesh it out more deeply.
