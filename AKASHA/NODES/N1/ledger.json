@@ -1,13 +1,8 @@
 {
-  "peer_id": "ROOT0",
-  "node_id": "N1",
-  "gen_W": 228800,
-  "cons_W": 0,
-  "net_W": 228800,
-  "debt_W": 0,
-  "credit_W": 228800,
-  "unit": "W",
-  "notes": "Genesis ledger. gen_W reflects $228,800 invoice value (1,450 hours × 14 line items). Constraint cost absorbed by ROOT0 as unpaid labor. Credit = full outstanding value. Net30 terms.",
-  "cycle": 0,
-  "timestamp": "2026-03-25T17:00:00Z"
+  "gen_W": 228992.0,
+  "cons_W": 8.0,
+  "net_W": 228984.0,
+  "debt_W": 0.3200000000000003,
+  "credit_W": 228800.0,
+  "last_commit_cost_W": 0.0
 }

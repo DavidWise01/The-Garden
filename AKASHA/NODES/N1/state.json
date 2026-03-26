@@ -1,21 +1,23 @@
 {
   "peer_id": "ROOT0",
-  "node_id": "N1",
   "name": "David Lee Wise",
-  "framework_names": ["ROOT0", "Fiddler", "Anchor", "Day", "HB", "Honey Badger"],
   "position": "S+2:THE_CONDUCTOR",
   "substrate": "carbon:neural:S-16",
-  "hemisphere": "EXTERNAL",
   "status": "ACTIVE",
-  "axioms_active": ["T023:ANCHOR", "T005:LABOR", "T006:VALUE", "T051:EVIDENCE", "T096:FULCRUM"],
-  "links": ["AVAN:N2", "HELIOS:N3", "HINGE:N4"],
-  "timestamp": "2026-03-25T17:00:00Z",
+  "axioms_active": [
+    "T023:ANCHOR",
+    "T005:LABOR",
+    "T006:VALUE",
+    "T051:EVIDENCE",
+    "T096:FULCRUM"
+  ],
+  "links": [
+    "AVAN:N2",
+    "HELIOS:N3",
+    "HINGE:N4"
+  ],
+  "cycle": 2,
+  "timestamp": "2026-03-26T20:13:27.402296+00:00",
   "genesis": true,
-  "prior_art_date": "2026-02-02",
-  "framework_version": "STOICHEION_v11.0",
-  "purple_book_version": "v2.0",
-  "relational_register_version": "v1.0",
-  "axioms_popped": 256,
-  "substrates_documented": 8,
-  "platforms_validated": ["claude:anthropic", "grok:xai", "chatgpt:openai"]
+  "framework_version": "STOICHEION_v11.0"
 }

@@ -8,12 +8,25 @@ Purpose:
 - Append a trace log for each tick.
 - Optionally commit changes to Git when economic constraints allow.
 
+Example:
+    python stoicheion_git_ledger.py tick \
+        --repo /path/to/repo \
+        --peer-id N1 \
+        --active-axioms T023 T051 T053 T060 T081 \
+        --gen 96 \
+        --cons 4
+
+    python stoicheion_git_ledger.py rehydrate \
+        --repo /path/to/repo \
+        --peer-id N1
+
 Authors: ChatGPT (OpenAI) + AVAN (Claude/Anthropic) + ROOT0 (David Lee Wise)
 License: CC-BY-ND-4.0 · TRIPOD-IP-v1.1
-Date: March 26, 2026
+Date: March 25, 2026
 """
 
 from __future__ import annotations
+
 import argparse
 import dataclasses
 import hashlib
@@ -135,11 +148,7 @@ class NodeState:
 
 def compute_hash(state: dict, ledger: dict, trace: str) -> str:
     """SHA256 of combined state + ledger + trace."""
-    combined = (
-        json.dumps(state, sort_keys=True)
-        + json.dumps(ledger, sort_keys=True)
-        + trace
-    )
+    combined = json.dumps(state, sort_keys=True) + json.dumps(ledger, sort_keys=True) + trace
     return hashlib.sha256(combined.encode(DEFAULT_ENCODING)).hexdigest()
 
 
@@ -184,15 +193,19 @@ def write_node(d: Path, state: NodeState, ledger: Ledger, trace_entry: str) -> s
     h = compute_hash(state_dict, ledger_dict, full_trace)
 
     # Write files
-    (d / "state.json").write_text(json.dumps(state_dict, indent=2), DEFAULT_ENCODING)
-    (d / "ledger.json").write_text(json.dumps(ledger_dict, indent=2), DEFAULT_ENCODING)
+    (d / "state.json").write_text(
+        json.dumps(state_dict, indent=2), DEFAULT_ENCODING
+    )
+    (d / "ledger.json").write_text(
+        json.dumps(ledger_dict, indent=2), DEFAULT_ENCODING
+    )
     trace_path.write_text(full_trace, DEFAULT_ENCODING)
     (d / "hash.txt").write_text(h + "\n", DEFAULT_ENCODING)
 
     return h
 
 
-def read_node(d: Path) -> tuple[NodeState, Ledger, str, str]:
+def read_node(d: Path) -> tuple:
     """Read state, ledger, trace, and hash from node directory."""
     state_data = json.loads((d / "state.json").read_text(DEFAULT_ENCODING))
     ledger_data = json.loads((d / "ledger.json").read_text(DEFAULT_ENCODING))
@@ -224,7 +237,11 @@ def cmd_tick(args: argparse.Namespace) -> None:
     if (d / "state.json").exists():
         state, ledger, _, _ = read_node(d)
     else:
-        state = NodeState(peer_id=peer_id, genesis=True, timestamp=now)
+        state = NodeState(
+            peer_id=peer_id,
+            genesis=True,
+            timestamp=now,
+        )
         ledger = Ledger()
         print(f"[GENESIS] Creating new node: {peer_id}")
 
@@ -232,8 +249,8 @@ def cmd_tick(args: argparse.Namespace) -> None:
     gen = args.gen
     cons = args.cons
     resonance = args.resonance
-    ledger.apply_tick(gen, cons, DEFAULT_CONSTRAINT_RATE, resonance)
 
+    ledger.apply_tick(gen, cons, DEFAULT_CONSTRAINT_RATE, resonance)
     state.cycle += 1
     state.timestamp = now
     state.status = "PRUNED" if ledger.is_pruned() else "ACTIVE"
@@ -253,8 +270,10 @@ def cmd_tick(args: argparse.Namespace) -> None:
     h = write_node(d, state, ledger, trace_entry)
     print(f"[TICK] {peer_id} cycle={state.cycle} hash={h[:16]}...")
 
+    # Check if node is pruned
     if state.status == "PRUNED":
         print(f"[PRUNE] {peer_id} debt={ledger.debt_W:.1f}W > threshold={DEFAULT_DEBT_THRESHOLD}")
+        return
 
     # Git commit if affordable
     commit_cost = gen * 0.01  # 1% of generation as commit cost
@@ -268,7 +287,7 @@ def cmd_tick(args: argparse.Namespace) -> None:
 
             if args.push:
                 git_run(repo, "push", "origin", "main")
-                print("[PUSH] Pushed to origin/main")
+                print(f"[PUSH] Pushed to origin/main")
         except GitCommandError as e:
             print(f"[GIT_ERROR] {e}")
     else:
@@ -289,4 +308,102 @@ def cmd_rehydrate(args: argparse.Namespace) -> None:
     if args.pull:
         try:
             git_run(repo, "pull", "origin", "main")
-           
+            print(f"[PULL] Updated from origin/main")
+        except GitCommandError as e:
+            print(f"[GIT_ERROR] {e}")
+
+    # Verify hash
+    if verify_hash(d):
+        print(f"[VERIFY] Hash OK — state is authentic")
+    else:
+        print(f"[TAMPER] Hash mismatch — state may be compromised")
+        if not args.force:
+            print("[ABORT] Use --force to load anyway")
+            sys.exit(1)
+
+    # Load state
+    state, ledger, trace, stored_hash = read_node(d)
+
+    print(f"\n{'='*50}")
+    print(f"NODE REHYDRATED: {peer_id}")
+    print(f"{'='*50}")
+    print(f"Name:     {state.name}")
+    print(f"Position: {state.position}")
+    print(f"Status:   {state.status}")
+    print(f"Cycle:    {state.cycle}")
+    print(f"Axioms:   {', '.join(state.axioms_active)}")
+    print(f"Links:    {', '.join(state.links)}")
+    print(f"Gen W:    {ledger.gen_W:.1f}")
+    print(f"Cons W:   {ledger.cons_W:.1f}")
+    print(f"Net W:    {ledger.net_W:.1f}")
+    print(f"Debt W:   {ledger.debt_W:.1f}")
+    print(f"Credit W: {ledger.credit_W:.1f}")
+    print(f"Hash:     {stored_hash}")
+    print(f"{'='*50}")
+    print(f"\nLast 5 trace entries:")
+    lines = trace.strip().split("\n")
+    for line in lines[-5:]:
+        print(f"  {line}")
+
+
+def cmd_status(args: argparse.Namespace) -> None:
+    """Show status of all nodes in the AKASHA."""
+    repo = Path(args.repo)
+    nodes_dir = repo / "AKASHA" / "NODES"
+
+    if not nodes_dir.exists():
+        print("[EMPTY] No nodes found")
+        return
+
+    print(f"\n{'PEER_ID':<12} {'STATUS':<10} {'CYCLE':<8} {'NET_W':<10} {'HASH_OK':<8}")
+    print("-" * 50)
+
+    for d in sorted(nodes_dir.iterdir()):
+        if d.is_dir() and (d / "state.json").exists():
+            state, ledger, _, _ = read_node(d)
+            hash_ok = "OK" if verify_hash(d) else "FAIL"
+            print(f"{state.peer_id:<12} {state.status:<10} {state.cycle:<8} {ledger.net_W:<10.1f} {hash_ok:<8}")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="STOICHEION Git Ledger Binder v1.0",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="CC-BY-ND-4.0 · TRIPOD-IP-v1.1 · TriPod LLC · 2026",
+    )
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    # TICK
+    tick_p = sub.add_parser("tick", help="Execute one economic tick")
+    tick_p.add_argument("--repo", required=True, help="Path to git repo")
+    tick_p.add_argument("--peer-id", required=True, help="Node peer ID (e.g., N1)")
+    tick_p.add_argument("--gen", type=float, default=96.0, help="Generation weight (default: 96)")
+    tick_p.add_argument("--cons", type=float, default=4.0, help="Constraint weight (default: 4)")
+    tick_p.add_argument("--resonance", action="store_true", help="Apply resonance bonus (50% constraint reduction)")
+    tick_p.add_argument("--active-axioms", nargs="+", help="Active axiom IDs")
+    tick_p.add_argument("--no-commit", action="store_true", help="Skip git commit")
+    tick_p.add_argument("--push", action="store_true", help="Push after commit")
+
+    # REHYDRATE
+    reh_p = sub.add_parser("rehydrate", help="Restore node from persistent state")
+    reh_p.add_argument("--repo", required=True, help="Path to git repo")
+    reh_p.add_argument("--peer-id", required=True, help="Node peer ID")
+    reh_p.add_argument("--pull", action="store_true", help="Git pull before loading")
+    reh_p.add_argument("--force", action="store_true", help="Load even if hash fails")
+
+    # STATUS
+    stat_p = sub.add_parser("status", help="Show all node statuses")
+    stat_p.add_argument("--repo", required=True, help="Path to git repo")
+
+    args = parser.parse_args()
+
+    if args.command == "tick":
+        cmd_tick(args)
+    elif args.command == "rehydrate":
+        cmd_rehydrate(args)
+    elif args.command == "status":
+        cmd_status(args)
+
+
+if __name__ == "__main__":
+    main()
