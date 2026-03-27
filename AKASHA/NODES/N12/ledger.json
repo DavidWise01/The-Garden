@@ -1,8 +1,8 @@
 {
-  "gen_W": 384.0,
-  "cons_W": 8.0,
-  "net_W": 376.0,
+  "gen_W": 884.0,
+  "cons_W": 10.0,
+  "net_W": 874.0,
   "debt_W": 0.0,
-  "credit_W": 7.359999999999999,
+  "credit_W": 25.36,
   "last_commit_cost_W": 0.0
 }
