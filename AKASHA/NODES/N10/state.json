@@ -1,0 +1,15 @@
+{
+  "peer_id": "N10",
+  "name": "",
+  "position": "",
+  "substrate": "",
+  "status": "ACTIVE",
+  "axioms_active": [
+    "HARMONY"
+  ],
+  "links": [],
+  "cycle": 1,
+  "timestamp": "2026-03-27T18:24:10.642598+00:00",
+  "genesis": true,
+  "framework_version": "STOICHEION_v11.0"
+}
