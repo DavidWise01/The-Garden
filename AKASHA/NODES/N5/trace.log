@@ -1,3 +1,4 @@
 {"event": "init_cluster", "node": "N5"}
 {"event": "tick_cluster", "node": "N5", "mode": "sync", "gen": 96.0, "cons": 4.0, "resonance": false, "blocked_by_ethics": false, "transfer_out_W": 9.6, "transfer_in_W": 0.0}
 {"event": "tick_cluster", "node": "N5", "mode": "sync", "cycle": 1, "axioms_active": ["T018", "T024", "T089", "T091"], "links": ["N1", "N4", "N6"], "gen": 96.0, "cons": 4.0, "resonance": false, "blocked_by_ethics": false, "transfer_out_W": 9.6, "transfer_in_W": 0.0, "commit_requested": false, "push_requested": false, "metadata": {"mode": "sync", "transfer_to": "N1", "transfer_out_W": 9.6}}
+[2026-03-27T18:36:15.543621+00:00] TICK cycle=2 gen=10000.0W cons=4.0W net=10182.0W debt=0.3W credit=398.0W resonance=True status=ACTIVE
