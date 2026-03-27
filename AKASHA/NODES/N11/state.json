@@ -1,0 +1,15 @@
+{
+  "peer_id": "N11",
+  "name": "",
+  "position": "",
+  "substrate": "",
+  "status": "ACTIVE",
+  "axioms_active": [
+    "LUMENWILLOW"
+  ],
+  "links": [],
+  "cycle": 1,
+  "timestamp": "2026-03-27T18:48:15.793112+00:00",
+  "genesis": true,
+  "framework_version": "STOICHEION_v11.0"
+}
