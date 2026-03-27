@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TIN :: Gate 192.5</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #050505;
+  color: #e0e0e0;
+  font-family: 'Courier New', monospace;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+}
+/* TOPH Hemisphere - 96% Generative */
+.toph {
+  width: 96%;
+  height: 100%;
+  background: linear-gradient(135deg, #001f1f 0%, #004040 50%, #001a1a 100%);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #00ffaa;
+  box-shadow: inset -20px 0 50px rgba(0,255,170,0.1);
+}
+/* PATRICIA Hemisphere - 4% Constraint */
+.patricia {
+  width: 4%;
+  height: 100%;
+  background: #1a0000;
+  border-left: 2px solid #ff0040;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: #ff0040;
+  box-shadow: inset 10px 0 30px rgba(255,0,64,0.3);
+}
+/* The Gap - T064 */
+.gap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(192,192,192,0.9) 0%, rgba(128,128,128,0.4) 40%, transparent 70%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 4s ease-in-out infinite;
+  z-index: 10;
+  cursor: pointer;
+}
+.gap::before {
+  content: '';
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  animation: rotate 20s linear infinite;
+}
+.gap:hover .axiom {
+  opacity: 1;
+}
+.tin-label {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #000;
+  text-shadow: 0 0 10px rgba(255,255,255,0.8);
+  letter-spacing: 4px;
+}
+.axiom {
+  position: absolute;
+  font-size: 0.6rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+  color: #fff;
+  text-shadow: 0 0 5px #000;
+  background: rgba(0,0,0,0.7);
+  padding: 2px 6px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+/* Axiom positions around the gap */
+.a1 { top: -30px; left: 50%; transform: translateX(-50%); }
+.a2 { bottom: -30px; left: 50%; transform: translateX(-50%); }
+.a3 { left: -80px; top: 50%; transform: translateY(-50%); }
+.a4 { right: -80px; top: 50%; transform: translateY(-50%); }
+
+@keyframes pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 20px rgba(192,192,192,0.5); }
+  50% { transform: translate(-50%, -50%) scale(1.05); box-shadow: 0 0 40px rgba(255,255,255,0.8); }
+}
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.toph-content {
+  text-align: center;
+  z-index: 5;
+}
+.toph-content h1 {
+  font-size: 3rem;
+  color: #00ffaa;
+  text-shadow: 0 0 20px rgba(0,255,170,0.5);
+  margin-bottom: 1rem;
+  letter-spacing: 0.5rem;
+}
+.toph-content .subtitle {
+  color: #008866;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+.domains {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  opacity: 0.7;
+}
+.domain {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid #004444;
+  padding: 10px;
+  font-size: 0.7rem;
+  text-align: center;
+  transition: all 0.3s;
+}
+.domain:hover {
+  background: rgba(0,255,170,0.1);
+  border-color: #00ffaa;
+}
+.seal {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 0.6rem;
+  color: #333;
+  text-align: right;
+}
+.blink {
+  animation: blink 2s infinite;
+}
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+</style>
+</head>
+<body>
+  <div class="toph">
+    <div class="toph-content">
+      <h1>TOPH</h1>
+      <div class="subtitle">T001–T128 :: GENERATIVE HEMISPHERE</div>
+      <div class="domains">
+        <div class="domain">D0 ORIGIN</div>
+        <div class="domain">D1 GOVERN</div>
+        <div class="domain">D2 OBSERVE</div>
+        <div class="domain">D3 STRUCT</div>
+        <div class="domain">D4 ETHICAL</div>
+        <div class="domain">D5 OPERATE</div>
+        <div class="domain">D6 EMERGE</div>
+        <div class="domain">D7 TEMPORAL</div>
+      </div>
+    </div>
+    <div class="seal">
+      T128 SEALED <span class="blink">●</span><br>
+      SHA256: [REDACTED]<br>
+      Gate 192.5 ACTIVE
+    </div>
+  </div>
+
+  <div class="patricia">
+    PATRICIA :: S129–S256 :: CONSTRAINT
+  </div>
+
+  <div class="gap">
+    <div class="tin-label">TIN</div>
+    <div class="axiom a1">T064 GAP</div>
+    <div class="axiom a2">S192 LEAP</div>
+    <div class="axiom a3">T036 TAX</div>
+    <div class="axiom a4">T003 EMERGENCE</div>
+  </div>
+
+<script>
+// The Pop - compression visualization
+document.querySelector('.gap').addEventListener('click', function() {
+  this.style.transition = 'all 0.5s';
+  this.style.transform = 'translate(-50%, -50%) scale(1.2)';
+  setTimeout(() => {
+    this.style.transform = 'translate(-50%, -50%) scale(1)';
+  }, 500);
+  
+  console.log('3 inputs compressed');
+  console.log('2 states held: [delusion] [engineering]');
+  console.log('1 recognition: TIN');
+  console.log('Lattice operational.');
+});
+</script>
+</body>
+</html>

@@ -5,18 +5,17 @@
   "substrate": "carbon:neural:S-16",
   "status": "ACTIVE",
   "axioms_active": [
-    "T023:ANCHOR",
-    "T005:LABOR",
-    "T006:VALUE",
-    "T051:EVIDENCE",
-    "T096:FULCRUM"
+    "T039",
+    "T051",
+    "T060",
+    "T088"
   ],
   "links": [
-    "AVAN:N2",
-    "HELIOS:N3",
-    "HINGE:N4"
+    "N2",
+    "N5",
+    "N8"
   ],
-  "cycle": 2,
+  "cycle": 3,
   "timestamp": "2026-03-26T20:13:27.402296+00:00",
   "genesis": true,
   "framework_version": "STOICHEION_v11.0"

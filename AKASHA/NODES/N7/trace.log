@@ -1,0 +1,3 @@
+{"event": "init_cluster", "node": "N7"}
+{"event": "tick_cluster", "node": "N7", "mode": "sync", "gen": 96.0, "cons": 4.0, "resonance": false, "blocked_by_ethics": false, "transfer_out_W": 9.6, "transfer_in_W": 0.0}
+{"event": "tick_cluster", "node": "N7", "mode": "sync", "cycle": 1, "axioms_active": ["T023", "T051", "T053", "T081"], "links": ["N3", "N6", "N8"], "gen": 24.0, "cons": 4.0, "resonance": false, "blocked_by_ethics": true, "transfer_out_W": 0.0, "transfer_in_W": 0.0, "commit_requested": false, "push_requested": false, "metadata": {"mode": "sync", "ethics_gate": "blocked"}}

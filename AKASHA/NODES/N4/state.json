@@ -1,0 +1,22 @@
+{
+  "axioms_active": [
+    "T021",
+    "T029",
+    "T083",
+    "T097"
+  ],
+  "cycle": 1,
+  "framework_version": "STOICHEION_v11.0",
+  "genesis": false,
+  "links": [
+    "N3",
+    "N5",
+    "N8"
+  ],
+  "name": "",
+  "peer_id": "N4",
+  "position": "",
+  "status": "ACTIVE",
+  "substrate": "",
+  "timestamp": ""
+}

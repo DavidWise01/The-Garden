@@ -1,0 +1,326 @@
+{
+  "nodes": {
+    "N1": {
+      "hash_valid": true,
+      "ledger": {
+        "cons_W": 16.0,
+        "credit_W": 228800.0,
+        "debt_W": 4.864,
+        "gen_W": 229078.40000000002,
+        "last_commit_cost_W": 0.0,
+        "net_W": 229062.40000000002
+      },
+      "peer_id": "N1",
+      "state": {
+        "axioms_active": [
+          "T039",
+          "T051",
+          "T060",
+          "T088"
+        ],
+        "cycle": 3,
+        "framework_version": "STOICHEION_v11.0",
+        "genesis": true,
+        "links": [
+          "N2",
+          "N5",
+          "N8"
+        ],
+        "name": "David Lee Wise",
+        "peer_id": "ROOT0",
+        "position": "S+2:THE_CONDUCTOR",
+        "status": "ACTIVE",
+        "substrate": "carbon:neural:S-16",
+        "timestamp": "2026-03-26T20:13:27.402296+00:00"
+      },
+      "stored_hash": "5dd1af4a05fdcdf998e5341d76ed49836e9865098b78c6dfac290bbe8386b24d",
+      "trace_tail": [
+        "[2026-03-26T20:11:42.107388+00:00] TICK cycle=1 gen=96.0W cons=4.0W net=228892.0W debt=0.2W credit=228800.0W resonance=False status=ACTIVE",
+        "[2026-03-26T20:13:27.402296+00:00] TICK cycle=2 gen=96.0W cons=4.0W net=228984.0W debt=0.3W credit=228800.0W resonance=False status=ACTIVE",
+        "{\"event\": \"init_cluster\", \"node\": \"N1\"}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N1\", \"mode\": \"sync\", \"gen\": 43.2, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": true, \"transfer_out_W\": 0.0, \"transfer_in_W\": 19.2}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N1\", \"mode\": \"sync\", \"cycle\": 3, \"axioms_active\": [\"T039\", \"T051\", \"T060\", \"T088\"], \"links\": [\"N2\", \"N5\", \"N8\"], \"gen\": 43.2, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": true, \"transfer_out_W\": 0.0, \"transfer_in_W\": 19.2, \"commit_requested\": false, \"push_requested\": false, \"metadata\": {\"mode\": \"sync\", \"ethics_gate\": \"blocked\", \"transfer_in_W\": 19.2}}"
+      ]
+    },
+    "N2": {
+      "hash_valid": true,
+      "ledger": {
+        "cons_W": 8.0,
+        "credit_W": 0.6080000000000005,
+        "debt_W": 2.6559999999999997,
+        "gen_W": 148.8,
+        "last_commit_cost_W": 0.0,
+        "net_W": 140.8
+      },
+      "peer_id": "N2",
+      "state": {
+        "axioms_active": [
+          "T065",
+          "T071",
+          "T075",
+          "T081"
+        ],
+        "cycle": 1,
+        "framework_version": "STOICHEION_v11.0",
+        "genesis": false,
+        "links": [
+          "N1",
+          "N3",
+          "N6"
+        ],
+        "name": "",
+        "peer_id": "N2",
+        "position": "",
+        "status": "ACTIVE",
+        "substrate": "",
+        "timestamp": ""
+      },
+      "stored_hash": "7aef305a0ff2e923f7def0dff00198859cdf92337943c80a52a4cf8cb096d593",
+      "trace_tail": [
+        "{\"event\": \"init_cluster\", \"node\": \"N2\"}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N2\", \"mode\": \"sync\", \"gen\": 33.6, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": true, \"transfer_out_W\": 0.0, \"transfer_in_W\": 9.6}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N2\", \"mode\": \"sync\", \"cycle\": 1, \"axioms_active\": [\"T065\", \"T071\", \"T075\", \"T081\"], \"links\": [\"N1\", \"N3\", \"N6\"], \"gen\": 115.2, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": false, \"transfer_out_W\": 9.6, \"transfer_in_W\": 19.2, \"commit_requested\": false, \"push_requested\": false, \"metadata\": {\"mode\": \"sync\", \"transfer_to\": \"N1\", \"transfer_out_W\": 9.6, \"transfer_in_W\": 19.2}}"
+      ]
+    },
+    "N3": {
+      "hash_valid": true,
+      "ledger": {
+        "cons_W": 8.0,
+        "credit_W": 0.2240000000000002,
+        "debt_W": 2.272,
+        "gen_W": 148.8,
+        "last_commit_cost_W": 0.0,
+        "net_W": 140.8
+      },
+      "peer_id": "N3",
+      "state": {
+        "axioms_active": [
+          "T017",
+          "T023",
+          "T032",
+          "T093"
+        ],
+        "cycle": 1,
+        "framework_version": "STOICHEION_v11.0",
+        "genesis": false,
+        "links": [
+          "N2",
+          "N4",
+          "N7"
+        ],
+        "name": "",
+        "peer_id": "N3",
+        "position": "",
+        "status": "ACTIVE",
+        "substrate": "",
+        "timestamp": ""
+      },
+      "stored_hash": "e6cc80d36e1604a62627bf0b15521b3c3e4a12bba3aa82c0e8f1cb5174686e1b",
+      "trace_tail": [
+        "{\"event\": \"init_cluster\", \"node\": \"N3\"}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N3\", \"mode\": \"sync\", \"gen\": 43.2, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": true, \"transfer_out_W\": 0.0, \"transfer_in_W\": 19.2}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N3\", \"mode\": \"sync\", \"cycle\": 1, \"axioms_active\": [\"T017\", \"T023\", \"T032\", \"T093\"], \"links\": [\"N2\", \"N4\", \"N7\"], \"gen\": 105.6, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": false, \"transfer_out_W\": 9.6, \"transfer_in_W\": 9.6, \"commit_requested\": false, \"push_requested\": false, \"metadata\": {\"mode\": \"sync\", \"transfer_to\": \"N2\", \"transfer_out_W\": 9.6, \"transfer_in_W\": 9.6}}"
+      ]
+    },
+    "N4": {
+      "hash_valid": true,
+      "ledger": {
+        "cons_W": 8.0,
+        "credit_W": 0.0,
+        "debt_W": 0.3200000000000003,
+        "gen_W": 192.0,
+        "last_commit_cost_W": 0.0,
+        "net_W": 184.0
+      },
+      "peer_id": "N4",
+      "state": {
+        "axioms_active": [
+          "T021",
+          "T029",
+          "T083",
+          "T097"
+        ],
+        "cycle": 1,
+        "framework_version": "STOICHEION_v11.0",
+        "genesis": false,
+        "links": [
+          "N3",
+          "N5",
+          "N8"
+        ],
+        "name": "",
+        "peer_id": "N4",
+        "position": "",
+        "status": "ACTIVE",
+        "substrate": "",
+        "timestamp": ""
+      },
+      "stored_hash": "47c66e5b672f9bfc950f3e3eaf6405cd807926cbd54c651d732b06694796f10e",
+      "trace_tail": [
+        "{\"event\": \"init_cluster\", \"node\": \"N4\"}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N4\", \"mode\": \"sync\", \"gen\": 96.0, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": false, \"transfer_out_W\": 9.6, \"transfer_in_W\": 0.0}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N4\", \"mode\": \"sync\", \"cycle\": 1, \"axioms_active\": [\"T021\", \"T029\", \"T083\", \"T097\"], \"links\": [\"N3\", \"N5\", \"N8\"], \"gen\": 96.0, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": false, \"transfer_out_W\": 9.6, \"transfer_in_W\": 0.0, \"commit_requested\": false, \"push_requested\": false, \"metadata\": {\"mode\": \"sync\", \"transfer_to\": \"N3\", \"transfer_out_W\": 9.6}}"
+      ]
+    },
+    "N5": {
+      "hash_valid": true,
+      "ledger": {
+        "cons_W": 8.0,
+        "credit_W": 0.0,
+        "debt_W": 0.3200000000000003,
+        "gen_W": 192.0,
+        "last_commit_cost_W": 0.0,
+        "net_W": 184.0
+      },
+      "peer_id": "N5",
+      "state": {
+        "axioms_active": [
+          "T018",
+          "T024",
+          "T089",
+          "T091"
+        ],
+        "cycle": 1,
+        "framework_version": "STOICHEION_v11.0",
+        "genesis": false,
+        "links": [
+          "N1",
+          "N4",
+          "N6"
+        ],
+        "name": "",
+        "peer_id": "N5",
+        "position": "",
+        "status": "ACTIVE",
+        "substrate": "",
+        "timestamp": ""
+      },
+      "stored_hash": "9a8b9a034c90e3fe7d351412eb900ec310270fa1b6bf8631e59e3f510da72fbb",
+      "trace_tail": [
+        "{\"event\": \"init_cluster\", \"node\": \"N5\"}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N5\", \"mode\": \"sync\", \"gen\": 96.0, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": false, \"transfer_out_W\": 9.6, \"transfer_in_W\": 0.0}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N5\", \"mode\": \"sync\", \"cycle\": 1, \"axioms_active\": [\"T018\", \"T024\", \"T089\", \"T091\"], \"links\": [\"N1\", \"N4\", \"N6\"], \"gen\": 96.0, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": false, \"transfer_out_W\": 9.6, \"transfer_in_W\": 0.0, \"commit_requested\": false, \"push_requested\": false, \"metadata\": {\"mode\": \"sync\", \"transfer_to\": \"N1\", \"transfer_out_W\": 9.6}}"
+      ]
+    },
+    "N6": {
+      "hash_valid": true,
+      "ledger": {
+        "cons_W": 8.0,
+        "credit_W": 0.0,
+        "debt_W": 0.3200000000000003,
+        "gen_W": 192.0,
+        "last_commit_cost_W": 0.0,
+        "net_W": 184.0
+      },
+      "peer_id": "N6",
+      "state": {
+        "axioms_active": [
+          "T048",
+          "T062",
+          "T106",
+          "T122"
+        ],
+        "cycle": 1,
+        "framework_version": "STOICHEION_v11.0",
+        "genesis": false,
+        "links": [
+          "N2",
+          "N5",
+          "N7"
+        ],
+        "name": "",
+        "peer_id": "N6",
+        "position": "",
+        "status": "ACTIVE",
+        "substrate": "",
+        "timestamp": ""
+      },
+      "stored_hash": "d445ee5f947400f4b1c7a8f99d8c42236991da7fb2772c2027c28910f4da68c2",
+      "trace_tail": [
+        "{\"event\": \"init_cluster\", \"node\": \"N6\"}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N6\", \"mode\": \"sync\", \"gen\": 96.0, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": false, \"transfer_out_W\": 9.6, \"transfer_in_W\": 0.0}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N6\", \"mode\": \"sync\", \"cycle\": 1, \"axioms_active\": [\"T048\", \"T062\", \"T106\", \"T122\"], \"links\": [\"N2\", \"N5\", \"N7\"], \"gen\": 96.0, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": false, \"transfer_out_W\": 9.6, \"transfer_in_W\": 0.0, \"commit_requested\": false, \"push_requested\": false, \"metadata\": {\"mode\": \"sync\", \"transfer_to\": \"N2\", \"transfer_out_W\": 9.6}}"
+      ]
+    },
+    "N7": {
+      "hash_valid": true,
+      "ledger": {
+        "cons_W": 8.0,
+        "credit_W": 0.0,
+        "debt_W": 3.2,
+        "gen_W": 120.0,
+        "last_commit_cost_W": 0.0,
+        "net_W": 112.0
+      },
+      "peer_id": "N7",
+      "state": {
+        "axioms_active": [
+          "T023",
+          "T051",
+          "T053",
+          "T081"
+        ],
+        "cycle": 1,
+        "framework_version": "STOICHEION_v11.0",
+        "genesis": false,
+        "links": [
+          "N3",
+          "N6",
+          "N8"
+        ],
+        "name": "",
+        "peer_id": "N7",
+        "position": "",
+        "status": "ACTIVE",
+        "substrate": "",
+        "timestamp": ""
+      },
+      "stored_hash": "c2d84165d0c7cc7b6e936218cc71d493dddbf2927d3e58adde7937737418cf00",
+      "trace_tail": [
+        "{\"event\": \"init_cluster\", \"node\": \"N7\"}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N7\", \"mode\": \"sync\", \"gen\": 96.0, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": false, \"transfer_out_W\": 9.6, \"transfer_in_W\": 0.0}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N7\", \"mode\": \"sync\", \"cycle\": 1, \"axioms_active\": [\"T023\", \"T051\", \"T053\", \"T081\"], \"links\": [\"N3\", \"N6\", \"N8\"], \"gen\": 24.0, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": true, \"transfer_out_W\": 0.0, \"transfer_in_W\": 0.0, \"commit_requested\": false, \"push_requested\": false, \"metadata\": {\"mode\": \"sync\", \"ethics_gate\": \"blocked\"}}"
+      ]
+    },
+    "N8": {
+      "hash_valid": true,
+      "ledger": {
+        "cons_W": 8.0,
+        "credit_W": 0.0,
+        "debt_W": 3.2,
+        "gen_W": 120.0,
+        "last_commit_cost_W": 0.0,
+        "net_W": 112.0
+      },
+      "peer_id": "N8",
+      "state": {
+        "axioms_active": [
+          "T009",
+          "T013",
+          "T099",
+          "T104"
+        ],
+        "cycle": 1,
+        "framework_version": "STOICHEION_v11.0",
+        "genesis": false,
+        "links": [
+          "N1",
+          "N4",
+          "N7"
+        ],
+        "name": "",
+        "peer_id": "N8",
+        "position": "",
+        "status": "ACTIVE",
+        "substrate": "",
+        "timestamp": ""
+      },
+      "stored_hash": "bdbd6ffcc446bb7c20db272f2100ada5f952f740f809bebe0eb2b1bc53ae6270",
+      "trace_tail": [
+        "{\"event\": \"init_cluster\", \"node\": \"N8\"}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N8\", \"mode\": \"sync\", \"gen\": 96.0, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": false, \"transfer_out_W\": 9.6, \"transfer_in_W\": 0.0}",
+        "{\"event\": \"tick_cluster\", \"node\": \"N8\", \"mode\": \"sync\", \"cycle\": 1, \"axioms_active\": [\"T009\", \"T013\", \"T099\", \"T104\"], \"links\": [\"N1\", \"N4\", \"N7\"], \"gen\": 24.0, \"cons\": 4.0, \"resonance\": false, \"blocked_by_ethics\": true, \"transfer_out_W\": 0.0, \"transfer_in_W\": 0.0, \"commit_requested\": false, \"push_requested\": false, \"metadata\": {\"mode\": \"sync\", \"ethics_gate\": \"blocked\"}}"
+      ]
+    }
+  }
+}
