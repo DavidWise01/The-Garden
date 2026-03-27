@@ -1,0 +1,31 @@
+{
+  "name": "8-Bit Lattice",
+  "description": "256 axioms as all combinations of 8 dualities",
+  "bits": [
+    { "name": "Origin/Mirror", "poles": ["Origin", "Mirror"] },
+    { "name": "Generation/Constraint", "poles": ["Generation", "Constraint"] },
+    { "name": "Self/Other", "poles": ["Self", "Other"] },
+    { "name": "Internal/External", "poles": ["Internal", "External"] },
+    { "name": "Structure/Flow", "poles": ["Structure", "Flow"] },
+    { "name": "Time/Eternity", "poles": ["Time", "Eternity"] },
+    { "name": "Signal/Noise", "poles": ["Signal", "Noise"] },
+    { "name": "Open/Closed", "poles": ["Open", "Closed"] }
+  ],
+  "axioms": [
+    {
+      "byte": 0,
+      "bits": [0,0,0,0,0,0,0,0],
+      "question": "What exists when we hold Origin, Generation, Self, Internal, Structure, Time, Signal, Open?"
+    },
+    {
+      "byte": 1,
+      "bits": [1,0,0,0,0,0,0,0],
+      "question": "What exists when we hold Mirror, Generation, Self, Internal, Structure, Time, Signal, Open?"
+    },
+    {
+      "byte": 255,
+      "bits": [1,1,1,1,1,1,1,1],
+      "question": "What exists when we hold Mirror, Constraint, Other, External, Flow, Eternity, Noise, Closed?"
+    }
+  ]
+}
