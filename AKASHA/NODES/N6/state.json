@@ -1,22 +1,22 @@
 {
+  "peer_id": "N6",
+  "name": "",
+  "position": "",
+  "substrate": "",
+  "status": "ACTIVE",
   "axioms_active": [
     "T048",
     "T062",
     "T106",
     "T122"
   ],
-  "cycle": 1,
-  "framework_version": "STOICHEION_v11.0",
-  "genesis": false,
   "links": [
     "N2",
     "N5",
     "N7"
   ],
-  "name": "",
-  "peer_id": "N6",
-  "position": "",
-  "status": "ACTIVE",
-  "substrate": "",
-  "timestamp": ""
+  "cycle": 2,
+  "timestamp": "2026-03-27T18:36:27.664780+00:00",
+  "genesis": false,
+  "framework_version": "STOICHEION_v11.0"
 }
