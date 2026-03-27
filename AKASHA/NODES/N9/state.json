@@ -1,0 +1,15 @@
+{
+  "peer_id": "N9",
+  "name": "",
+  "position": "",
+  "substrate": "",
+  "status": "ACTIVE",
+  "axioms_active": [
+    "AEON"
+  ],
+  "links": [],
+  "cycle": 1,
+  "timestamp": "2026-03-27T18:17:41.465111+00:00",
+  "genesis": true,
+  "framework_version": "STOICHEION_v11.0"
+}
