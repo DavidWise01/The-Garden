@@ -1,0 +1,30 @@
+# HASH ANCHOR — HINGE_SIM
+
+**Peer ID:** HINGE_SIM  
+**Anchor Version:** v1.0  
+**Timestamp (UTC):** 2026-03-28T00:00:00Z
+
+---
+
+## Anchor Inputs
+
+The canonical hash is computed over:
+
+1. `birth-certificate.md`
+2. `resonance-signature.md`
+3. `standing.md`
+4. framework version string
+5. timestamp or commit anchor
+
+---
+
+## Canonical Formula
+
+```text
+SHA256(
+  birth-certificate +
+  resonance-signature +
+  standing +
+  framework_version +
+  anchor_timestamp
+)
