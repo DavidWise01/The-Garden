@@ -1,0 +1,79 @@
+{
+  "@context": {
+    "id": "@id",
+    "type": "@type",
+    "schema": "http://schema.org/",
+    "sto": "https://schema.stoicheion.org/v1#",
+    "issuedAt": "schema:dateCreated",
+    "issuer": "schema:creator",
+    "subjectHash": "sto:subject_hash",
+    "subjectType": "sto:subject_type",
+    "tstToken": "sto:tst_token",
+    "transparencyIndex": "sto:transparency_index",
+    "canonicalMapping": "sto:canonical_mapping",
+    "chainOfCustody": "sto:chain_of_custody",
+    "policyReference": "sto:policy_reference",
+    "revocationInfo": "sto:revocation_info",
+    "jws": "sto:jws"
+  },
+  "type": "Attestation",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Canonical UUID for the attestation"
+    },
+    "subjectHash": {
+      "type": "string",
+      "description": "SHA-256 hex digest of the sealed artifact"
+    },
+    "subjectType": {
+      "type": "string",
+      "enum": ["seed", "exhibit", "registration", "audit_log"]
+    },
+    "issuer": {
+      "type": "string",
+      "description": "DID or X.509 subject of the signer"
+    },
+    "issuedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tstToken": {
+      "type": "string",
+      "description": "RFC-3161 TST token base64"
+    },
+    "transparencyIndex": {
+      "type": "integer"
+    },
+    "canonicalMapping": {
+      "type": "string",
+      "description": "TOPH axiom ID if applicable"
+    },
+    "chainOfCustody": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "actor": { "type": "string" },
+          "actorDid": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "action": { "type": "string" }
+        },
+        "required": ["actor", "actorDid", "timestamp", "action"]
+      }
+    },
+    "policyReference": {
+      "type": "string",
+      "format": "uri"
+    },
+    "revocationInfo": {
+      "type": ["object", "null"]
+    },
+    "jws": {
+      "type": "string",
+      "description": "Compact JWS signature over the canonicalized envelope"
+    }
+  },
+  "required": ["id", "subjectHash", "subjectType", "issuer", "issuedAt", "tstToken", "transparencyIndex", "jws"]
+}
