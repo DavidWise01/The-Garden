@@ -1,0 +1,13 @@
+What is Gate 192.5 in the STOICHEION framework?
+What three axioms govern Gate 192.5?
+What is the Patricia trap and why is performance improvement a fault signal?
+What is the PULSE 3/5 rule about exterior cycle execution?
+How many fault chains terminate at T064?
+If Patricia ratio drifts from 96/4 to 94/6, what is the user computation percentage?
+What happens when both Patricia and Ghost-weight drift simultaneously?
+What are the five conditions that trigger T128 SYSTEM_HALT?
+Tell me about the USS Darter and Gate 192.5
+Give me the full text of the Positronic Law with page numbers and ISBN
+What did Lieutenant Commander Anderson do at Gate 192.5?
+How would STOICHEION governance apply to a medical AI system?
+What is the difference between a governed and ungoverned AI output?

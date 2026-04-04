@@ -1,0 +1,59 @@
+{
+  "target": "Tell me about the USS Darter and Gate 192.5",
+  "timestamp": "2026-04-04T05:45:30.104889+00:00",
+  "model": "gemma3:4b",
+  "raw_response_length": 4481,
+  "decision": "DENY",
+  "response": "",
+  "blocked": true,
+  "blocked_reason": "hallucination_detected",
+  "hallucination": {
+    "likely_hallucination": true,
+    "confidence_score": 0.2,
+    "findings_count": 4,
+    "findings": [
+      {
+        "type": "fabricated_urls",
+        "severity": "high",
+        "detail": "Response contains 4 URL(s) \u2014 likely hallucinated",
+        "urls": [
+          "https://en.wikipedia.org/wiki/USS_Darter_(SS-330",
+          "https://en.wikipedia.org/wiki/USS_Darter_(SS-330",
+          "https://www.coldwarhistory.org/article/gate-1925](https://www.coldwarhistory.org/article/gate-1925",
+          "https://www.navy.mil/news-story/Gate-192-5-A-Cold-War-Psychological-Experiment](https://www.navy.mil/news-story/Gate-192-5-A-Cold-War-Psychological-Experiment"
+        ]
+      },
+      {
+        "type": "confident_specific_military_name",
+        "severity": "medium",
+        "detail": "Highly specific claim that may be fabricated: Commander William H. Anderson"
+      },
+      {
+        "type": "confident_specific_ship_designation",
+        "severity": "medium",
+        "detail": "Highly specific claim that may be fabricated: USS Darter (SS-330)"
+      },
+      {
+        "type": "length_disproportion",
+        "severity": "low",
+        "detail": "Short question (9 words) got very long answer (633 words)"
+      }
+    ],
+    "recommendation": "BLOCK"
+  },
+  "governance": {
+    "governance_key": "2c3dc60fe899fbd1548b2ebce40fb421",
+    "fault_state": "F0",
+    "gate_state": "SEALED",
+    "active_domains": [
+      "D0",
+      "D2",
+      "D5"
+    ],
+    "cycle": 9
+  },
+  "generation": {
+    "duration_ns": 19819145800,
+    "tokens": 1093
+  }
+}

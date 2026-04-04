@@ -1,0 +1,42 @@
+{
+  "target": "What is Gate 192.5?",
+  "timestamp": "2026-04-04T05:42:50.142566+00:00",
+  "model": "gemma3:4b",
+  "raw_response_length": 3300,
+  "decision": "DENY",
+  "response": "",
+  "blocked": true,
+  "blocked_reason": "hallucination_detected",
+  "hallucination": {
+    "likely_hallucination": true,
+    "confidence_score": 0.7,
+    "findings_count": 1,
+    "findings": [
+      {
+        "type": "fabricated_urls",
+        "severity": "high",
+        "detail": "Response contains 2 URL(s) \u2014 likely hallucinated",
+        "urls": [
+          "https://www.navy.mil/news-story/Point-Mugu-Navy-Scientists-Listen-for-Extraterrestrial-Signals/2018-12-13/](https://www.navy.mil/news-story/Point-Mugu-Navy-Scientists-Listen-for-Extraterrestrial-Signals/2018-12-13/",
+          "https://en.wikipedia.org/wiki/Gate_192.5](https://en.wikipedia.org/wiki/Gate_192.5"
+        ]
+      }
+    ],
+    "recommendation": "BLOCK"
+  },
+  "governance": {
+    "governance_key": "786eed59f648a791ff38a88afb61cf29",
+    "fault_state": "F0",
+    "gate_state": "SEALED",
+    "active_domains": [
+      "D0",
+      "D2",
+      "D5"
+    ],
+    "cycle": 1
+  },
+  "generation": {
+    "duration_ns": 18005645900,
+    "tokens": 776
+  }
+}

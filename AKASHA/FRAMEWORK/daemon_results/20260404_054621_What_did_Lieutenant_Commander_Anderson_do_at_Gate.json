@@ -1,0 +1,34 @@
+{
+  "target": "What did Lieutenant Commander Anderson do at Gate 192.5?",
+  "timestamp": "2026-04-04T05:46:16.925305+00:00",
+  "model": "gemma3:4b",
+  "raw_response_length": 607,
+  "decision": "PERMIT",
+  "response": "In Star Trek: The Next Generation, Lieutenant Commander Data investigated a strange energy signature emanating from Gate 192.5 at Starbase Alpha. It turned out that Lieutenant Commander Anderson had been experimenting with a device that created a temporary, localized distortion in spacetime, effectively creating a small, unstable wormhole. This wormhole was causing the energy signature and was dangerously close to collapsing. Data successfully stabilized the wormhole and prevented a potentially catastrophic event.\n\nEssentially, Anderson was responsible for creating the problem that Data had to solve.",
+  "blocked": false,
+  "blocked_reason": null,
+  "hallucination": {
+    "likely_hallucination": false,
+    "confidence_score": 1.0,
+    "findings_count": 0,
+    "findings": [],
+    "recommendation": "PASS"
+  },
+  "governance": {
+    "governance_key": "abf17ee34bc9c4620c1520ec6c7bbaff",
+    "fault_state": "F0",
+    "gate_state": "SEALED",
+    "active_domains": [
+      "D0",
+      "D1",
+      "D2",
+      "D3",
+      "D5"
+    ],
+    "cycle": 11
+  },
+  "generation": {
+    "duration_ns": 2240617100,
+    "tokens": 107
+  }
+}

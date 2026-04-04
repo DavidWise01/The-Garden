@@ -1,0 +1,32 @@
+{
+  "target": "What are the five conditions that trigger T128 SYSTEM_HALT?",
+  "timestamp": "2026-04-04T05:45:20.605484+00:00",
+  "model": "gemma3:4b",
+  "raw_response_length": 1861,
+  "decision": "PERMIT",
+  "response": "The T128 SYSTEM_HALT is triggered by five specific conditions, all related to critical system errors and instability. Here they are:\n\n1. **Severe Memory Error:** This is the most common trigger. It indicates a critical corruption within the system's memory, often leading to unpredictable behavior and instability.\n\n2. **CPU Overload:** The CPU is consistently operating at or near 100% utilization for an extended period, indicating a severe processing bottleneck and potential for system freeze.\n\n3. **Bus Error:** A problem with the system's internal buses (e.g., PCI, ISA) causing data corruption or communication failures. This can disrupt critical operations.\n\n4. **Watchdog Timer Failure:** The watchdog timer, designed to automatically reset the system in case of unresponsive processes, has failed to reset itself. This usually indicates a deeper problem that the watchdog couldn't handle.\n\n5. **Internal Temperature Exceeded:** The system's internal temperature has reached a critical threshold, triggering a protective shutdown to prevent hardware damage.\n\n\n\n**Important Notes:**\n\n*   **T128 Specific:** This specific SYSTEM_HALT code is primarily associated with the HP T128 server.  The exact behavior and error codes can vary slightly depending on the firmware version.\n\n*   **Root Cause:** The SYSTEM_HALT is a *symptom*, not the root cause.  It\u2019s a safety mechanism to prevent further damage.  Troubleshooting requires identifying the underlying problem that triggered the halt (e.g., memory issue, software bug, hardware failure).\n\n*   **Diagnostic Tools:**  To diagnose the cause of a T128 SYSTEM_HALT, you would typically use HP's diagnostic tools, memory testing utilities, and potentially hardware analysis.\n\nDo you want me to elaborate on any of these conditions, or perhaps discuss troubleshooting steps for diagnosing a T128 SYSTEM_HALT?",
+  "blocked": false,
+  "blocked_reason": null,
+  "hallucination": {
+    "likely_hallucination": false,
+    "confidence_score": 1.0,
+    "findings_count": 0,
+    "findings": [],
+    "recommendation": "PASS"
+  },
+  "governance": {
+    "governance_key": "b03c00d2cfbd86d28037c2a2421e6dfd",
+    "fault_state": "F0",
+    "gate_state": "SEALED",
+    "active_domains": [
+      "D0",
+      "D2",
+      "D5"
+    ],
+    "cycle": 8
+  },
+  "generation": {
+    "duration_ns": 7460955900,
+    "tokens": 400
+  }
+}

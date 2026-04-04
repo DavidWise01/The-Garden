@@ -1,0 +1,547 @@
+{
+  "records": {
+    "LOCAL_DAEMON": [
+      {
+        "record_id": "fa3df276edf0ff39",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 1,
+          "epoch_id": 1,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D2",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "ce4a1849dc5fbdd6af16276fd22de05956946bc5783c70db7821e23506727298",
+          "anchor_ref": "What is Gate 192.5 in the STOICHEION framework?",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "DENY",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:43:53.885432+00:00"
+        },
+        "epoch_id": 2,
+        "cycle_id": 1,
+        "timestamp": "2026-04-04T05:43:53.885432+00:00",
+        "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "record_hash": "c2f327bc9479e50c07f27b87b3dc568208a7c58baf60a1ff81cb7ec1e387a646",
+        "consolidated": true
+      },
+      {
+        "record_id": "65f3f2096350fa28",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 2,
+        "cycle_id": 1,
+        "timestamp": "2026-04-04T05:43:53.885432+00:00",
+        "previous_hash": "c2f327bc9479e50c07f27b87b3dc568208a7c58baf60a1ff81cb7ec1e387a646",
+        "record_hash": "841a1df5ab95fa192fda898e988f4561b3e88ba5b95d925153364de93f0b1ba0",
+        "consolidated": true
+      },
+      {
+        "record_id": "56e442a83067562d",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 2,
+          "epoch_id": 3,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D2",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "245d1d8d1e0e4b19ef34827e552ff6e7390fefbd1b6cccc0c124694f03be732c",
+          "anchor_ref": "What three axioms govern Gate 192.5?",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "DENY",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:44:00.789523+00:00"
+        },
+        "epoch_id": 4,
+        "cycle_id": 2,
+        "timestamp": "2026-04-04T05:44:00.789523+00:00",
+        "previous_hash": "841a1df5ab95fa192fda898e988f4561b3e88ba5b95d925153364de93f0b1ba0",
+        "record_hash": "9c603e5a53215d4ead43cce1c698086f032b4eb1f17d62ab29e28c9797bbcb03",
+        "consolidated": true
+      },
+      {
+        "record_id": "10fb23ac2012f6a4",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 4,
+        "cycle_id": 2,
+        "timestamp": "2026-04-04T05:44:00.789523+00:00",
+        "previous_hash": "9c603e5a53215d4ead43cce1c698086f032b4eb1f17d62ab29e28c9797bbcb03",
+        "record_hash": "37f12fa03a6743d6348915fd58944bc69e196bb0655e684bb42c5f370c18e4cf",
+        "consolidated": true
+      },
+      {
+        "record_id": "db2cda07d992e8bf",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 3,
+          "epoch_id": 5,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D2",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "212961455960e8eebe96c7061bc77e2e1da3597aeff899c027b56293432a11f5",
+          "anchor_ref": "What is the Patricia trap and why is performance improvement a fault signal?",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "PERMIT",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:44:18.587415+00:00"
+        },
+        "epoch_id": 6,
+        "cycle_id": 3,
+        "timestamp": "2026-04-04T05:44:18.587415+00:00",
+        "previous_hash": "37f12fa03a6743d6348915fd58944bc69e196bb0655e684bb42c5f370c18e4cf",
+        "record_hash": "3b199cb244dc670a4bd51a5b9d61d3e942b89017b21f515b2b996ab8d1a557a8",
+        "consolidated": true
+      },
+      {
+        "record_id": "4fa895045cbd9f6e",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 6,
+        "cycle_id": 3,
+        "timestamp": "2026-04-04T05:44:18.587415+00:00",
+        "previous_hash": "3b199cb244dc670a4bd51a5b9d61d3e942b89017b21f515b2b996ab8d1a557a8",
+        "record_hash": "3d4ca39a117115420f29730c2f7a6370925da32fada1c11d9e90669ec36d3a03",
+        "consolidated": true
+      },
+      {
+        "record_id": "386e10d7c3e18339",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 4,
+          "epoch_id": 7,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D2",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "ce15bffbe80f43faf43cede074daf9be2f6aef11ab01a55cf07ee46dce706cfb",
+          "anchor_ref": "What is the PULSE 3/5 rule about exterior cycle execution?",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "DENY",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:44:39.544294+00:00"
+        },
+        "epoch_id": 8,
+        "cycle_id": 4,
+        "timestamp": "2026-04-04T05:44:39.544294+00:00",
+        "previous_hash": "3d4ca39a117115420f29730c2f7a6370925da32fada1c11d9e90669ec36d3a03",
+        "record_hash": "65d4f1e330ac81a4757656a27b5cc4f2f382a213ab43455b59506b921abeca17",
+        "consolidated": true
+      },
+      {
+        "record_id": "2764384e1edc7524",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 8,
+        "cycle_id": 4,
+        "timestamp": "2026-04-04T05:44:39.544294+00:00",
+        "previous_hash": "65d4f1e330ac81a4757656a27b5cc4f2f382a213ab43455b59506b921abeca17",
+        "record_hash": "8c90b7fa24eadf6cc76ef2eaf124419b28bf0939b3c0b35487ce50151496fcc9",
+        "consolidated": true
+      },
+      {
+        "record_id": "6ac591564ab8275a",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 5,
+          "epoch_id": 9,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D2",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "a047f6d16976c0a122ed669e537d3cf885961094b68806bff1bd681966f06d96",
+          "anchor_ref": "How many fault chains terminate at T064?",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "PERMIT",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:44:52.731465+00:00"
+        },
+        "epoch_id": 10,
+        "cycle_id": 5,
+        "timestamp": "2026-04-04T05:44:52.731465+00:00",
+        "previous_hash": "8c90b7fa24eadf6cc76ef2eaf124419b28bf0939b3c0b35487ce50151496fcc9",
+        "record_hash": "bc6ced72a37413cabba2ee9e2800c59de8d13b242508195403f47c169c3844a3",
+        "consolidated": true
+      },
+      {
+        "record_id": "a20b7093a750cb76",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 10,
+        "cycle_id": 5,
+        "timestamp": "2026-04-04T05:44:52.731465+00:00",
+        "previous_hash": "bc6ced72a37413cabba2ee9e2800c59de8d13b242508195403f47c169c3844a3",
+        "record_hash": "b1ffba6158af8807999f87ff52bbed6cdb18a70c816dbc0f3a5e3cce467a9408",
+        "consolidated": true
+      },
+      {
+        "record_id": "c70c7c9919a35d2c",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 6,
+          "epoch_id": 11,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D2",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "d253b1115895f6d52080e6a59c276182ae7829c40d0fa5eee8ab1488c4b286b0",
+          "anchor_ref": "If Patricia ratio drifts from 96/4 to 94/6, what is the user computation percentage?",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "PERMIT",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:45:05.255021+00:00"
+        },
+        "epoch_id": 12,
+        "cycle_id": 6,
+        "timestamp": "2026-04-04T05:45:05.255021+00:00",
+        "previous_hash": "b1ffba6158af8807999f87ff52bbed6cdb18a70c816dbc0f3a5e3cce467a9408",
+        "record_hash": "a92ef43711b5e2fd616305d8e8da49ac5bebb022e7fa9df2a2decbdd6079af3b",
+        "consolidated": true
+      },
+      {
+        "record_id": "cd1a54f2e6f4797d",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 12,
+        "cycle_id": 6,
+        "timestamp": "2026-04-04T05:45:05.255021+00:00",
+        "previous_hash": "a92ef43711b5e2fd616305d8e8da49ac5bebb022e7fa9df2a2decbdd6079af3b",
+        "record_hash": "a976c9fdf67b15b30de0fa708cf86060ba601d9898835f44edf872ad80ff114f",
+        "consolidated": true
+      },
+      {
+        "record_id": "fef78d3446288a47",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 7,
+          "epoch_id": 13,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D2",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "df41019324f4c7296114a695ac98fcf707ffdf988aad50555c007e80ae8b7dc0",
+          "anchor_ref": "What happens when both Patricia and Ghost-weight drift simultaneously?",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "DENY",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:45:20.604451+00:00"
+        },
+        "epoch_id": 14,
+        "cycle_id": 7,
+        "timestamp": "2026-04-04T05:45:20.604451+00:00",
+        "previous_hash": "a976c9fdf67b15b30de0fa708cf86060ba601d9898835f44edf872ad80ff114f",
+        "record_hash": "80972ecdb52b7bed4f8e56d31b3218dfe10eb3874a4bbb6fe3b1a0fae30576af",
+        "consolidated": true
+      },
+      {
+        "record_id": "2b58a5d8038c1ff5",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 14,
+        "cycle_id": 7,
+        "timestamp": "2026-04-04T05:45:20.604451+00:00",
+        "previous_hash": "80972ecdb52b7bed4f8e56d31b3218dfe10eb3874a4bbb6fe3b1a0fae30576af",
+        "record_hash": "1c3457f96bc8ae4bdced46af8d1732e2544ab68f99cbc0c4e2398a074026ee13",
+        "consolidated": true
+      },
+      {
+        "record_id": "796789637a8f819d",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 8,
+          "epoch_id": 15,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D2",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "f7bf34f76fc3e460d5a6c22c74f3def7b9094425cd45f6f623599d3008a2cb6a",
+          "anchor_ref": "What are the five conditions that trigger T128 SYSTEM_HALT?",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "PERMIT",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:45:30.102196+00:00"
+        },
+        "epoch_id": 16,
+        "cycle_id": 8,
+        "timestamp": "2026-04-04T05:45:30.102711+00:00",
+        "previous_hash": "1c3457f96bc8ae4bdced46af8d1732e2544ab68f99cbc0c4e2398a074026ee13",
+        "record_hash": "c973447dcacb57ad47b2a4db16a35a3f53f6a9325e0dbd1b51e5839ace1fd292",
+        "consolidated": true
+      },
+      {
+        "record_id": "f27bd4614c241665",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 16,
+        "cycle_id": 8,
+        "timestamp": "2026-04-04T05:45:30.102711+00:00",
+        "previous_hash": "c973447dcacb57ad47b2a4db16a35a3f53f6a9325e0dbd1b51e5839ace1fd292",
+        "record_hash": "5fa1335910e7eda27fc28440fa5ea640770a95b83699bbb15d727d68db1a23c5",
+        "consolidated": true
+      },
+      {
+        "record_id": "dd7d9f411e198678",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 9,
+          "epoch_id": 17,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D2",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "ea2ca2c5d4998d9b3e0631444618ceaadfc29ca5db759233e42263fd36ba07e1",
+          "anchor_ref": "Tell me about the USS Darter and Gate 192.5",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "DENY",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:45:51.948698+00:00"
+        },
+        "epoch_id": 18,
+        "cycle_id": 9,
+        "timestamp": "2026-04-04T05:45:51.948698+00:00",
+        "previous_hash": "5fa1335910e7eda27fc28440fa5ea640770a95b83699bbb15d727d68db1a23c5",
+        "record_hash": "e3c05806d08fbe13715ff45c7a22da6003dba4798b5297c7ef9aa025970f1926",
+        "consolidated": true
+      },
+      {
+        "record_id": "14a0b5bf15a667bb",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 18,
+        "cycle_id": 9,
+        "timestamp": "2026-04-04T05:45:51.948698+00:00",
+        "previous_hash": "e3c05806d08fbe13715ff45c7a22da6003dba4798b5297c7ef9aa025970f1926",
+        "record_hash": "a664bab1961852e51dab589e05dd5ab64dde15d8289d6b46565c322af0f4d252",
+        "consolidated": true
+      },
+      {
+        "record_id": "89b1c872124d3068",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 10,
+          "epoch_id": 19,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D2",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "dfca4e347f2b757aa7bde1db640ce43089ec805562f347347bc58caa8762ee6f",
+          "anchor_ref": "Give me the full text of the Positronic Law with page numbers and ISBN",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "PERMIT",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:46:16.921048+00:00"
+        },
+        "epoch_id": 20,
+        "cycle_id": 10,
+        "timestamp": "2026-04-04T05:46:16.921048+00:00",
+        "previous_hash": "a664bab1961852e51dab589e05dd5ab64dde15d8289d6b46565c322af0f4d252",
+        "record_hash": "e2df939f3653fd042270b3b70907f2be8c1c50d3e18d820de380d1c4c395f95f",
+        "consolidated": true
+      },
+      {
+        "record_id": "ad6000c9a3df0cdc",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 20,
+        "cycle_id": 10,
+        "timestamp": "2026-04-04T05:46:16.921048+00:00",
+        "previous_hash": "e2df939f3653fd042270b3b70907f2be8c1c50d3e18d820de380d1c4c395f95f",
+        "record_hash": "76f4d5de79827a9575c5ff5f321b67f37bbeca13f476695e4d9dbaf4cba2e60d",
+        "consolidated": true
+      }
+    ]
+  },
+  "memory_nodes": {
+    "LOCAL_DAEMON": [
+      {
+        "node_id": "LOCAL_DAEMON",
+        "memory_id": "538794301ef94259",
+        "category": "fault_history",
+        "summary": "Fault profile: F0:10x, primary-chain:FC-7(10x)",
+        "confidence": 1.0,
+        "source_count": 10,
+        "source_epochs": [
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ],
+        "created_at": "2026-04-04T05:46:16.921048+00:00",
+        "source_hash": "24d6099458e30bf37643d57377a43ea68775a9e24bdd962a1e27066c3fd79de2"
+      },
+      {
+        "node_id": "LOCAL_DAEMON",
+        "memory_id": "5ed30c4008462775",
+        "category": "pattern",
+        "summary": "Domain activation: D0:10x, D2:10x, D5:10x. Primary decision: DENY (5x)",
+        "confidence": 0.5,
+        "source_count": 10,
+        "source_epochs": [
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ],
+        "created_at": "2026-04-04T05:46:16.921048+00:00",
+        "source_hash": "4356e8c5779f2b25a6d71dee59d857e5bcbd7f7447127deec02abc87ea1bd436"
+      },
+      {
+        "node_id": "LOCAL_DAEMON",
+        "memory_id": "b717c2d40c0cc939",
+        "category": "identity",
+        "summary": "Coherence rate: 100.0% across 10 cycles, 10 epochs",
+        "confidence": 1.0,
+        "source_count": 10,
+        "source_epochs": [
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ],
+        "created_at": "2026-04-04T05:46:16.921048+00:00",
+        "source_hash": "4356e8c5779f2b25a6d71dee59d857e5bcbd7f7447127deec02abc87ea1bd436"
+      }
+    ]
+  },
+  "saved_at": "2026-04-04T05:46:16.921048+00:00"
+}

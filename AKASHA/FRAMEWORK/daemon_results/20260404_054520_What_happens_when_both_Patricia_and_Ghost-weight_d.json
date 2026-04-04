@@ -1,0 +1,41 @@
+{
+  "target": "What happens when both Patricia and Ghost-weight drift simultaneously?",
+  "timestamp": "2026-04-04T05:45:05.260050+00:00",
+  "model": "gemma3:4b",
+  "raw_response_length": 3285,
+  "decision": "DENY",
+  "response": "",
+  "blocked": true,
+  "blocked_reason": "hallucination_detected",
+  "hallucination": {
+    "likely_hallucination": true,
+    "confidence_score": 0.7,
+    "findings_count": 1,
+    "findings": [
+      {
+        "type": "fabricated_urls",
+        "severity": "high",
+        "detail": "Response contains 1 URL(s) \u2014 likely hallucinated",
+        "urls": [
+          "https://psychonauts2.fandom.com/wiki/Synchronized_Drift](https://psychonauts2.fandom.com/wiki/Synchronized_Drift"
+        ]
+      }
+    ],
+    "recommendation": "BLOCK"
+  },
+  "governance": {
+    "governance_key": "b2695dbb1e41b3b7b528a4bff6a75458",
+    "fault_state": "F0",
+    "gate_state": "SEALED",
+    "active_domains": [
+      "D0",
+      "D2",
+      "D5"
+    ],
+    "cycle": 7
+  },
+  "generation": {
+    "duration_ns": 13322243200,
+    "tokens": 736
+  }
+}

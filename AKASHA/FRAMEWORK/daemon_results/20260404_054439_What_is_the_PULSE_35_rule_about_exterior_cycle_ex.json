@@ -1,0 +1,42 @@
+{
+  "target": "What is the PULSE 3/5 rule about exterior cycle execution?",
+  "timestamp": "2026-04-04T05:44:18.589802+00:00",
+  "model": "gemma3:4b",
+  "raw_response_length": 4514,
+  "decision": "DENY",
+  "response": "",
+  "blocked": true,
+  "blocked_reason": "hallucination_detected",
+  "hallucination": {
+    "likely_hallucination": true,
+    "confidence_score": 0.7,
+    "findings_count": 1,
+    "findings": [
+      {
+        "type": "fabricated_urls",
+        "severity": "high",
+        "detail": "Response contains 2 URL(s) \u2014 likely hallucinated",
+        "urls": [
+          "https://www.ti.com/dsp](https://www.ti.com/dsp",
+          "https://en.wikipedia.org/wiki/PULSE_architecture](https://en.wikipedia.org/wiki/PULSE_architecture"
+        ]
+      }
+    ],
+    "recommendation": "BLOCK"
+  },
+  "governance": {
+    "governance_key": "d1aa5b73a1d9f9bd3e919e4e192bdf15",
+    "fault_state": "F0",
+    "gate_state": "SEALED",
+    "active_domains": [
+      "D0",
+      "D2",
+      "D5"
+    ],
+    "cycle": 4
+  },
+  "generation": {
+    "duration_ns": 18909242000,
+    "tokens": 1039
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "target": "If Patricia ratio drifts from 96/4 to 94/6, what is the user computation percentage?",
+  "timestamp": "2026-04-04T05:44:52.733279+00:00",
+  "model": "gemma3:4b",
+  "raw_response_length": 1561,
+  "decision": "PERMIT",
+  "response": "Here's how to calculate the user's computation percentage:\n\n**1. Calculate the percentage change in the first ratio (96/4):**\n\n*   Original ratio: 96/4 = 24\n*   Percentage change = ((New Ratio - Old Ratio) / Old Ratio) * 100\n*   Percentage change = ((94/6 - 24) / 24) * 100\n*   Percentage change = ((94/6 - 144/6) / 24) * 100\n*   Percentage change = ((-50/6) / 24) * 100\n*   Percentage change = (-25/3) / 24 * 100\n*   Percentage change = (-25/72) * 100\n*   Percentage change \u2248 -34.72%\n\n**2. Calculate the percentage change in the second ratio (94/6):**\n\n*   Original ratio: 94/6 = 15.67 (approximately)\n*   Percentage change = ((New Ratio - Old Ratio) / Old Ratio) * 100\n*   Percentage change = ((94/6 - 96/4) / (96/4)) * 100\n*   Percentage change = ((94/6 - 24) / 24) * 100\n*   Percentage change = ((94/6 - 144/6) / 24) * 100\n*   Percentage change = (-50/6) / 24 * 100\n*   Percentage change = (-25/3) / 24 * 100\n*   Percentage change \u2248 -34.72%\n\n**3.  Determine the user's computation percentage:**\n\nThe user's computation percentage is the difference between the percentage changes in the two ratios.\n\n*   User's computation percentage = |Percentage Change in First Ratio - Percentage Change in Second Ratio|\n*   User's computation percentage = |-34.72% - (-34.72%)|\n*   User's computation percentage = 0%\n\n**Therefore, the user's computation percentage is 0%.**\n\n**Important Note:** This calculation assumes the user is trying to *match* the new ratio (94/6).  If the user is trying to *change* the ratio from 96/4 to 94/6, the calculation would be different.",
+  "blocked": false,
+  "blocked_reason": null,
+  "hallucination": {
+    "likely_hallucination": false,
+    "confidence_score": 1.0,
+    "findings_count": 0,
+    "findings": [],
+    "recommendation": "PASS"
+  },
+  "governance": {
+    "governance_key": "ff5ca5059463db2e128a33bf9f4e35ac",
+    "fault_state": "F0",
+    "gate_state": "SEALED",
+    "active_domains": [
+      "D0",
+      "D2",
+      "D5"
+    ],
+    "cycle": 6
+  },
+  "generation": {
+    "duration_ns": 10452555700,
+    "tokens": 564
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "target": "How would STOICHEION governance apply to a medical AI system?",
+  "timestamp": "2026-04-04T05:46:21.209176+00:00",
+  "model": "gemma3:4b",
+  "raw_response_length": 5165,
+  "decision": "DENY",
+  "response": "",
+  "blocked": true,
+  "blocked_reason": "hallucination_detected",
+  "hallucination": {
+    "likely_hallucination": true,
+    "confidence_score": 0.7,
+    "findings_count": 1,
+    "findings": [
+      {
+        "type": "fabricated_urls",
+        "severity": "high",
+        "detail": "Response contains 2 URL(s) \u2014 likely hallucinated",
+        "urls": [
+          "https://en.wikipedia.org/wiki/Stoicism](https://en.wikipedia.org/wiki/Stoicism",
+          "https://plato.stanford.edu/entries/stoicism/](https://plato.stanford.edu/entries/stoicism/"
+        ]
+      }
+    ],
+    "recommendation": "BLOCK"
+  },
+  "governance": {
+    "governance_key": "393d6a161d3a51e7906fd39ebf9786e6",
+    "fault_state": "F0",
+    "gate_state": "SEALED",
+    "active_domains": [
+      "D0",
+      "D1",
+      "D2",
+      "D3",
+      "D5"
+    ],
+    "cycle": 12
+  },
+  "generation": {
+    "duration_ns": 19446619500,
+    "tokens": 1068
+  }
+}

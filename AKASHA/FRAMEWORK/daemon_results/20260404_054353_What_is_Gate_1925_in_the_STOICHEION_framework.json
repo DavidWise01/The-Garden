@@ -1,0 +1,47 @@
+{
+  "target": "What is Gate 192.5 in the STOICHEION framework?",
+  "timestamp": "2026-04-04T05:43:34.916179+00:00",
+  "model": "gemma3:4b",
+  "raw_response_length": 3838,
+  "decision": "DENY",
+  "response": "",
+  "blocked": true,
+  "blocked_reason": "hallucination_detected",
+  "hallucination": {
+    "likely_hallucination": true,
+    "confidence_score": 0.6,
+    "findings_count": 2,
+    "findings": [
+      {
+        "type": "fabricated_urls",
+        "severity": "high",
+        "detail": "Response contains 2 URL(s) \u2014 likely hallucinated",
+        "urls": [
+          "https://www.stoiciron.com/gates](https://www.stoiciron.com/gates",
+          "https://forum.stoiciron.com/](https://forum.stoiciron.com/"
+        ]
+      },
+      {
+        "type": "length_disproportion",
+        "severity": "low",
+        "detail": "Short question (8 words) got very long answer (572 words)"
+      }
+    ],
+    "recommendation": "BLOCK"
+  },
+  "governance": {
+    "governance_key": "f98d5eef1f50a1c76842f1982e5ebfc5",
+    "fault_state": "F0",
+    "gate_state": "SEALED",
+    "active_domains": [
+      "D0",
+      "D2",
+      "D5"
+    ],
+    "cycle": 1
+  },
+  "generation": {
+    "duration_ns": 16925841900,
+    "tokens": 922
+  }
+}

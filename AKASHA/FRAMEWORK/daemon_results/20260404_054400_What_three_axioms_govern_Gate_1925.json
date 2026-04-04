@@ -1,0 +1,41 @@
+{
+  "target": "What three axioms govern Gate 192.5?",
+  "timestamp": "2026-04-04T05:43:53.887132+00:00",
+  "model": "gemma3:4b",
+  "raw_response_length": 1020,
+  "decision": "DENY",
+  "response": "",
+  "blocked": true,
+  "blocked_reason": "hallucination_detected",
+  "hallucination": {
+    "likely_hallucination": true,
+    "confidence_score": 0.7,
+    "findings_count": 1,
+    "findings": [
+      {
+        "type": "fabricated_urls",
+        "severity": "high",
+        "detail": "Response contains 1 URL(s) \u2014 likely hallucinated",
+        "urls": [
+          "https://gate192.5.com/](https://gate192.5.com/"
+        ]
+      }
+    ],
+    "recommendation": "BLOCK"
+  },
+  "governance": {
+    "governance_key": "5fda9b47feb08392611467b3dde745dc",
+    "fault_state": "F0",
+    "gate_state": "SEALED",
+    "active_domains": [
+      "D0",
+      "D2",
+      "D5"
+    ],
+    "cycle": 2
+  },
+  "generation": {
+    "duration_ns": 4874851200,
+    "tokens": 254
+  }
+}
