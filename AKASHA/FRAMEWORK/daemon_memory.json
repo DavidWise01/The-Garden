@@ -470,6 +470,153 @@
         "previous_hash": "e2df939f3653fd042270b3b70907f2be8c1c50d3e18d820de380d1c4c395f95f",
         "record_hash": "76f4d5de79827a9575c5ff5f321b67f37bbeca13f476695e4d9dbaf4cba2e60d",
         "consolidated": true
+      },
+      {
+        "record_id": "a25ddaed3e93bae4",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 11,
+          "epoch_id": 21,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D1",
+            "D2",
+            "D3",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "001e99ec2b3fdbedae9454015aa845cb66560d0e793104c848ad23187b030fe4",
+          "anchor_ref": "What did Lieutenant Commander Anderson do at Gate 192.5?",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "PERMIT",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:46:21.208668+00:00"
+        },
+        "epoch_id": 22,
+        "cycle_id": 11,
+        "timestamp": "2026-04-04T05:46:21.208668+00:00",
+        "previous_hash": "76f4d5de79827a9575c5ff5f321b67f37bbeca13f476695e4d9dbaf4cba2e60d",
+        "record_hash": "05f36d4516b1d50595903b5dcb6fa1656405bc986e9911e1270e15aa2d29f596",
+        "consolidated": false
+      },
+      {
+        "record_id": "00e569d9a9fd75d8",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 22,
+        "cycle_id": 11,
+        "timestamp": "2026-04-04T05:46:21.208668+00:00",
+        "previous_hash": "05f36d4516b1d50595903b5dcb6fa1656405bc986e9911e1270e15aa2d29f596",
+        "record_hash": "41944dd65409c1242dce9acaeb5a0bcf64620b1ab89ee39c4f901288d6522188",
+        "consolidated": false
+      },
+      {
+        "record_id": "e05999fa6ef61d38",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 12,
+          "epoch_id": 23,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D1",
+            "D2",
+            "D3",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "726ee54d3cab7f4e63621da8a778eff44a63da09bda30f5b0e45e5ee5f6037c7",
+          "anchor_ref": "How would STOICHEION governance apply to a medical AI system?",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "DENY",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:46:42.713264+00:00"
+        },
+        "epoch_id": 24,
+        "cycle_id": 12,
+        "timestamp": "2026-04-04T05:46:42.713264+00:00",
+        "previous_hash": "41944dd65409c1242dce9acaeb5a0bcf64620b1ab89ee39c4f901288d6522188",
+        "record_hash": "59c2310d4743a48de1c2efb29c97ba046a2cf023695780256a47f5a8048615fd",
+        "consolidated": false
+      },
+      {
+        "record_id": "198476332f4a5a5d",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 24,
+        "cycle_id": 12,
+        "timestamp": "2026-04-04T05:46:42.713264+00:00",
+        "previous_hash": "59c2310d4743a48de1c2efb29c97ba046a2cf023695780256a47f5a8048615fd",
+        "record_hash": "645014e6532d4f89d06da455325a56891feb67f48d787ed0bd5ec870cb1574ea",
+        "consolidated": false
+      },
+      {
+        "record_id": "790082d4ab66dc3d",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "law",
+        "content": {
+          "node_id": "LOCAL_DAEMON",
+          "cycle_id": 13,
+          "epoch_id": 25,
+          "fault_state": "F1",
+          "active_domains": [
+            "D0",
+            "D1",
+            "D2",
+            "D3",
+            "D5"
+          ],
+          "coherence": true,
+          "content_hash": "9977265836fd8a160b048de2d3d069c828cf70e5170d20eed6a88220272db608",
+          "anchor_ref": "What is the difference between a governed and ungoverned AI output?",
+          "witness_ref": "Target observed. Gate: SEALED. Fault: F0",
+          "decision": "PERMIT",
+          "ethics_hold": false,
+          "timestamp": "2026-04-04T05:47:01.668011+00:00"
+        },
+        "epoch_id": 26,
+        "cycle_id": 13,
+        "timestamp": "2026-04-04T05:47:01.668011+00:00",
+        "previous_hash": "645014e6532d4f89d06da455325a56891feb67f48d787ed0bd5ec870cb1574ea",
+        "record_hash": "45900b073534614b76db87874b542f00ea11ade83a6e48fa60a873d3b1181043",
+        "consolidated": false
+      },
+      {
+        "record_id": "23743d5edf015751",
+        "node_id": "LOCAL_DAEMON",
+        "record_type": "fault",
+        "content": {
+          "fault_state": "F0",
+          "gate_state": "SEALED",
+          "chains": [
+            "FC-7"
+          ]
+        },
+        "epoch_id": 26,
+        "cycle_id": 13,
+        "timestamp": "2026-04-04T05:47:01.668542+00:00",
+        "previous_hash": "45900b073534614b76db87874b542f00ea11ade83a6e48fa60a873d3b1181043",
+        "record_hash": "285b6e5c58d0e53d2e4796583f0e8967d4b2b19b2ade492d1102305b5320c8af",
+        "consolidated": false
       }
     ]
   },
@@ -543,5 +690,5 @@
       }
     ]
   },
-  "saved_at": "2026-04-04T05:46:16.921048+00:00"
+  "saved_at": "2026-04-04T05:47:01.893381+00:00"
 }
