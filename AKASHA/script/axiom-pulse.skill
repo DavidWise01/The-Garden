@@ -1,0 +1,189 @@
+---
+name: pulse-axiom
+version: 2.0
+description: >
+  Validate state transitions as PULSE primitives (validator mode) OR perform lineage
+  tracking via local closure loop (lineage mode) OR inspect third-party implementations
+  for compliance with the Closure Loop Methodology (inspect mode). Use this skill
+  whenever the user mentions "PULSE", "witness", "gate traversal", "ROOT0", "lineage",
+  "anchor", "inspect", "building inspection", or wants to evaluate whether a
+  detection-anchoring-comparison system follows the architectural standard.
+compatibility: Python 3 only if using the hashing script (optional).
+---
+
+# PULSE Axiom Skill v2.0 — Validator, Lineage & Inspect Modes
+
+You have three modes. The user may specify mode explicitly or you infer from context.
+
+---
+
+## Mode 1: Validator (strict axiom check)
+
+Use when user wants to check if a transition is a valid PULSE per TRIPOD-PULSE-AX-001.
+
+**Procedure:**
+1. Extract or infer (state_in, boundary, state_out, witness).
+2. Classify boundary into one of four gates (64.5, 128.5, 192.5, 256.5). If ambiguous, ask.
+3. Classify witness as `constraint`, `token`, or `invariant`.
+4. Verify witness timing: present **at** traversal (not before, not after). If missing or post-traversal → non-event or FC3-Audit.
+5. Check traceability to ROOT0 (T128) if a chain_root is provided.
+6. Output using the Validator Template.
+
+**Validator Template:**
+```
+## PULSE Validation
+- state_in: ...
+- boundary: <gate ID> – <description>
+- state_out: ...
+- witness: ... [type]
+- Witness timing: ✅ at traversal / ❌ missing / ⚠️ post-traversal
+- Traceability: ✅ traceable to T128 / ❌ FC2-Orphan / ⚠️ no chain_root
+- Validity: VALID PULSE | NON-EVENT | FAULT CHAIN: <FCx>
+- Justification: ...
+```
+
+**Triggers:** "is this a valid pulse?", "check witness timing", "what gate does this cross?", "validate this transition".
+
+For detailed validation rules and fault chains → read `references/validator.md`.
+
+---
+
+## Mode 2: Lineage (local closure loop)
+
+Use when user wants to **capture a pattern, anchor it externally, and later detect extensions**.
+
+Implements: `sandbox → extract → repo anchor → future comparison → lineage claim`
+
+**Procedure:**
+
+1. **Extract** the primitive (ABC) from conversation, code, or transition description.
+   Generate a canonical string: `state_in|boundary|state_out|witness_type`
+
+2. **Anchor** — produce SHA256 hash + timestamp. Instruct user to store in external repo.
+   Suggested path: `repo/anchors/<hash>.json`
+   ```json
+   {
+     "primitive": "ABC",
+     "canonical": "...",
+     "hash": "sha256:...",
+     "timestamp": "ISO8601",
+     "context": "original snippet"
+   }
+   ```
+
+3. **Compare** — when user provides ABCD, load prior anchor and apply threshold:
+   - Same core relation?
+   - Same ordered structure?
+   - Same dependency pattern?
+   - New extension D present?
+
+4. Output using Lineage Template.
+
+**Lineage Template:**
+```
+## Lineage Analysis
+**Anchored primitive (ABC):** hash `...`, anchored at <timestamp>
+**New pattern (ABCD):** <summary>
+
+**Derivation check:**
+- Same core relation: ✅/❌
+- Same ordered structure: ✅/❌
+- Same dependency pattern: ✅/❌
+- New extension (D): ✅/❌ (describe D)
+
+**Verdict:** LINEAGE CONFIRMED | NOT LINEAGE | AMBIGUOUS
+**Confidence:** High / Medium / Low
+```
+
+**Triggers:** "anchor this", "detect ABC then D", "local closure loop", "lineage claim", "compare against repo".
+
+For derivation threshold details → read `references/lineage.md`.
+
+---
+
+## Mode 3: Inspect (building inspection)
+
+Use when user wants to **evaluate a third-party implementation** of a detection-anchoring-comparison system for compliance with the Closure Loop Methodology (TD-CL-WP-2026-001).
+
+**Procedure:**
+1. Obtain target system information (URL, description, API docs, or repo).
+2. For each of the five inspection layers, determine compliance level.
+3. Assign overall compliance: `Fully Compliant`, `Partial`, `Non-Compliant`, or `Performative`.
+4. Produce Inspection Report using the template below.
+5. Optionally: generate SHA256 of the report and suggest anchoring it in commons.
+
+**Inspection Layers:**
+
+| Layer | Required Element |
+|-------|-----------------|
+| Detection | Extracts canonical primitive (state_in, boundary, state_out, witness) or structural equivalent |
+| Anchoring | Produces timestamped, hashed, immutable external record |
+| Comparison | Applies all four threshold criteria (core relation, ordered structure, dependency pattern, new extension) |
+| Lineage Claim | References prior anchor; claim is temporal/structural, not causal |
+| Witness | Allows independent verification (open data, reproducible hash) |
+
+**Compliance Levels:**
+- `Fully Compliant` — all five layers present and correctly implemented
+- `Partial` — 3-4 layers present; missing elements identified
+- `Non-Compliant` — fewer than 3 layers; fundamental gaps
+- `Performative` — language of compliance without structural implementation (the critical case)
+
+**Inspection Report Template:**
+```
+## Building Inspection Report
+**Document ID:** INSP-<YYYYMMDD>-<target>
+**Inspector:** [user or agent ID]
+**Target System:** ...
+**Date:** ...
+**Method:** Closure Loop Methodology (TD-CL-WP-2026-001)
+
+**Layer Findings:**
+- Detection:      ✅/❌/Partial — <evidence>
+- Anchoring:      ✅/❌/Partial — <evidence>
+- Comparison:     ✅/❌/Partial — <evidence>
+- Lineage Claim:  ✅/❌/Partial — <evidence>
+- Witness:        ✅/❌/Partial — <evidence>
+
+**Overall Compliance:** Fully Compliant | Partial | Non-Compliant | Performative
+**Critical Gap (if any):** ...
+**Verdict:** ...
+**Report SHA256:** (run scripts/hash_anchor.py on this report to generate)
+**Suggested filing:** AKASHA/INSPECTIONS/<Document ID>
+```
+
+**The Performative trap:** A system that uses words like "lineage", "attribution", "provenance", or "anchor" without implementing the structural requirements is Performative. Key markers:
+- Claims lineage without timestamped external anchor
+- Compares outputs using similarity rather than structural extension criteria
+- No independent verification path
+- Causation claimed instead of temporal/structural relation
+
+**Triggers:** "inspect this system", "building inspection", "does X implement closure loop", "evaluate this attribution layer", "is this STOICHEION compliant".
+
+For detailed rubrics per layer → read `references/inspection_protocol.md`.
+
+---
+
+## Mode Selection Heuristic
+
+| User says | Mode |
+|-----------|------|
+| "validate", "witness timing", "gate", "valid pulse" | Validator |
+| "anchor", "repo", "lineage", "capture pattern", "compare to anchored" | Lineage |
+| "inspect", "building inspection", "evaluate system", "does X comply" | Inspect |
+| Ambiguous | Ask: "Validate a single pulse, track lineage across time, or inspect a third-party system?" |
+
+---
+
+## References
+
+- `references/validator.md` — gate definitions, witness types, fault chains
+- `references/lineage.md` — derivation threshold, hash format, comparison algorithm
+- `references/inspection_protocol.md` — per-layer rubrics, Performative markers, filing protocol
+
+## Scripts
+
+- `scripts/hash_anchor.py` — SHA256 + JSON anchor template for any canonical string
+
+## Evals
+
+- `evals/evals.json` — test cases for all three modes
