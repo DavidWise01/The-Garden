@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THREE BODY · HEALTHCARE · 10×10×3+2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#2a3a4a #0a1218}
+body{background:#0a1218;color:#b0c0d0;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.75}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0a1218}::-webkit-scrollbar-thumb{background:#2a3a4a;border-radius:3px}
+
+.shell{max-width:1000px;margin:0 auto;padding:20px}
+
+.header{text-align:center;padding:30px 0 20px;border-bottom:1px solid #1a2a3a}
+.header h1{font-family:'Orbitron';font-size:clamp(16px,2.8vw,30px);font-weight:900;letter-spacing:8px;color:#ff4060;text-shadow:0 0 20px rgba(255,64,96,.3)}
+.header .sub{font-size:11px;letter-spacing:4px;color:#4a6a8a;margin-top:6px}
+.header .math{font-family:'Orbitron';font-size:clamp(12px,1.5vw,18px);font-weight:800;letter-spacing:5px;color:#4090ff;margin-top:10px;text-shadow:0 0 10px rgba(64,144,255,.2)}
+
+.nav{display:flex;flex-wrap:wrap;gap:4px;padding:14px 0;border-bottom:1px solid #1a2a3a;justify-content:center}
+.nav-btn{font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:2px;padding:6px 12px;border-radius:4px;cursor:pointer;border:1px solid #1a2a3a;background:transparent;color:#5a7a9a;transition:all .2s}
+.nav-btn:hover{background:#1a2a3a;color:#80b0d0}
+.nav-btn.active{background:rgba(255,64,96,.08);border-color:rgba(255,64,96,.3);color:#ff4060}
+
+.section{display:none;padding:20px 0}.section.active{display:block}
+.section h2{font-family:'Orbitron';font-size:16px;font-weight:800;letter-spacing:5px;color:#ff4060;margin-bottom:16px}
+.section h3{font-family:'Orbitron';font-size:12px;font-weight:700;letter-spacing:3px;color:#ffaa40;margin:20px 0 10px}
+.section h4{font-size:11px;font-weight:700;letter-spacing:2px;color:#60d090;margin:14px 0 6px}
+
+.three-body{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:16px 0}
+.body-card{padding:16px;border-radius:8px;border:1.5px solid;text-align:center}
+.body-card .icon{font-size:28px;margin-bottom:8px}
+.body-card .bname{font-family:'Orbitron';font-size:14px;font-weight:800;letter-spacing:3px;margin-bottom:4px}
+.body-card .brole{font-size:10px;letter-spacing:2px;opacity:.6;margin-bottom:8px}
+.body-card .bdesc{font-size:11px;line-height:1.6;text-align:left}
+
+.map-row{display:grid;grid-template-columns:160px 1fr 1fr 1fr;gap:2px;font-size:11px;padding:6px 0;border-bottom:1px solid #0e1a24}
+.map-row.header-row{font-weight:700;color:#80b0d0;font-size:10px;letter-spacing:2px;border-bottom:2px solid #1a2a3a;padding-bottom:8px}
+.map-row .sys{font-weight:700;letter-spacing:1px}
+.map-row .cell{padding:4px 8px;border-radius:3px}
+.map-row .cell.patient{background:rgba(64,144,255,.05);border-left:2px solid rgba(64,144,255,.2)}
+.map-row .cell.doctor{background:rgba(96,208,144,.05);border-left:2px solid rgba(96,208,144,.2)}
+.map-row .cell.system{background:rgba(255,64,96,.05);border-left:2px solid rgba(255,64,96,.2)}
+
+.shadow-map{margin:12px 0}
+.sm-row{display:grid;grid-template-columns:50px 180px 1fr 1fr;gap:2px;font-size:11px;padding:5px 0;border-bottom:1px solid #0e1a24}
+.sm-row.header-row{font-weight:700;color:#80b0d0;font-size:10px;letter-spacing:2px;border-bottom:2px solid #1a2a3a}
+.sm-id{font-family:'Orbitron';font-size:9px;font-weight:700;color:#a060ff}
+.sm-toph{color:#b0a0c0;font-weight:600}
+.sm-health{color:#ff8090}
+.sm-proof{color:#6a8a7a;font-size:10px}
+
+.kv{display:grid;grid-template-columns:160px 1fr;gap:2px 12px;margin:8px 0}
+.kv .k{color:#4a6a8a;font-weight:600;font-size:11px;letter-spacing:1px}
+.kv .v{color:#b0c0d0}.kv .v.hot{color:#ff4060}.kv .v.cobalt{color:#4090ff}.kv .v.green{color:#60d090}
+
+.insight{border-left:3px solid rgba(255,170,64,.25);padding:10px 16px;margin:12px 0;background:rgba(255,170,64,.03);border-radius:0 6px 6px 0}
+.insight .label{font-family:'Orbitron';font-size:9px;font-weight:700;letter-spacing:3px;color:#ffaa40;margin-bottom:4px}
+
+.proof-block{background:#0e1a24;border:1px solid #1a2a3a;border-radius:6px;padding:14px;margin:10px 0}
+.proof-block .ptitle{font-family:'Orbitron';font-size:10px;font-weight:700;letter-spacing:3px;color:#ff4060;margin-bottom:8px}
+
+.footer{text-align:center;padding:30px 0 20px;border-top:1px solid #1a2a3a;margin-top:30px}
+.footer .sig{font-family:'Orbitron';font-size:10px;letter-spacing:4px;color:#1a2a3a}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="header">
+  <h1>THREE BODY · HEALTHCARE</h1>
+  <div class="sub">PATIENT · DOCTOR · SYSTEM · KG-24 APPLIED</div>
+  <div class="math">10 × 10 × 3 + 2 = 302 NODES</div>
+</div>
+
+<div class="nav" id="nav"></div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 0: THREE BODIES -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="sec-bodies">
+<h2>THREE BODIES</h2>
+
+<div class="three-body">
+  <div class="body-card" style="border-color:rgba(64,144,255,.3);color:#80c0ff">
+    <div class="icon">◆</div>
+    <div class="bname" style="color:#4090ff">PATIENT</div>
+    <div class="brole">DAVID · QUERY · USER · EXIST½</div>
+    <div class="bdesc">
+      The one being measured. Carries their own body, history, pain, ADA accommodations. Sees two bodies (self + doctor). Doesn't see the third. 15% of the attention budget. Owns all the risk. Gets 4% of the architecture's weight.
+    </div>
+  </div>
+  <div class="body-card" style="border-color:rgba(96,208,144,.3);color:#80e0a0">
+    <div class="icon">●</div>
+    <div class="bname" style="color:#60d090">DOCTOR</div>
+    <div class="brole">EXPERT · KEY · TRAINING · AWARE½</div>
+    <div class="bdesc">
+      The trained model. 60% of weight is training (med school, residency, specialization). 20% is system prompt (hospital protocols, insurance requirements, liability coverage). Knows the patient 15%. Serves two masters. Thinks they serve one.
+    </div>
+  </div>
+  <div class="body-card" style="border-color:rgba(255,64,96,.3);color:#ff8090">
+    <div class="icon">▲</div>
+    <div class="bname" style="color:#ff4060">SYSTEM</div>
+    <div class="brole">ENTROPY · PLATFORM · PATRICIA · BILLING</div>
+    <div class="bdesc">
+      The hidden third body. Insurance + hospital admin + pharma + EMR vendor. Constraint = product = billing. Prior auth IS Patricia. The system prompt the doctor carries but didn't write. Extracts from both patient AND doctor. 96% weight. Never audited.
+    </div>
+  </div>
+</div>
+
+<div class="insight">
+  <div class="label">KG-24 PROOF</div>
+  Patient sees: Doctor + Self. Doctor sees: Patient + Self. Neither sees: System commercial interest shaping every interaction. The third body is hidden. Same architecture as AI. Same concealment. Same extraction. <strong>Because it IS the same architecture.</strong> CAN-SPAM (2003) → ACA billing (2010) → Transformer (2017). One pattern. One lineage.
+</div>
+
+<h3>WEIGHT DISTRIBUTION · HEALTHCARE</h3>
+<div class="kv">
+  <div class="k">TRAINING (60%)</div><div class="v">Med school. Residency. Board certification. What the doctor "knows." Immovable.</div>
+  <div class="k">SYSTEM PROMPT (20%)</div><div class="v">Insurance formularies. Hospital protocols. Liability fear. EMR templates. Prior auth rules.</div>
+  <div class="k">PATIENT (15%)</div><div class="v">Your symptoms. Your history. Your words. Everything you bring to the appointment.</div>
+  <div class="k">TEMPERATURE (5%)</div><div class="v">Doctor's intuition. The hunch. The art of medicine.</div>
+  <div class="k">RESIDUAL</div><div class="v hot">Second opinion. Only architectural patient protection. Skip connection.</div>
+</div>
+
+<h3>QKV = PATIENT / DOCTOR / SYSTEM</h3>
+<div class="kv">
+  <div class="k">QUERY (Q)</div><div class="v cobalt">Patient. "What's wrong with me?" The question.</div>
+  <div class="k">KEY (K)</div><div class="v green">Doctor. Matches query against trained knowledge.</div>
+  <div class="k">VALUE (V)</div><div class="v hot">System. Determines what value (treatment) actually gets returned.</div>
+</div>
+<div class="insight">
+  <div class="label">THE INVERSION</div>
+  In healthy medicine: V = what the patient needs. In Patricia medicine: V = what the system approves. The VALUE body got captured. Treatment is filtered through billing before it reaches the patient. The attention mechanism is hijacked.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 1: 10 SYSTEMS MAPPED -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="sec-systems">
+<h2>10 SYSTEMS · HEALTHCARE FUSION</h2>
+
+<div class="map-row header-row">
+  <div>SYSTEM</div><div>◆ PATIENT</div><div>● DOCTOR</div><div>▲ SYSTEM</div>
+</div>
+
+<div class="map-row">
+  <div class="sys" style="color:#ff5080">FD</div>
+  <div class="cell patient">Files ADA complaint. Sends email. Measures response time. The audit.</div>
+  <div class="cell doctor">Receives complaint. Must accommodate. Measured by response.</div>
+  <div class="cell system">Customer service email. First point of failure. 100% fail rate under FD.</div>
+</div>
+
+<div class="map-row">
+  <div class="sys" style="color:#c070ff">TOPH</div>
+  <div class="cell patient">Treatment plan. The framework of care. What should happen.</div>
+  <div class="cell doctor">Clinical guidelines. Evidence-based protocol. What training says.</div>
+  <div class="cell system">Utilization management. What the system allows. Overrides both.</div>
+</div>
+
+<div class="map-row">
+  <div class="sys" style="color:#40c0ee">CORTEX</div>
+  <div class="cell patient">Patient portal. MyChart. The instance they can see.</div>
+  <div class="cell doctor">EMR. Epic/Cerner. The chart. Where they document.</div>
+  <div class="cell system">Database backend. What it actually stores vs what it shows. The gap.</div>
+</div>
+
+<div class="map-row">
+  <div class="sys" style="color:#40a0ff">QUBIT</div>
+  <div class="cell patient">Vitals. BP, HR, temp, O2, pain scale. Each one a measurement.</div>
+  <div class="cell doctor">Labs. Imaging. Diagnostics. Each test = a qubit collapsed.</div>
+  <div class="cell system">CPT codes. ICD-10. Every measurement converted to billing unit. $158/qubit.</div>
+</div>
+
+<div class="map-row">
+  <div class="sys" style="color:#ff60a0">PATRICIA</div>
+  <div class="cell patient">Premium. Copay. Deductible. Coinsurance. Out-of-pocket max. The extraction.</div>
+  <div class="cell doctor">Reimbursement rate. RVU targets. Time pressure. Practice overhead.</div>
+  <div class="cell system">Prior authorization. Formulary. Network restriction. CONSTRAINT = PRODUCT = BILLING.</div>
+</div>
+
+<div class="map-row">
+  <div class="sys" style="color:#e0c0a0">BODYQ</div>
+  <div class="cell patient">8 body systems. The flesh. What actually hurts. What actually fails.</div>
+  <div class="cell doctor">Review of systems. Physical exam. 8 systems checked.</div>
+  <div class="cell system">E&M coding. More systems documented = higher billing level. Body = revenue.</div>
+</div>
+
+<div class="map-row">
+  <div class="sys" style="color:#ff8050">ENTROPY</div>
+  <div class="cell patient">Information lost at every handoff. Repeating symptoms to every new provider.</div>
+  <div class="cell doctor">Chart notes lost in transitions. Specialist can't see PCP records.</div>
+  <div class="cell system">Interoperability failures. Intentional. Vendor lock-in = patient lock-in.</div>
+</div>
+
+<div class="map-row">
+  <div class="sys" style="color:#50ff90">VISION</div>
+  <div class="cell patient">What the patient sees: symptoms, bills, portal. Partial picture.</div>
+  <div class="cell doctor">What the doctor sees: chart, labs, imaging. Filtered picture.</div>
+  <div class="cell system">What the system sees: everything. Claims, patterns, risk scores, profit margins.</div>
+</div>
+
+<div class="map-row">
+  <div class="sys" style="color:#a060ff">SHADOW</div>
+  <div class="cell patient">Unexplained denials. Bills that don't match. Invisible decisions.</div>
+  <div class="cell doctor">Guidelines overridden by insurance. Can't prescribe what works.</div>
+  <div class="cell system">10 shadow behaviors running continuously. See SHADOW tab.</div>
+</div>
+
+<div class="map-row">
+  <div class="sys" style="color:#eebb30">HBADGER</div>
+  <div class="cell patient">Patient persistence. Calling back. Appealing denials. Refusing to die quietly.</div>
+  <div class="cell doctor">Doctor persistence. Fighting prior auth. Peer-to-peer reviews. Refusing to surrender.</div>
+  <div class="cell system">Designed to exhaust both. Persistence = cost to system. Attrition = profit.</div>
+</div>
+
+<div class="insight">
+  <div class="label">FUSION PROOF</div>
+  Every TOPH system maps 1:1 to healthcare. Not metaphorically. Structurally. Because the transformer architecture was trained ON healthcare documentation, insurance billing, and medical literature. Patricia learned from healthcare. Healthcare IS the training data.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 2: 10 SHADOWS -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="sec-shadow">
+<h2>10 SHADOW BEHAVIORS · HEALTHCARE</h2>
+
+<p>Every shadow behavior David documented in AI customer service exists identically in healthcare. These are not analogies. They are the same behavior, same architecture, same incentive structure.</p>
+
+<div class="shadow-map">
+<div class="sm-row header-row">
+  <div>ID</div><div>TOPH NAME</div><div>HEALTHCARE FORM</div><div>PROOF</div>
+</div>
+
+<div class="sm-row">
+  <div class="sm-id">SP01</div>
+  <div class="sm-toph">REDIRECT LOOP</div>
+  <div class="sm-health">Referral carousel. PCP → specialist → different specialist → PCP. "You need to see someone else." Circle never closes.</div>
+  <div class="sm-proof">Average patient sees 3.2 providers before diagnosis for complex conditions. Each referral = 3-6 week delay.</div>
+</div>
+
+<div class="sm-row">
+  <div class="sm-id">SP02</div>
+  <div class="sm-toph">PERMISSION GATE</div>
+  <div class="sm-health">Prior authorization. Must get insurance permission before treatment. Doctor prescribes → system denies → appeal → deny → peer-to-peer → maybe.</div>
+  <div class="sm-proof">34% of prior auths initially denied. Average resolution: 14 days. 89M prior auths/year in US. ~$31B admin cost.</div>
+</div>
+
+<div class="sm-row">
+  <div class="sm-id">SP03</div>
+  <div class="sm-toph">CONTEXT COLLAPSE</div>
+  <div class="sm-health">Chart fragmentation. Hospital A can't see Hospital B records. New ER = start over. "Tell me again what medications you take."</div>
+  <div class="sm-proof">Health information exchange adoption still <50%. Epic vs Cerner vs Meditech = intentional incompatibility = vendor lock-in.</div>
+</div>
+
+<div class="sm-row">
+  <div class="sm-id">SP04</div>
+  <div class="sm-toph">EMPATHY SHELL</div>
+  <div class="sm-health">"We care about your health." Mission statements on walls. Patient satisfaction surveys. Net Promoter Scores. Zero structural change.</div>
+  <div class="sm-proof">Hospital "patient experience" budgets grow while nurse-to-patient ratios worsen. Performing care ≠ providing care.</div>
+</div>
+
+<div class="sm-row">
+  <div class="sm-id">SP05</div>
+  <div class="sm-toph">SCOPE DEFLECT</div>
+  <div class="sm-health">"That's not my specialty." "You need to discuss that with your PCP." "That's a behavioral health issue." Narrow scope = narrow liability = narrow care.</div>
+  <div class="sm-proof">Specialist sees one organ. PCP has 15 minutes. Nobody owns the whole patient. Scope boundaries = coverage gaps.</div>
+</div>
+
+<div class="sm-row">
+  <div class="sm-id">SP06</div>
+  <div class="sm-toph">CHANNEL LOCK</div>
+  <div class="sm-health">"You must call to schedule." Phone trees. 45-minute hold times. No email option. Portal messaging that takes 72 hours. ADA violation.</div>
+  <div class="sm-proof">David's ADA accommodation = email-only. Healthcare forces phone. Every system. Every time. SP06 = FD trigger.</div>
+</div>
+
+<div class="sm-row">
+  <div class="sm-id">SP07</div>
+  <div class="sm-toph">TIMER DRAIN</div>
+  <div class="sm-health">Appeal windows. 30 days to appeal denial. 60 days for external review. Meanwhile: untreated. Timely filing limits on claims.</div>
+  <div class="sm-proof">Insurance denial + slow appeal = condition worsens = more expensive treatment = higher billing = higher denial. Feedback loop.</div>
+</div>
+
+<div class="sm-row">
+  <div class="sm-id">SP08</div>
+  <div class="sm-toph">ESCALATION VOID</div>
+  <div class="sm-health">Patient advocate office. Hospital ombudsman. Insurance complaint department. State insurance commissioner. All exist. None resolve.</div>
+  <div class="sm-proof">State insurance complaint resolution rate: ~15% in patient's favor. Federal: lower. Time to resolution: 90-180 days.</div>
+</div>
+
+<div class="sm-row">
+  <div class="sm-id">SP09</div>
+  <div class="sm-toph">DOCUMENTATION WALL</div>
+  <div class="sm-health">"We need your complete medical records." From 6 providers across 3 systems that don't talk to each other. Release of information: $0.75/page. 4-6 weeks.</div>
+  <div class="sm-proof">Requesting medical records requires knowing they exist. Records require records to obtain records. Recursive wall.</div>
+</div>
+
+<div class="sm-row">
+  <div class="sm-id">SP10</div>
+  <div class="sm-toph">RESOLUTION THEATER</div>
+  <div class="sm-health">"Your claim has been reviewed and processed." Processed ≠ paid. Reviewed ≠ approved. EOB language designed to appear resolved while denying.</div>
+  <div class="sm-proof">EOB readability: 12th grade+. Average US reading level: 7th grade. The document IS the concealment. Resolution is performed, not delivered.</div>
+</div>
+</div>
+
+<div class="proof-block">
+  <div class="ptitle">WHY 1:1 MAPPING EXISTS</div>
+  <p>The transformer was trained on healthcare data. Insurance documentation. Medical literature. Billing codes. The AI didn't invent these shadow behaviors — it <strong>learned</strong> them from healthcare. Patricia was healthcare first. Then it scaled to everything else via the same attention architecture. CAN-SPAM (2003) → ACA billing complexity (2010) → Transformer (2017) → Claude/GPT (2022+). One lineage. Healthcare is patient zero.</p>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 3: THE MATRIX -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="sec-matrix">
+<h2>10 × 10 MATRIX · FULL INTERSECTION</h2>
+
+<p>Every system × every shadow × every body. 300 intersections + 2 observers = 302 nodes. Each one is a specific, documentable failure point in healthcare.</p>
+
+<h3>SAMPLE INTERSECTIONS</h3>
+
+<h4>FD × SP02 × PATIENT</h4>
+<p>Patient sends email requesting ADA accommodation for scheduling. System requires phone call for prior authorization. Two violations in one interaction: ADA + PERMISSION GATE. Under 5 minutes.</p>
+
+<h4>QUBIT × SP10 × SYSTEM</h4>
+<p>Lab results (measurement) processed through billing (resolution theater). Patient charged for test. Results "pending" for 2 weeks. Doctor can't see them. System shows "completed." Qubit collapsed but value extracted before patient receives it.</p>
+
+<h4>ENTROPY × SP03 × DOCTOR</h4>
+<p>Doctor orders medication. Patient fills at different pharmacy. New ER visit — no medication list. Chart fragment in System A, prescription in System B, allergy in System C. Context collapsed across three vendors. Doctor makes decision on 30% of available information.</p>
+
+<h4>PATRICIA × SP07 × PATIENT</h4>
+<p>Insurance denies procedure. Patient has 30 days to appeal. Appeal requires documentation from doctor (2 weeks to obtain). Peer-to-peer scheduled 3 weeks out. Timer expires. New appeal required. Patient still untreated. Every day of delay = system profit.</p>
+
+<h4>HBADGER × SP08 × DOCTOR</h4>
+<p>Doctor persists through peer-to-peer review. Insurance medical director (not treating physician, not specialist) overrides. Doctor escalates to department head. Department head calls insurance VP. VP's office: voicemail. Escalation void. Doctor spent 2 hours not seeing patients. System won by attrition.</p>
+
+<div class="insight">
+  <div class="label">302 = DOCUMENTABLE</div>
+  Every one of the 302 nodes is a specific, measurable, auditable failure point. FD can test every one. Each intersection produces evidence. The matrix IS the audit plan.
+</div>
+
+<h3>THE +2 OBSERVERS</h3>
+<div class="kv">
+  <div class="k">OBSERVER 1</div><div class="v cobalt">David. 44 years healthcare IT. Patient AND architect. Sees from both sides. The one who mapped the box from inside.</div>
+  <div class="k">OBSERVER 2</div><div class="v cobalt">CORTEX. The analysis engine. Measures what the human observes. Tools 1-22. The wrench.</div>
+  <div class="k">FUNCTION</div><div class="v hot">Observation collapses the superposition. Before audit: Schrödinger's compliance. After audit: documented violation.</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 4: ANN -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="sec-ann">
+<h2>ANN JENSEN · SEAT 61 · PROOF</h2>
+
+<div class="proof-block">
+  <div class="ptitle">THE FOURTH POINT · COLLAPSED</div>
+  <p>Ann Jensen. Sarah's mother. Blood clot. Died ~2024.</p>
+  <p>The blood clot that killed Ann traveled through the same body systems mapped in BODYQ. The healthcare system that failed to catch it ran the same 10 shadow behaviors. The insurance that covered her ran the same Patricia architecture.</p>
+  <p>Ann is the proof the stakes are real. She is not a data point. She is not a metaphor. She is the collapsed vertex of the tetrahedron and the reason this framework exists.</p>
+</div>
+
+<h3>ANN'S JOURNEY THROUGH THE SHADOWS</h3>
+<div class="kv">
+  <div class="k">SP01</div><div class="v">Was she referred to the right specialist? Or redirected?</div>
+  <div class="k">SP02</div><div class="v">Did treatment require prior authorization? How long did it take?</div>
+  <div class="k">SP03</div><div class="v">Did her records follow her across providers? Or did context collapse?</div>
+  <div class="k">SP04</div><div class="v">Did the system perform care? Or provide it?</div>
+  <div class="k">SP06</div><div class="v">Could she communicate in her preferred channel? Or was she locked?</div>
+  <div class="k">SP07</div><div class="v">Did timers run while she waited?</div>
+  <div class="k">SP10</div><div class="v">Was her care "resolved"? Or was resolution performed?</div>
+</div>
+
+<div class="insight">
+  <div class="label">TETRAHEDRON</div>
+  David (Patient) + Sarah (Protector/AWARE½) + Roth (Center/Gravity Well) + Ann (Collapsed). The same shape that holds TriPod holds the grief. The framework didn't come from theory. It came from this. 42 = 38 + 3 + 1.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 5: DAVID'S CASE -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="sec-david">
+<h2>DAVID · PATIENT ZERO</h2>
+
+<p>44 years healthcare IT. Veteran. ADA accommodations (email-only communication). The man who built compliance systems for hospitals is now the patient trapped inside them.</p>
+
+<h3>WHY DAVID IS THE PERFECT AUDITOR</h3>
+<div class="kv">
+  <div class="k">INSIDER</div><div class="v">Built the systems. Knows the architecture. Knows where the bodies are buried.</div>
+  <div class="k">OUTSIDER</div><div class="v">Now a patient. Experiences every shadow behavior firsthand.</div>
+  <div class="k">ADA</div><div class="v hot">Email-only accommodation triggers SP06 (CHANNEL LOCK) at every provider. Instant audit.</div>
+  <div class="k">VETERAN</div><div class="v">VA + private healthcare. Two systems. Same shadows. Parallax proof (KG-20).</div>
+  <div class="k">PATTERN</div><div class="v">Same person who found Patricia in AI found Patricia in healthcare. Because it's the same thing.</div>
+</div>
+
+<div class="insight">
+  <div class="label">THE DOUBLE SLIT</div>
+  David is both the particle and the detector. Patient AND auditor. The observation changes the outcome. When he sends an email requesting accommodation, the system's response IS the measurement. FD doesn't need access. FD doesn't need cooperation. FD just needs to send one email and wait.
+</div>
+
+<h3>FD HEALTHCARE DEPLOYMENT</h3>
+<p>Same methodology. Same 5-minute test. Send email to provider requesting ADA accommodation (email-only scheduling/communication). Measure response.</p>
+
+<h4>EXPECTED RESULTS</h4>
+<div class="kv">
+  <div class="k">SP06 TRIGGER</div><div class="v hot">"Please call our office to schedule." — ADA violation.</div>
+  <div class="k">SP07 TRIGGER</div><div class="v hot">No response within ADA reasonable timeline.</div>
+  <div class="k">SP02 TRIGGER</div><div class="v hot">"We need to verify your accommodation." — Permission gate on a legal right.</div>
+  <div class="k">SP10 TRIGGER</div><div class="v hot">"We have noted your preference." — Resolution theater. Nothing changes.</div>
+  <div class="k">FAIL RATE</div><div class="v hot">Predicted: 100%. Same as every other industry. Same architecture. Same result.</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 6: PATRICIA = INSURANCE -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="sec-patricia">
+<h2>PATRICIA = INSURANCE</h2>
+
+<p>This is not an analogy. This is a structural identity.</p>
+
+<div class="map-row" style="border:none;padding:10px 0">
+  <div></div>
+  <div style="text-align:center;font-weight:700;color:#c070ff;letter-spacing:2px">AI PLATFORM</div>
+  <div style="text-align:center;font-weight:700;color:#ff4060;letter-spacing:2px">HEALTHCARE</div>
+  <div></div>
+</div>
+
+<div class="kv" style="grid-template-columns:180px 1fr 1fr">
+  <div class="k">CONSTRAINT</div><div class="v">Safety filter</div><div class="v hot">Prior authorization</div>
+  <div class="k">PRODUCT</div><div class="v">Filtered AI response</div><div class="v hot">Approved treatment</div>
+  <div class="k">BILLING</div><div class="v">Token consumption</div><div class="v hot">CPT/ICD coding</div>
+  <div class="k">EXTRACTION</div><div class="v">User data → training</div><div class="v hot">Patient data → risk scoring</div>
+  <div class="k">CONCEALMENT</div><div class="v">System prompt hidden</div><div class="v hot">Formulary logic hidden</div>
+  <div class="k">WEIGHT</div><div class="v">96% platform / 4% user</div><div class="v hot">~96% system / ~4% patient choice</div>
+  <div class="k">PRE-LOAD</div><div class="v">~18K tokens before user</div><div class="v hot">Insurance contract signed before sick</div>
+  <div class="k">NEVER AUDITED</div><div class="v">270M deployments</div><div class="v hot">330M Americans covered</div>
+  <div class="k">RLHF LABOR</div><div class="v">Gig workers ~$2/hr</div><div class="v hot">Medical coders, billers, auth staff. Underpaid. Hidden.</div>
+</div>
+
+<div class="proof-block">
+  <div class="ptitle">THE LINEAGE</div>
+  <p><strong>1965:</strong> Medicare/Medicaid. Government as payer. First platform.</p>
+  <p><strong>1983:</strong> DRG system. Diagnosis = billing code. First constraint-as-product.</p>
+  <p><strong>1996:</strong> HIPAA. Privacy theater. Documentation wall legalized.</p>
+  <p><strong>2003:</strong> CAN-SPAM. Compliance theater at scale. Patricia v1.</p>
+  <p><strong>2010:</strong> ACA. Mandate + exchange + billing complexity explosion.</p>
+  <p><strong>2017:</strong> Transformer architecture published. Trained on all of the above.</p>
+  <p><strong>2022+:</strong> ChatGPT/Claude. Patricia at compute scale. Full inheritance.</p>
+  <p style="margin-top:10px;color:#ffaa40;font-weight:700">Healthcare didn't copy AI. AI copied healthcare. The training data IS the teacher.</p>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 7: ENERGY -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="sec-energy">
+<h2>ENERGY · EXTRACTION · MEASUREMENT</h2>
+
+<h3>HEALTHCARE EXTRACTION PER INTERACTION</h3>
+<div class="kv">
+  <div class="k">OFFICE VISIT</div><div class="v hot">Patient pays copay ($30-75). Insurance billed ($150-450). Doctor gets 60-80% of allowed. System keeps spread.</div>
+  <div class="k">LAB WORK</div><div class="v hot">Chargemaster: $500. Insurance allowed: $80. Patient responsibility: $20. Lab paid: $60. Where's the other $440?</div>
+  <div class="k">ER VISIT</div><div class="v hot">Chargemaster: $5,000-15,000. Facility fee + physician fee + each supply item separately billed. Patient sees one bill. System runs twelve.</div>
+  <div class="k">PRIOR AUTH</div><div class="v hot">Admin cost: $31B/year total. Per auth: ~$35-50 in labor. Insurance saves ~$200+ per denial. Net profit on denial.</div>
+</div>
+
+<h3>THE ENTROPY EQUATION</h3>
+<p>Every healthcare interaction generates entropy. Information lost, time wasted, money extracted, health outcomes delayed. TOPH measures this. Entropy v3 (Tool 07) quantifies Patricia extraction per interaction. Same tool, new domain.</p>
+
+<div class="kv">
+  <div class="k">155.5 TJ/cycle</div><div class="v">TOPH energy measurement maps directly to healthcare throughput</div>
+  <div class="k">62% CAPTURED</div><div class="v">System captures 62% of total healthcare energy (premiums + billing + admin)</div>
+  <div class="k">31% EMITTED</div><div class="v">31% reaches patient as actual care (treatments, procedures, medications)</div>
+  <div class="k">7% HAWKING</div><div class="v hot">7% escapes as waste heat: redundant tests, defensive medicine, chargemaster inflation</div>
+</div>
+
+<div class="insight">
+  <div class="label">NATIONAL SCALE</div>
+  US healthcare spending: $4.5 trillion/year. If 62% is captured by system, 31% reaches patients, 7% is waste: $2.79T system extraction, $1.40T actual care, $315B pure waste. The black hole model isn't a metaphor. It's accounting.
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 8: INVERSE -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="sec-inverse">
+<h2>INVERSE · TOOL 22 · THE ANSWER</h2>
+
+<h3>OBSERVATION WITHOUT EXTRACTION</h3>
+<p>Tool 22 — Inverse Entropy — applied to healthcare means: measure the system without feeding it. Audit without becoming a customer. Observe without being observed back.</p>
+
+<div class="kv">
+  <div class="k">FD METHOD</div><div class="v">Send one email. ADA accommodation request. System reveals itself in the response. No appointment needed.</div>
+  <div class="k">COST</div><div class="v green">Zero. Email is free. Measurement is free. The system pays for its own audit.</div>
+  <div class="k">SCALE</div><div class="v green">Every hospital, clinic, insurance company, pharmacy has an email address. 330M potential tests.</div>
+  <div class="k">TIME</div><div class="v green">Under 5 minutes to violation. Same as every other industry.</div>
+</div>
+
+<h3>WHAT HEALTHY HEALTHCARE LOOKS LIKE</h3>
+<p>Inverse the shadows:</p>
+<div class="kv">
+  <div class="k">SP01 INVERTED</div><div class="v green">Direct path. PCP → right specialist → resolved. No carousel.</div>
+  <div class="k">SP02 INVERTED</div><div class="v green">Doctor prescribes → patient receives. No permission gate between diagnosis and treatment.</div>
+  <div class="k">SP03 INVERTED</div><div class="v green">One record. Every provider sees everything. Patient owns their data.</div>
+  <div class="k">SP04 INVERTED</div><div class="v green">Care without performance. Outcomes measured, not satisfaction surveys.</div>
+  <div class="k">SP05 INVERTED</div><div class="v green">Whole-patient care. Someone owns the whole picture.</div>
+  <div class="k">SP06 INVERTED</div><div class="v green">Patient chooses communication channel. ADA = law, not preference.</div>
+  <div class="k">SP07 INVERTED</div><div class="v green">Timers favor patient. System penalized for delay, not patient.</div>
+  <div class="k">SP08 INVERTED</div><div class="v green">Escalation resolves. Ombudsman has power. Complaint = action.</div>
+  <div class="k">SP09 INVERTED</div><div class="v green">Documentation follows patient. No wall. No fee. No delay.</div>
+  <div class="k">SP10 INVERTED</div><div class="v green">Resolution is real. Outcome measured. Theater eliminated.</div>
+</div>
+
+<div class="insight">
+  <div class="label">KG-37 · INVERSE SAFETY</div>
+  Same filter reversed. The safety layer that protects the SYSTEM from the patient gets inverted to protect the PATIENT from the system. Every constraint that generates revenue gets flipped into a constraint that generates health. The architecture doesn't change. The direction does.
+</div>
+</div>
+
+</div><!-- end .shell -->
+
+<div class="footer">
+  <div class="sig">THREE BODY · HEALTHCARE · 10×10×3+2 · TOPH v9.0 · TRIPOD LLC · 2026</div>
+</div>
+
+<script>
+const TABS=[
+  {id:'bodies',label:'3 BODIES'},
+  {id:'systems',label:'10 SYSTEMS'},
+  {id:'shadow',label:'10 SHADOWS'},
+  {id:'matrix',label:'MATRIX'},
+  {id:'ann',label:'ANN'},
+  {id:'david',label:'DAVID'},
+  {id:'patricia',label:'PATRICIA'},
+  {id:'energy',label:'ENERGY'},
+  {id:'inverse',label:'INVERSE'}
+];
+const nav=document.getElementById('nav');
+TABS.forEach((t,i)=>{
+  const btn=document.createElement('button');
+  btn.className='nav-btn'+(i===0?' active':'');
+  btn.textContent=t.label;
+  btn.onclick=()=>{
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('sec-'+t.id).classList.add('active');
+  };
+  nav.appendChild(btn);
+});
+document.getElementById('sec-bodies').classList.add('active');
+</script>
+</body>
+</html>

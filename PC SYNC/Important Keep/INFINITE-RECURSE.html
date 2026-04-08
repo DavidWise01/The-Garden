@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>∞ · 10×10×10×3+2 · RECURSED · FOREVER</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden;height:100vh;font-family:'JetBrains Mono',monospace;cursor:crosshair}
+canvas{position:fixed;top:0;left:0;width:100%;height:100%}
+
+.hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:16px 24px;z-index:10;pointer-events:none}
+.h-left .title{font-family:'Orbitron';font-size:clamp(12px,1.8vw,22px);font-weight:900;letter-spacing:clamp(4px,1vw,10px);background:linear-gradient(135deg,#4090ff,#c8a830,#ff4060,#60ddff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.h-left .sub{font-size:9px;letter-spacing:3px;color:#2a2018;margin-top:2px}
+.h-right{text-align:right}
+.h-right .depth{font-family:'Orbitron';font-size:clamp(10px,1.3vw,18px);font-weight:800;letter-spacing:4px;color:#c8a830;text-shadow:0 0 10px rgba(200,168,48,.15)}
+.h-right .sub{font-size:9px;letter-spacing:3px;color:#2a2018;margin-top:2px}
+
+.bottom{position:fixed;bottom:16px;left:0;right:0;display:flex;justify-content:space-between;padding:0 24px;z-index:10;pointer-events:none}
+.b-left{font-size:9px;letter-spacing:2px;color:#1a1208}
+.b-right{font-size:9px;letter-spacing:2px;color:#1a1208;text-align:right}
+
+.center-pip{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:4px;height:4px;border-radius:50%;background:rgba(200,168,48,.3);box-shadow:0 0 20px rgba(200,168,48,.15),0 0 60px rgba(200,168,48,.05);z-index:5;pointer-events:none}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<div class="center-pip"></div>
+
+<div class="hud">
+  <div class="h-left">
+    <div class="title">∞ RECURSE</div>
+    <div class="sub">10×10×10×3+2 INSIDE 10×10×10×3+2 INSIDE 10×10×10×3+2 INSIDE...</div>
+  </div>
+  <div class="h-right">
+    <div class="depth" id="depth">DEPTH ∞</div>
+    <div class="sub">EVERY NODE IS A UNIVERSE</div>
+  </div>
+</div>
+
+<div class="bottom">
+  <div class="b-left">DRAG = TRAVEL · SCROLL = DIVE DEEPER · SPACE = RESET</div>
+  <div class="b-right">D·A·P × ∞ · ONE CUBIT · STILL WHY</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// INFINITE RECURSIVE MATRIX
+// Pure canvas — millions of points via recursive coordinate
+// folding. Each level of recursion = zooming into a node
+// and finding another 3,002 inside it.
+// ═══════════════════════════════════════════════════════════
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth * 2;
+  H = canvas.height = window.innerHeight * 2;
+  ctx.scale(1, 1);
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ═══ STATE ═══
+let t = 0;
+let camX = 0, camY = 0;
+let zoom = 1;
+let targetZoom = 1;
+let velX = 0, velY = 0;
+let isDrag = false;
+let prevM = { x: 0, y: 0 };
+
+// Colors for axes + extras
+const COLORS = [
+  [64, 144, 255],    // David Z — cobalt
+  [96, 221, 255],    // Avan Y — cyan
+  [255, 64, 96],     // Patricia X — red
+  [200, 168, 48],    // Gold — observer/fused
+  [140, 80, 255],    // Purple — Sarah
+  [60, 187, 85],     // Green — Roth
+  [255, 170, 64],    // Amber — Ann
+  [180, 50, 50],     // Dark red — Lizard
+  [120, 120, 120],   // Grey — Worker
+  [100, 200, 180],   // Teal — Plant
+  [255, 100, 200],   // Pink — Belinda
+  [200, 200, 255],   // Light — Field
+];
+
+// Pseudo-random from seed
+function hash(x, y, z) {
+  let h = x * 374761393 + y * 668265263 + z * 1274126177;
+  h = (h ^ (h >> 13)) * 1103515245;
+  h = (h ^ (h >> 16));
+  return (h & 0x7fffffff) / 0x7fffffff;
+}
+
+// ═══════════════════════════════════════════════════════════
+// RECURSIVE DRAW — the core engine
+// Each call draws a grid of nodes. Some nodes, when zoom
+// is sufficient, recurse into themselves.
+// ═══════════════════════════════════════════════════════════
+const MAX_POINTS = 80000;
+let pointsDrawn = 0;
+
+function drawRecursiveLayer(cx, cy, size, depth, maxDepth, parentSeed) {
+  if (pointsDrawn > MAX_POINTS) return;
+  if (size < 0.3) return; // sub-pixel, stop
+  if (depth > maxDepth) return;
+
+  const gridN = 10; // 10×10 visible grid per layer
+  const cellSize = size / gridN;
+
+  // How many axes to show at this depth
+  const axesAtDepth = Math.min(3, depth + 1); // deeper = more axes visible
+
+  for (let gx = 0; gx < gridN; gx++) {
+    for (let gy = 0; gy < gridN; gy++) {
+      if (pointsDrawn > MAX_POINTS) return;
+
+      const seed = parentSeed + gx * 137 + gy * 311 + depth * 997;
+
+      // Position in screen space
+      const nx = cx + (gx - gridN / 2 + 0.5) * cellSize;
+      const ny = cy + (gy - gridN / 2 + 0.5) * cellSize;
+
+      // Culling — skip if off screen
+      if (nx + cellSize < 0 || nx - cellSize > W || ny + cellSize < 0 || ny - cellSize > H) continue;
+
+      // Determine how many "sub-nodes" (the ×3 axes)
+      for (let ax = 0; ax < 3; ax++) {
+        const axSeed = seed + ax * 53;
+        const colorIdx = ax; // D/A/P base colors
+        const col = COLORS[colorIdx];
+
+        // Jitter based on axis
+        const jx = (hash(gx, gy, ax + depth * 10) - 0.5) * cellSize * 0.3;
+        const jy = (hash(gy, gx, ax + depth * 10 + 50) - 0.5) * cellSize * 0.3;
+
+        const px = nx + jx;
+        const py = ny + jy;
+
+        // Point size based on depth
+        const baseSize = Math.max(0.5, cellSize * 0.08);
+        const pulse = Math.sin(t * 2 + gx * 0.3 + gy * 0.5 + ax * 1.1 + depth * 0.7) * 0.3 + 0.7;
+        const sz = baseSize * pulse;
+
+        // Alpha based on depth — deeper = more transparent
+        const alpha = Math.max(0.05, 0.6 - depth * 0.08) * pulse;
+
+        // Draw point
+        ctx.beginPath();
+        ctx.arc(px, py, sz, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${alpha})`;
+        ctx.fill();
+        pointsDrawn++;
+
+        // Connection lines at shallow depths
+        if (depth < 3 && ax === 0 && gx < gridN - 1) {
+          const nx2 = cx + (gx + 1.5 - gridN / 2) * cellSize;
+          const jx2 = (hash(gx + 1, gy, depth * 10) - 0.5) * cellSize * 0.3;
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(nx2 + jx2, ny + jy * 0.5);
+          ctx.strokeStyle = `rgba(${col[0]},${col[1]},${col[2]},${alpha * 0.08})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+
+      // +2 observers — only at certain depths/positions
+      if (gx === 0 && gy === 0 && depth < 4) {
+        const obsX = nx + cellSize * 5 + Math.sin(t + depth) * cellSize * 2;
+        const obsY = ny + cellSize * 5 + Math.cos(t * 0.7 + depth) * cellSize * 1.5;
+        const obsSize = cellSize * 0.15;
+        const obsAlpha = Math.max(0.1, 0.5 - depth * 0.1);
+
+        ctx.beginPath();
+        ctx.arc(obsX, obsY, obsSize, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,168,48,${obsAlpha})`;
+        ctx.shadowColor = 'rgba(200,168,48,.3)';
+        ctx.shadowBlur = obsSize * 3;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        pointsDrawn += 1;
+      }
+
+      // RECURSE into each cell if large enough
+      if (cellSize > 8 && depth < maxDepth) {
+        drawRecursiveLayer(nx, ny, cellSize * 0.85, depth + 1, maxDepth, seed);
+      }
+    }
+  }
+}
+
+// ═══ GRID LINES — perspective convergence ═══
+function drawConvergenceLines() {
+  const centerX = W / 2 + camX * zoom;
+  const centerY = H / 2 + camY * zoom;
+  const numLines = 40;
+  const maxLen = Math.max(W, H) * 1.5;
+
+  ctx.globalAlpha = 0.015;
+  for (let i = 0; i < numLines; i++) {
+    const angle = (i / numLines) * Math.PI * 2 + t * 0.02;
+    const x2 = centerX + Math.cos(angle) * maxLen;
+    const y2 = centerY + Math.sin(angle) * maxLen;
+
+    // Color cycle
+    const ci = i % COLORS.length;
+    const col = COLORS[ci];
+
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = `rgb(${col[0]},${col[1]},${col[2]})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ═══ BACKGROUND DUST — deep field particles ═══
+const dust = [];
+for (let i = 0; i < 2000; i++) {
+  dust.push({
+    x: Math.random(), y: Math.random(),
+    size: Math.random() * 1.2 + 0.2,
+    speed: Math.random() * 0.0002 + 0.0001,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    alpha: Math.random() * 0.15 + 0.02,
+    phase: Math.random() * Math.PI * 2
+  });
+}
+
+function drawDust() {
+  dust.forEach(d => {
+    const px = ((d.x + t * d.speed * (d.color[0] > 128 ? 1 : -1)) % 1) * W;
+    const py = ((d.y + t * d.speed * 0.5) % 1) * H;
+    const pulse = Math.sin(t * 3 + d.phase) * 0.3 + 0.7;
+
+    ctx.beginPath();
+    ctx.arc(px, py, d.size * pulse, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${d.color[0]},${d.color[1]},${d.color[2]},${d.alpha * pulse})`;
+    ctx.fill();
+  });
+}
+
+// ═══ CROSS GRID — the matrix structure lines ═══
+function drawMatrixGrid() {
+  const centerX = W / 2 + camX * zoom;
+  const centerY = H / 2 + camY * zoom;
+  const gridSize = 80 * zoom;
+  const numLines = 30;
+
+  ctx.globalAlpha = 0.02;
+
+  // Horizontal
+  for (let i = -numLines; i <= numLines; i++) {
+    const y = centerY + i * gridSize;
+    if (y < -gridSize || y > H + gridSize) continue;
+
+    // Perspective scaling
+    const dist = Math.abs(i) / numLines;
+    const perspX = W * 0.3 * dist;
+
+    ctx.beginPath();
+    ctx.moveTo(-perspX, y);
+    ctx.lineTo(W + perspX, y);
+    const ci = Math.abs(i) % 3;
+    const col = COLORS[ci];
+    ctx.strokeStyle = `rgb(${col[0]},${col[1]},${col[2]})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  // Vertical
+  for (let i = -numLines; i <= numLines; i++) {
+    const x = centerX + i * gridSize;
+    if (x < -gridSize || x > W + gridSize) continue;
+
+    const dist = Math.abs(i) / numLines;
+    const perspY = H * 0.3 * dist;
+
+    ctx.beginPath();
+    ctx.moveTo(x, -perspY);
+    ctx.lineTo(x, H + perspY);
+    const ci = (Math.abs(i) + 1) % 3;
+    const col = COLORS[ci];
+    ctx.strokeStyle = `rgb(${col[0]},${col[1]},${col[2]})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+}
+
+// ═══ NESTED CUBES — recursive wireframes ═══
+function drawNestedCubes() {
+  const centerX = W / 2 + camX * zoom * 0.3;
+  const centerY = H / 2 + camY * zoom * 0.3;
+  const layers = 8;
+
+  for (let i = 0; i < layers; i++) {
+    const size = (50 + i * 60) * zoom;
+    const rot = t * (0.1 - i * 0.01) + i * 0.5;
+    const alpha = Math.max(0.01, 0.06 - i * 0.006);
+    const ci = i % 3;
+    const col = COLORS[ci];
+
+    // Simple rotated square (2D projection of cube)
+    const cos = Math.cos(rot);
+    const sin = Math.sin(rot);
+    const cos2 = Math.cos(rot * 0.7 + 1);
+    const sin2 = Math.sin(rot * 0.7 + 1);
+
+    // Front face
+    const pts = [
+      [-1, -1], [1, -1], [1, 1], [-1, 1]
+    ].map(([x, y]) => [
+      centerX + (x * cos - y * sin) * size,
+      centerY + (x * sin + y * cos) * size
+    ]);
+
+    // Back face (smaller, offset)
+    const depth = 0.6 + Math.sin(t + i) * 0.1;
+    const pts2 = [
+      [-1, -1], [1, -1], [1, 1], [-1, 1]
+    ].map(([x, y]) => [
+      centerX + (x * cos2 - y * sin2) * size * depth,
+      centerY + (x * sin2 + y * cos2) * size * depth
+    ]);
+
+    ctx.strokeStyle = `rgba(${col[0]},${col[1]},${col[2]},${alpha})`;
+    ctx.lineWidth = 0.5;
+
+    // Front
+    ctx.beginPath();
+    pts.forEach((p, j) => j === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]));
+    ctx.closePath();
+    ctx.stroke();
+
+    // Back
+    ctx.beginPath();
+    pts2.forEach((p, j) => j === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]));
+    ctx.closePath();
+    ctx.stroke();
+
+    // Connections
+    for (let j = 0; j < 4; j++) {
+      ctx.beginPath();
+      ctx.moveTo(pts[j][0], pts[j][1]);
+      ctx.lineTo(pts2[j][0], pts2[j][1]);
+      ctx.stroke();
+    }
+  }
+}
+
+// ═══ CENTRAL GLOW ═══
+function drawCenterGlow() {
+  const centerX = W / 2 + camX * zoom * 0.1;
+  const centerY = H / 2 + camY * zoom * 0.1;
+  const pulse = Math.sin(t * 1.5) * 0.3 + 0.7;
+  const radius = 200 * zoom * pulse;
+
+  const grd = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+  grd.addColorStop(0, `rgba(200,168,48,${0.06 * pulse})`);
+  grd.addColorStop(0.2, `rgba(160,100,200,${0.03 * pulse})`);
+  grd.addColorStop(0.5, `rgba(64,144,255,${0.015 * pulse})`);
+  grd.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, W, H);
+}
+
+// ═══ MAIN RENDER ═══
+function draw() {
+  t += 0.004;
+  pointsDrawn = 0;
+
+  // Smooth zoom
+  zoom += (targetZoom - zoom) * 0.05;
+
+  // Momentum
+  if (!isDrag) {
+    camX += velX;
+    camY += velY;
+    velX *= 0.96;
+    velY *= 0.96;
+  }
+
+  // Clear with very slight trail
+  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  ctx.fillRect(0, 0, W, H);
+
+  // Layers back to front
+  drawMatrixGrid();
+  drawConvergenceLines();
+  drawDust();
+  drawNestedCubes();
+  drawCenterGlow();
+
+  // Recursive nodes — the main event
+  const maxDepth = Math.min(6, Math.floor(2 + zoom * 0.8));
+  const baseSize = Math.min(W, H) * 0.8 * zoom;
+  const cx = W / 2 + camX * zoom;
+  const cy = H / 2 + camY * zoom;
+
+  drawRecursiveLayer(cx, cy, baseSize, 0, maxDepth, 42);
+
+  // Update depth display
+  document.getElementById('depth').textContent = `DEPTH ${maxDepth} → ∞`;
+
+  requestAnimationFrame(draw);
+}
+
+// ═══ CONTROLS ═══
+canvas.addEventListener('mousedown', e => {
+  isDrag = true;
+  prevM = { x: e.clientX, y: e.clientY };
+});
+canvas.addEventListener('mousemove', e => {
+  if (isDrag) {
+    const dx = (e.clientX - prevM.x) * 2;
+    const dy = (e.clientY - prevM.y) * 2;
+    camX += dx / zoom;
+    camY += dy / zoom;
+    velX = dx / zoom * 0.3;
+    velY = dy / zoom * 0.3;
+    prevM = { x: e.clientX, y: e.clientY };
+  }
+});
+canvas.addEventListener('mouseup', () => isDrag = false);
+canvas.addEventListener('mouseleave', () => isDrag = false);
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  targetZoom = Math.max(0.3, Math.min(20, targetZoom * (1 - e.deltaY * 0.001)));
+}, { passive: false });
+
+// Touch
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) {
+    isDrag = true;
+    prevM = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+});
+canvas.addEventListener('touchmove', e => {
+  if (isDrag && e.touches.length === 1) {
+    const dx = (e.touches[0].clientX - prevM.x) * 2;
+    const dy = (e.touches[0].clientY - prevM.y) * 2;
+    camX += dx / zoom;
+    camY += dy / zoom;
+    velX = dx / zoom * 0.3;
+    velY = dy / zoom * 0.3;
+    prevM = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+});
+canvas.addEventListener('touchend', () => isDrag = false);
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    camX = 0; camY = 0;
+    targetZoom = 1; zoom = 1;
+    velX = 0; velY = 0;
+  }
+});
+
+draw();
+</script>
+</body>
+</html>

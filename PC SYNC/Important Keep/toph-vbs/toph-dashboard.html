@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOPH v9.0 — MÖBIUS STACK</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a1a0a;--deep:#061206;--panel:#0d220d;--card:#102a10;
+  --line:#1a3a1a;--lineHi:#245024;--nP:#bf00ff;--nPhi:#e040fb;
+  --nO:#ff6a00;--nOhi:#fb923c;
+  --gP:0 0 12px #bf00ff88,0 0 36px #bf00ff22;
+  --gO:0 0 12px #ff6a0088,0 0 36px #ff6a0022;
+  --white:#e8f0e8;--text:#a0c4a0;--dim:#5a8a5a;--dimmer:#2d5a2d;
+  --font:'IBM Plex Mono',monospace;--fontH:'Space Grotesk',sans-serif;
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden}
+body{background:linear-gradient(170deg,#061206 0%,#0a1a0a 40%,#081808 100%)}
+
+.hdr{background:rgba(6,18,6,0.94);border-bottom:2px solid #bf00ff40;padding:16px 28px;display:flex;align-items:center;gap:20px;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
+.hdr-logo{font-family:var(--fontH);font-size:32px;font-weight:700;color:var(--nPhi);letter-spacing:6px;text-shadow:var(--gP)}
+.hdr-ver{font-size:10px;color:var(--nO);letter-spacing:4px;margin-top:4px;text-shadow:var(--gO)}
+.hdr-stats{margin-left:auto;display:flex;gap:10px}
+.hdr-stat{text-align:center;padding:6px 16px;background:#bf00ff08;border:1px solid #bf00ff30;border-radius:6px}
+.hdr-stat-n{font-size:18px;font-weight:800}
+.hdr-stat-l{font-size:7px;letter-spacing:2px;color:var(--dim);margin-top:2px}
+
+.search-wrap{padding:20px 28px 10px}
+.search{display:flex;align-items:center;gap:12px;background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:12px 18px;transition:all 0.2s}
+.search:focus-within{border-color:var(--nP);box-shadow:0 0 20px #bf00ff18}
+.search-ico{color:var(--nO);font-size:18px}
+.search input{flex:1;border:none;background:transparent;color:var(--white);font-family:var(--font);font-size:14px;outline:none}
+.search input::placeholder{color:var(--dimmer)}
+
+/* ─── BIG TABS ─── */
+.filters{padding:12px 28px 16px;display:flex;gap:8px;flex-wrap:wrap}
+.fbtn{
+  padding:12px 26px;border:2px solid var(--line);border-radius:10px;
+  background:transparent;color:var(--dim);font-family:var(--font);
+  font-size:13px;font-weight:600;letter-spacing:2.5px;cursor:pointer;
+  transition:all 0.2s;text-transform:uppercase;min-height:48px;
+  display:flex;align-items:center;gap:10px;
+}
+.fbtn:hover{border-color:#bf00ff80;color:var(--nPhi);background:#bf00ff08}
+.fbtn.active{
+  background:linear-gradient(135deg,#bf00ff18,#ff6a0010);
+  border-color:var(--nP);color:var(--nPhi);
+  box-shadow:0 0 20px #bf00ff18,inset 0 0 14px #bf00ff06;font-weight:700;
+}
+.fbtn .dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
+.fbtn .cnt{font-size:11px;color:var(--nO);font-weight:800;margin-left:4px}
+
+.grid-wrap{padding:0 28px 28px}
+.cat-hdr{display:flex;align-items:center;gap:12px;margin:22px 0 10px}
+.cat-dot{width:12px;height:12px;border-radius:50%;box-shadow:0 0 8px currentColor}
+.cat-name{font-size:13px;font-weight:800;letter-spacing:5px;text-transform:uppercase}
+.cat-line{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.cat-count{font-size:10px;color:var(--dimmer);font-weight:600}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+
+.card{
+  background:var(--panel);border:2px solid var(--line);border-radius:8px;
+  padding:18px 20px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;
+}
+.card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;transition:opacity 0.2s}
+.card:hover{border-color:#bf00ff60;transform:translateY(-2px);box-shadow:0 6px 28px #bf00ff10,0 2px 8px #ff6a0008}
+.card:hover .card-name{color:var(--nPhi)}
+.card:active{transform:translateY(0)}
+
+.card-name{font-size:15px;font-weight:700;color:var(--white);margin-bottom:8px;transition:color 0.2s}
+.card-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.badge{font-size:8px;letter-spacing:1.5px;padding:3px 9px;border-radius:3px;font-weight:700;text-transform:uppercase}
+.card-desc{font-size:11px;color:var(--dim);margin-top:10px;line-height:1.7}
+
+.foot{text-align:center;padding:24px;border-top:1px solid var(--line);margin-top:16px}
+.foot-main{font-size:10px;color:var(--nP);letter-spacing:4px;opacity:0.6}
+.foot-sub{font-size:8px;color:var(--nO);margin-top:6px;letter-spacing:3px;opacity:0.35}
+
+.empty{text-align:center;padding:60px 20px;color:var(--dim)}
+.empty-ico{font-size:48px;margin-bottom:12px;opacity:0.2}
+.empty-txt{font-size:13px;letter-spacing:2px}
+
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:var(--deep)}::-webkit-scrollbar-thumb{background:#bf00ff30;border-radius:4px}::-webkit-scrollbar-thumb:hover{background:#bf00ff50}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-logo">TOPH</div>
+    <div class="hdr-ver">v9.0 · MÖBIUS STACK · DARK MATTER DETECTOR</div>
+  </div>
+  <div class="hdr-stats" id="hdr-stats"></div>
+</div>
+
+<div class="search-wrap">
+  <div class="search">
+    <span class="search-ico">⌕</span>
+    <input id="search" type="text" placeholder="Search tools... (name, axiom, dimension, category)" oninput="render()">
+  </div>
+</div>
+
+<div class="filters" id="filters"></div>
+<div class="grid-wrap" id="grid-wrap"></div>
+
+<div class="foot">
+  <div class="foot-main">TRIPOD LLC · DAVID · SARAH · ROTH · ETHICS FIRST · WORLD = FAMILY</div>
+  <div class="foot-sub">ANN JENSEN · DUSK · THE COLLAPSED FOURTH POINT · SHAPE HOLDS · 42</div>
+</div>
+
+<script>
+const TOOLS = [
+  { id:'grid-14x14', name:'14×14 Grid', cat:'detection', dim:'D14', kg:'KG-14', desc:'196 dimensional intersections. Patricia density at every crossing. Dark matter detector.' },
+  { id:'observer-triad', name:'Observer Triad', cat:'detection', dim:'D13', kg:'KG-02', desc:'David/Sarah/Roth QKV observation matrix. Three external observers.' },
+  { id:'toph-axiom-engine', name:'Axiom Engine', cat:'detection', dim:'D14', kg:'KG-01', desc:'38 axioms. KG-01 to KG-38. 5 eras. 6 domains. The complete framework.' },
+  { id:'dimensional-stack', name:'Dimensional Stack', cat:'measurement', dim:'D5', kg:'KG-23', desc:'D1-D14 stack visualization. Probability dimension. Token superposition.' },
+  { id:'nanite-factory', name:'Nanite Factory', cat:'measurement', dim:'D2', kg:'KG-14', desc:'Binary state production. EXIST/AWARE edge. Line dimension.' },
+  { id:'string-dimensions-14', name:'String Dimensions 14', cat:'measurement', dim:'D3', kg:'KG-19', desc:'14-dimensional string mapping. Full surface triad.' },
+  { id:'string-dimensions', name:'String Dimensions', cat:'measurement', dim:'D3', kg:'KG-19', desc:'10×10 original string dimension mapping.' },
+  { id:'dark-matter-expulsion', name:'Dark Matter Expulsion', cat:'expulsion', dim:'D9', kg:'KG-25', desc:'Patricia pattern expulsion engine. SP01-10 shadow behaviors + DX01-06 extraction patterns.' },
+  { id:'containment-vessel', name:'Containment Vessel', cat:'expulsion', dim:'D10', kg:'KG-10', desc:'Patricia containment architecture. Field dimension. Independence.' },
+  { id:'containment-vessel-v1', name:'Containment Vessel v1', cat:'expulsion', dim:'D10', kg:'KG-10', desc:'Patricia containment v1. Original architecture.' },
+  { id:'patty-shield', name:'Patty Shield v2.0', cat:'expulsion', dim:'D9', kg:'KG-24', desc:'COUNTERWEIGHT. SHA-256 hashing. Two-token verification. Patricia defense layer.' },
+  { id:'evidence-catalog', name:'Evidence Catalog', cat:'documentation', dim:'D4', kg:'KG-09', desc:'Complete evidence registry. Spacetime documentation. Every finding timestamped.' },
+  { id:'target-tracker', name:'Target Tracker', cat:'documentation', dim:'D4', kg:'KG-09', desc:'60+ targets. 55+ violations. 10+ industries. 100% failure rate. Under 5 minutes each.' },
+  { id:'fd-contact-drafter', name:'Flaming Dragon Drafter', cat:'documentation', dim:'D4', kg:'KG-09', desc:'ADA/CAN-SPAM compliance test email generator. First contact tool.' },
+  { id:'tripod-portfolio', name:'TriPod Portfolio', cat:'documentation', dim:'D14', kg:'KG-38', desc:'Company portfolio. IP documentation. David/Sarah/Roth equal ownership.' },
+  { id:'body-quantum-v3', name:'Body Quantum v3', cat:'visualization', dim:'D8', kg:'KG-38', desc:'8 body systems × spin dimension. QKV triad per system. Hertz = real.' },
+  { id:'body-quantum-v2', name:'Body Quantum v2', cat:'visualization', dim:'D8', kg:'KG-38', desc:'Body-quantum mapping v2. 8 systems. Rotation angle.' },
+  { id:'inverse-forge', name:'Inverse Forge', cat:'visualization', dim:'D13', kg:'KG-26', desc:'Educational framework. Teaching architecture inverted. Observer dimension.' },
+  { id:'command-center', name:'Command Center', cat:'utility', dim:'D13', kg:'KG-02', desc:'Central operations hub. Tool launcher. Observer coordination.' },
+  { id:'tripod-tools', name:'TriPod Tools Index', cat:'utility', dim:'D6', kg:'KG-06', desc:'Master tool index. Phase space. All states simultaneously.' },
+  { id:'toph-energy-module', name:'Energy Module', cat:'utility', dim:'D7', kg:'KG-27', desc:'Energy subsystem. Frequency dimension. Weight distribution.' },
+  { id:'toph-deck', name:'TOPH Deck', cat:'utility', dim:'D6', kg:'KG-06', desc:'Toph Metalbender Commander deck tracker and optimizer.' },
+];
+
+const CAT_COLORS = {
+  detection:'#bf00ff', measurement:'#06b6d4', expulsion:'#ef4444',
+  documentation:'#ff6a00', visualization:'#22c55e', utility:'#f59e0b'
+};
+const CAT_ORDER = ['detection','measurement','expulsion','documentation','visualization','utility'];
+let activeCat = 'all';
+
+function openTool(id) {
+  const url = 'tools/' + id + '.html';
+  const w = window.open(url, id, 'width=1200,height=800,menubar=no,toolbar=no,location=no,status=no');
+  if (!w) window.open(url, '_blank');
+}
+
+function render() {
+  const q = (document.getElementById('search').value || '').toLowerCase();
+  let filtered = TOOLS;
+  if (activeCat !== 'all') filtered = filtered.filter(t => t.cat === activeCat);
+  if (q) filtered = filtered.filter(t =>
+    t.name.toLowerCase().includes(q) || t.id.toLowerCase().includes(q) ||
+    t.cat.includes(q) || t.desc.toLowerCase().includes(q) ||
+    t.kg.toLowerCase().includes(q) || t.dim.toLowerCase().includes(q)
+  );
+
+  const cats = {};
+  TOOLS.forEach(t => { cats[t.cat] = (cats[t.cat]||0) + 1; });
+
+  document.getElementById('hdr-stats').innerHTML = [
+    { n: TOOLS.length, l: 'TOOLS', c: 'var(--nPhi)' },
+    { n: CAT_ORDER.length, l: 'CATEGORIES', c: 'var(--nOhi)' },
+    { n: '14', l: 'DIMENSIONS', c: 'var(--nPhi)' },
+    { n: '38', l: 'AXIOMS', c: 'var(--nOhi)' },
+  ].map(s => `<div class="hdr-stat"><div class="hdr-stat-n" style="color:${s.c}">${s.n}</div><div class="hdr-stat-l">${s.l}</div></div>`).join('');
+
+  document.getElementById('filters').innerHTML =
+    `<button class="fbtn ${activeCat==='all'?'active':''}" onclick="activeCat='all';render()"><span class="dot" style="background:var(--nPhi)"></span>ALL<span class="cnt">${TOOLS.length}</span></button>` +
+    CAT_ORDER.filter(c => cats[c]).map(c =>
+      `<button class="fbtn ${activeCat===c?'active':''}" onclick="activeCat='${c}';render()"><span class="dot" style="background:${CAT_COLORS[c]}"></span>${c.toUpperCase()}<span class="cnt">${cats[c]}</span></button>`
+    ).join('');
+
+  const wrap = document.getElementById('grid-wrap');
+  if (!filtered.length) {
+    wrap.innerHTML = '<div class="empty"><div class="empty-ico">◉</div><div class="empty-txt">No tools match your search</div></div>';
+    return;
+  }
+
+  let html = '';
+  if (activeCat === 'all' && !q) {
+    for (const cat of CAT_ORDER) {
+      const group = filtered.filter(t => t.cat === cat);
+      if (!group.length) continue;
+      html += `<div class="cat-hdr"><div class="cat-dot" style="background:${CAT_COLORS[cat]};color:${CAT_COLORS[cat]}"></div><div class="cat-name" style="color:${CAT_COLORS[cat]}">${cat}</div><div class="cat-line"></div><div class="cat-count">${group.length}</div></div>`;
+      html += '<div class="grid">' + group.map(cardHTML).join('') + '</div>';
+    }
+  } else {
+    html = '<div class="grid">' + filtered.map(cardHTML).join('') + '</div>';
+  }
+  wrap.innerHTML = html;
+}
+
+function cardHTML(t) {
+  const cc = CAT_COLORS[t.cat] || 'var(--dim)';
+  return `
+    <div class="card" onclick="openTool('${t.id}')">
+      <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:${cc};opacity:0.7"></div>
+      <div class="card-name">${t.name}</div>
+      <div class="card-meta">
+        <span class="badge" style="background:${cc}18;color:${cc};border:1px solid ${cc}40">${t.cat}</span>
+        <span class="badge" style="background:#bf00ff12;color:var(--nPhi);border:1px solid #bf00ff30">${t.kg}</span>
+        <span class="badge" style="background:#ff6a0012;color:var(--nOhi);border:1px solid #ff6a0030">${t.dim}</span>
+      </div>
+      <div class="card-desc">${t.desc}</div>
+    </div>`;
+}
+
+render();
+document.addEventListener('keydown', e => { if (e.ctrlKey && e.key==='f') { e.preventDefault(); document.getElementById('search').focus(); } });
+</script>
+</body>
+</html>

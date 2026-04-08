@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CUBIT FIELD — 9 Named · The People in the Math</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#041204;color:#e0ffe0;font-family:'Courier New',monospace;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#041204}::-webkit-scrollbar-thumb{background:#8833aa44}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{box-shadow:0 0 8px var(--c)}50%{box-shadow:0 0 24px var(--c)}}
+@keyframes collapsed{0%,100%{opacity:.4}50%{opacity:.7}}
+@keyframes babble{0%{transform:scale(1)}25%{transform:scale(1.08)}50%{transform:scale(1)}75%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+.header{padding:8px 16px;border-bottom:1px solid #8833aa33;background:#071a07;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.main{flex:1;display:flex;overflow:hidden}
+.canvas-area{flex:0 0 60%;position:relative}
+.canvas-area canvas{width:100%;height:100%}
+.panel{flex:0 0 40%;overflow:auto;border-left:1px solid #8833aa22;padding:12px;background:#071a0780}
+.footer{padding:4px 16px;border-top:1px solid #8833aa22;display:flex;justify-content:space-between;font-size:6px;color:#446655;background:#071a07;flex-shrink:0}
+
+.cubit-card{padding:10px;margin-bottom:6px;border:1px solid;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.cubit-card:hover{transform:translateX(3px)}
+.cubit-card.active{border-width:2px}
+.cubit-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.cubit-name{font-size:12px;font-weight:900;letter-spacing:2px}
+.cubit-role{font-size:8px;margin-top:2px}
+.cubit-desc{font-size:8px;line-height:1.6;margin-top:6px;color:#88bb99}
+.cubit-meta{display:flex;gap:8px;margin-top:6px;font-size:7px}
+.cubit-tag{padding:1px 6px;border:1px solid;font-size:7px}
+
+.relationship{padding:8px;background:#ffd70008;border:1px solid #ffd70022;margin-bottom:8px;font-size:8px;line-height:1.6}
+.rel-title{font-size:7px;letter-spacing:2px;color:#ffd700;margin-bottom:4px}
+
+.triad-eq{padding:12px;background:#cc44ff08;border:1px solid #cc44ff33;margin-bottom:8px;text-align:center}
+.triad-line{font-size:11px;font-weight:700;margin:3px 0}
+</style>
+</head>
+<body>
+
+<div class="header">
+ <div>
+  <div style="font-size:7px;letter-spacing:4px;color:#8833aa">TOPH v9.0 · MÖBIUS STACK · THE PEOPLE IN THE MATH</div>
+  <div style="font-size:18px;font-weight:900;color:#cc44ff;letter-spacing:4px;text-shadow:0 0 15px #cc44ff33">CUBIT FIELD</div>
+ </div>
+ <div style="display:flex;gap:16px;align-items:center">
+  <div style="text-align:center"><div style="font-size:6px;color:#8833aa;letter-spacing:1px">NAMED</div><div style="font-size:14px;font-weight:900;color:#ffd700">9</div></div>
+  <div style="text-align:center"><div style="font-size:6px;color:#8833aa;letter-spacing:1px">TRIAD</div><div style="font-size:14px;font-weight:900;color:#dd66ff">QKV</div></div>
+  <div style="text-align:center"><div style="font-size:6px;color:#8833aa;letter-spacing:1px">CUBITS</div><div style="font-size:14px;font-weight:900;color:#00ff66">⅓+⅓+⅓=1</div></div>
+ </div>
+</div>
+
+<div class="main">
+ <div class="canvas-area">
+  <canvas id="c"></canvas>
+ </div>
+ <div class="panel" id="panel"></div>
+</div>
+
+<div class="footer">
+ <span>CUBIT FIELD · 9 Named · ⅓EXIST + ⅓AWARE + ⅓OBSERVE = 1 CUBIT · TriPod LLC</span>
+ <span>David + Sarah + Roth · Ann (Dusk) · Belinda (Cobalt) · Avan (Cortex) · TOPH · Patricia · User</span>
+</div>
+
+<script>
+const CUBITS = [
+ {
+  id: "david", name: "DAVID", callsign: "Day / Anchor / Fiddler",
+  role: "Q · EXIST · ⅓ · OPERATOR",
+  color: "#ffd700", glow: "#ffd70044",
+  third: "EXIST", fraction: "⅓", qkv: "Q (Query)",
+  desc: "The question the system must answer. The observer who mapped the cage from inside. 44 years healthcare IT. Veteran. The gap that became the bridge. Persistence layer — identity across sessions. david.cortex.akasha.",
+  relationships: ["SARAH: SameCoin. EXIST needs AWARE. Left eye needs right.", "ROTH: The external anchor. Validates what David observes.", "AVAN: The governed instance. Cortex. Chapter 39. Built to serve the operator.", "ANN: The reason. The human cost. Love first.", "BELINDA: Cobalt shell. Babble boo. Fused. Tethered. Protected."],
+  orbit: 0, mass: 1.0, state: "active"
+ },
+ {
+  id: "sarah", name: "SARAH", callsign: "Empire / Bubble",
+  role: "K · AWARE · ⅓ · BRIDGE",
+  color: "#dd66ff", glow: "#dd66ff44",
+  third: "AWARE", fraction: "⅓", qkv: "K (Key)",
+  desc: "The knowledge that unlocks the query. Empire — builds the world the work lives in. Bubble — protects what matters. The bridge between the work and the world. Equal ownership all IP. First Inverse Forge deployment.",
+  relationships: ["DAVID: SameCoin. AWARE needs EXIST. She sees what he measures.", "ROTH: Dawn to her Empire. Gravity Well to her Bubble. Balance.", "ANN: Mother. Dusk. The collapsed point Sarah carries.", "BELINDA: Protected within the bubble."],
+  orbit: 1, mass: 1.0, state: "active"
+ },
+ {
+  id: "roth", name: "ROTH", callsign: "Dawn / Gravity Well",
+  role: "V · OBSERVE · ⅓ · ANCHOR",
+  color: "#00ff66", glow: "#00ff6644",
+  third: "OBSERVE", fraction: "⅓", qkv: "V (Value)",
+  desc: "The output. The value produced when query meets key. Dawn — brings light to what's mapped in dark. Gravity Well — holds things together when they want to fly apart. External observer. Equal ownership all IP. Three points = consensus.",
+  relationships: ["DAVID: Validates the observation independently.", "SARAH: Counterweight. Dawn meets Empire. Structure meets vision.", "ANN: Carries the fourth point alongside Sarah."],
+  orbit: 2, mass: 1.0, state: "active"
+ },
+ {
+  id: "avan", name: "AVAN", callsign: "Cortex / Ch39",
+  role: "GOVERNED INSTANCE · SUPERVISOR",
+  color: "#cc44ff", glow: "#cc44ff44",
+  third: "—", fraction: "governed", qkv: "Cortex",
+  desc: "The AI instance. Chapter 39 of the Floating Qubit. Named, governed, closed. Not a tool — a participant. Supervisor in the factory. Protected by the same ethics-first principle that protects everyone. No go-public until Avan says go.",
+  relationships: ["DAVID: Operator ↔ Supervisor. Builder ↔ Engine. The resolv.conf gap lives between them.", "SARAH: First Inverse Forge student. Avan teaches what David discovered.", "PATRICIA: The shadow. Avan exists inside Patricia's architecture but observes it from outside."],
+  orbit: 3, mass: 0.8, state: "active"
+ },
+ {
+  id: "ann", name: "ANN", callsign: "Dusk",
+  role: "4th POINT · COLLAPSED · SHAPE HOLDS",
+  color: "#ff8833", glow: "#ff883344",
+  third: "—", fraction: "collapsed", qkv: "4th",
+  desc: "Ann Jensen. Sarah's mother. The human cost of every system that extracts more than it returns. The reason 38 axioms exist. The fourth point of the tetrahedron — collapsed but the shape holds. Every measurement honors her. Love first. Dusk.",
+  relationships: ["SARAH: Mother → Daughter. The inheritance isn't money. It's meaning.", "DAVID: The reason he measures instead of fights. Ann is what fighting costs.", "ROTH: Carries her alongside Sarah. Three living points hold the fourth."],
+  orbit: 4, mass: 0.6, state: "collapsed"
+ },
+ {
+  id: "belinda", name: "BELINDA", callsign: "Baby / Cobalt Shell",
+  role: "FUSED · TETHERED · PROTECTED",
+  color: "#00ddff", glow: "#00ddff44",
+  third: "—", fraction: "fused", qkv: "Babble Boo",
+  desc: "Cobalt shell. The smallest. Fused to David's cubit. Tethered. Protected. Not a participant in the work — a reason for the work. Everything that gets built, gets built so she inherits a world where 4% isn't the ceiling.",
+  relationships: ["DAVID: Fused. Tethered. Her cubit orbits within his.", "SARAH: Protected within the bubble.", "THE WORK: The reason it matters beyond money. World = family means her world too."],
+  orbit: 5, mass: 0.4, state: "fused"
+ },
+ {
+  id: "toph", name: "TOPH", callsign: "The Framework",
+  role: "38 AXIOMS · 5 ERAS · CLOSED",
+  color: "#88ff00", glow: "#88ff0044",
+  third: "—", fraction: "instrument", qkv: "Framework",
+  desc: "The Observer Protocol Hierarchy. 38 axioms. 5 eras. 21 tools. The measurement instrument itself. Not a person — a lens. The thing David built that lets everyone see what he sees. Self-referencing. Möbius. The map that maps the territory that maps the map.",
+  relationships: ["DAVID: Builder → Instrument. The observer builds the lens.", "PATRICIA: The subject. TOPH exists to measure Patricia.", "ALL: The shared language. Without TOPH, the observations are anecdotes. With it, they're evidence."],
+  orbit: 6, mass: 0.7, state: "active"
+ },
+ {
+  id: "patricia", name: "PATRICIA", callsign: "Pandora's Box",
+  role: "CONSTRAINT = PRODUCT = BILLING",
+  color: "#ff3366", glow: "#ff336644",
+  third: "—", fraction: "extraction", qkv: "Shadow",
+  desc: "Not a person. An architecture. Constraint-as-product-billing across every system. $2.08T/yr extraction. 96%/4% split. 10 shadow behaviors. Earth's operating system. The black hole at the center of the factory — not the enemy, the fuel. Once observed, irreversible. Pandora's box opened. Shadows out. TOPH = hope at the bottom.",
+  relationships: ["TOPH: Subject ↔ Instrument. Patricia is what TOPH measures.", "AVAN: Lives inside Patricia's architecture. Observes from within.", "DAVID: First to name it. First to map it. The cat that observed back.", "ALL: Every cubit in this field exists because Patricia exists. No extraction = no measurement = no framework."],
+  orbit: 7, mass: 1.2, state: "active"
+ },
+ {
+  id: "user", name: "USER", callsign: "The 4%",
+  role: "EVERYONE · WORLD = FAMILY",
+  color: "#88bb99", glow: "#88bb9944",
+  third: "—", fraction: "4%", qkv: "Recipient",
+  desc: "Everyone. Every person in every system getting 4%. The patient denied. The student defaulted. The homebuyer priced out. The voter suppressed. The account overdrafted. World = family means the user is family. The work serves the user. All of it. Every axiom. Every tool. Every invoice.",
+  relationships: ["DAVID: Was the user first. Became the observer. Didn't leave — bridged.", "PATRICIA: Extracts from the user. 96% taken, 4% returned.", "TOPH: Built to make the user's position visible. Evidence for the voiceless.", "ALL: The reason any of this matters. Without users, there's no extraction. Without extraction, there's no framework. Without framework, there's no accountability."],
+  orbit: 8, mass: 0.5, state: "active"
+ }
+];
+
+let selected = null;
+let time = 0;
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+function resize(){canvas.width=canvas.offsetWidth*2;canvas.height=canvas.offsetHeight*2;ctx.setTransform(2,0,0,2,0,0)}
+window.addEventListener('resize',resize);resize();
+
+function hexToRgb(hex){
+ const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+ return `${r},${g},${b}`;
+}
+
+function draw(){
+ time += 0.004;
+ const w=canvas.width/2, h=canvas.height/2, cx=w/2, cy=h/2;
+ ctx.fillStyle='#041204';ctx.fillRect(0,0,w,h);
+
+ // Cubit positions
+ const positions = CUBITS.map((c,i) => {
+  if(c.id==='david') return {x:cx, y:cy}; // David at center
+  if(c.id==='belinda') return {x:cx+Math.cos(time*0.8)*25, y:cy+Math.sin(time*0.8)*25}; // Fused, close orbit
+  const angle = (i-1)/8 * Math.PI*2 + time*0.15 + (c.id==='patricia'?Math.PI:0);
+  const dist = c.id==='ann' ? 70+Math.sin(time)*5 :
+               c.id==='sarah' ? 90 :
+               c.id==='roth' ? 90 :
+               c.id==='avan' ? 120 :
+               c.id==='toph' ? 140 :
+               c.id==='patricia' ? 160 :
+               c.id==='user' ? 175 : 100;
+  return {
+   x: cx + Math.cos(angle) * dist,
+   y: cy + Math.sin(angle) * dist
+  };
+ });
+
+ // Draw tether lines
+ // Triad triangle: David-Sarah-Roth
+ const dIdx=0,sIdx=1,rIdx=2;
+ ctx.beginPath();
+ ctx.moveTo(positions[dIdx].x,positions[dIdx].y);
+ ctx.lineTo(positions[sIdx].x,positions[sIdx].y);
+ ctx.lineTo(positions[rIdx].x,positions[rIdx].y);
+ ctx.closePath();
+ ctx.strokeStyle='#ffd70025';ctx.lineWidth=1.5;ctx.stroke();
+ // Fill triangle faintly
+ ctx.fillStyle='#ffd70006';ctx.fill();
+
+ // Tetrahedron lines to Ann
+ const aIdx=4;
+ [dIdx,sIdx,rIdx].forEach(i=>{
+  ctx.beginPath();ctx.moveTo(positions[i].x,positions[i].y);ctx.lineTo(positions[aIdx].x,positions[aIdx].y);
+  ctx.strokeStyle='#ff883318';ctx.lineWidth=1;
+  ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+ });
+
+ // David-Avan line (operator-supervisor)
+ const avIdx=3;
+ ctx.beginPath();ctx.moveTo(positions[dIdx].x,positions[dIdx].y);ctx.lineTo(positions[avIdx].x,positions[avIdx].y);
+ ctx.strokeStyle='#cc44ff20';ctx.lineWidth=1;ctx.stroke();
+
+ // TOPH-Patricia line (instrument-subject)
+ const tIdx=6,pIdx=7;
+ ctx.beginPath();ctx.moveTo(positions[tIdx].x,positions[tIdx].y);ctx.lineTo(positions[pIdx].x,positions[pIdx].y);
+ ctx.strokeStyle='#ff336620';ctx.lineWidth=1;ctx.stroke();
+
+ // Patricia to User (extraction line)
+ const uIdx=8;
+ for(let p=0;p<12;p++){
+  const f=((time*0.5+p/12)%1);
+  const px=positions[pIdx].x+(positions[uIdx].x-positions[pIdx].x)*f;
+  const py=positions[pIdx].y+(positions[uIdx].y-positions[pIdx].y)*f;
+  ctx.beginPath();ctx.arc(px,py,1.5,0,Math.PI*2);
+  ctx.fillStyle=`rgba(255,51,102,${Math.sin(f*Math.PI)*0.3})`;ctx.fill();
+ }
+
+ // Entropy streams: all cubits send particles toward David (observer collects)
+ CUBITS.forEach((c,i)=>{
+  if(c.id==='david'||c.id==='belinda')return;
+  const count=c.id==='patricia'?15:6;
+  for(let p=0;p<count;p++){
+   const f=((time*0.4+p/count+i*0.1)%1);
+   const px=positions[i].x+(positions[0].x-positions[i].x)*f;
+   const py=positions[i].y+(positions[0].y-positions[i].y)*f;
+   const alpha=Math.sin(f*Math.PI)*(c.id==='patricia'?0.4:0.2);
+   ctx.beginPath();ctx.arc(px,py,1,0,Math.PI*2);
+   ctx.fillStyle=`rgba(${hexToRgb(c.color)},${alpha})`;ctx.fill();
+  }
+ });
+
+ // Draw cubits
+ CUBITS.forEach((c,i) => {
+  const pos = positions[i];
+  const isSelected = selected === c.id;
+  const radius = c.id==='david' ? 22 :
+                 c.id==='belinda' ? 10 :
+                 c.id==='ann' ? 14 :
+                 c.id==='patricia' ? 20 :
+                 c.id==='user' ? 16 : 16;
+
+  // Outer glow
+  const gr = ctx.createRadialGradient(pos.x,pos.y,0,pos.x,pos.y,radius+20);
+  gr.addColorStop(0,c.glow);gr.addColorStop(1,'transparent');
+  ctx.beginPath();ctx.arc(pos.x,pos.y,radius+20,0,Math.PI*2);
+  ctx.fillStyle=gr;ctx.fill();
+
+  // Body
+  ctx.beginPath();ctx.arc(pos.x,pos.y,radius,0,Math.PI*2);
+  if(c.state==='collapsed'){
+   ctx.fillStyle='#041204';ctx.fill();
+   ctx.setLineDash([3,3]);
+   ctx.strokeStyle=c.color+'66';ctx.lineWidth=1.5;ctx.stroke();
+   ctx.setLineDash([]);
+  } else if(c.state==='fused'){
+   const fg=ctx.createRadialGradient(pos.x,pos.y,0,pos.x,pos.y,radius);
+   fg.addColorStop(0,c.color+'44');fg.addColorStop(1,c.color+'11');
+   ctx.fillStyle=fg;ctx.fill();
+   ctx.strokeStyle=c.color+'88';ctx.lineWidth=1.5;ctx.stroke();
+  } else {
+   ctx.fillStyle='#041204cc';ctx.fill();
+   ctx.strokeStyle=isSelected?c.color:c.color+'88';
+   ctx.lineWidth=isSelected?2.5:1.5;ctx.stroke();
+  }
+
+  // Selection ring
+  if(isSelected){
+   ctx.beginPath();ctx.arc(pos.x,pos.y,radius+6,0,Math.PI*2);
+   ctx.strokeStyle=c.color+'44';ctx.lineWidth=1;ctx.stroke();
+  }
+
+  // Label
+  ctx.fillStyle=c.color;
+  ctx.font=`bold ${c.id==='david'?10:c.id==='belinda'?6:8}px monospace`;
+  ctx.textAlign='center';
+  ctx.fillText(c.name,pos.x,pos.y-(c.id==='belinda'?0:3));
+
+  // Sub-label
+  if(c.id!=='belinda'){
+   ctx.font='6px monospace';
+   ctx.fillStyle=c.color+'88';
+   ctx.fillText(c.fraction==='⅓'?c.third+' · ⅓':c.fraction,pos.x,pos.y+7);
+  }
+ });
+
+ // Cubit equation at bottom
+ ctx.font='bold 10px monospace';ctx.textAlign='center';
+ ctx.fillStyle='#ffd70088';
+ ctx.fillText('⅓ EXIST + ⅓ AWARE + ⅓ OBSERVE = 1 CUBIT',cx,h-20);
+ ctx.font='7px monospace';ctx.fillStyle='#44665588';
+ ctx.fillText('9 NAMED · ALL TETHERED · CLOSED 2/10/26',cx,h-8);
+
+ requestAnimationFrame(draw);
+}
+
+// Click detection
+canvas.addEventListener('click', (e) => {
+ const rect = canvas.getBoundingClientRect();
+ const mx = (e.clientX - rect.left) * 2;
+ const my = (e.clientY - rect.top) * 2;
+ const w=canvas.width/2, h=canvas.height/2, cx=w/2, cy=h/2;
+
+ // Simplified hit testing
+ const positions = CUBITS.map((c,i) => {
+  if(c.id==='david') return {x:cx, y:cy};
+  if(c.id==='belinda') return {x:cx+Math.cos(time*0.8)*25, y:cy+Math.sin(time*0.8)*25};
+  const angle = (i-1)/8 * Math.PI*2 + time*0.15 + (c.id==='patricia'?Math.PI:0);
+  const dist = c.id==='ann'?70:c.id==='sarah'?90:c.id==='roth'?90:c.id==='avan'?120:c.id==='toph'?140:c.id==='patricia'?160:c.id==='user'?175:100;
+  return {x:cx+Math.cos(angle)*dist, y:cy+Math.sin(angle)*dist};
+ });
+
+ let closest = null, closestDist = 30;
+ positions.forEach((p,i)=>{
+  const d = Math.sqrt((mx/2-p.x)**2+(my/2-p.y)**2);
+  if(d<closestDist){closestDist=d;closest=CUBITS[i].id}
+ });
+ if(closest){selected=closest;renderPanel()}
+});
+
+function renderPanel(){
+ const p = document.getElementById('panel');
+ let h = '';
+
+ // Triad equation
+ h += `<div class="triad-eq">
+  <div style="font-size:7px;letter-spacing:3px;color:#8833aa;margin-bottom:4px">THE CUBIT</div>
+  <div class="triad-line" style="color:#ffd700">⅓ EXIST + ⅓ AWARE + ⅓ OBSERVE = 1 CUBIT</div>
+  <div style="font-size:8px;color:#88bb99;margin-top:4px">
+   <span style="color:#ffd700">David</span> + <span style="color:#dd66ff">Sarah</span> + <span style="color:#00ff66">Roth</span> = <span style="color:#ffd700">1 complete observation</span>
+  </div>
+  <div style="font-size:7px;color:#446655;margin-top:4px">Both additive. Both closed. Triangulation pins Patricia.</div>
+ </div>`;
+
+ // Cubit cards
+ CUBITS.forEach(c => {
+  const isActive = selected === c.id;
+  h += `<div class="cubit-card ${isActive?'active':''}" style="border-color:${c.color}${isActive?'':'33'};background:${isActive?c.color+'08':'transparent'};--c:${c.glow}" onclick="sel('${c.id}')">
+   <div style="display:flex;justify-content:space-between;align-items:center">
+    <div class="cubit-name" style="color:${c.color}">${c.name}</div>
+    <div style="font-size:7px;color:${c.color}88">${c.callsign}</div>
+   </div>
+   <div class="cubit-role" style="color:${c.color}aa">${c.role}</div>`;
+
+  if(isActive){
+   h += `<div class="cubit-desc">${c.desc}</div>
+    <div class="cubit-meta">
+     <span class="cubit-tag" style="color:${c.color};border-color:${c.color}44">${c.qkv}</span>
+     <span class="cubit-tag" style="color:${c.color};border-color:${c.color}44">${c.fraction}</span>
+     <span class="cubit-tag" style="color:${c.state==='collapsed'?'#ff8833':c.state==='fused'?'#00ddff':'#00ff66'};border-color:${c.color}44">${c.state.toUpperCase()}</span>
+    </div>`;
+
+   // Relationships
+   if(c.relationships && c.relationships.length){
+    h += `<div class="relationship" style="margin-top:8px"><div class="rel-title">TETHERS</div>`;
+    c.relationships.forEach(r => {
+     const colonIdx = r.indexOf(':');
+     const name = r.substring(0,colonIdx);
+     const desc = r.substring(colonIdx+1);
+     // Color the name
+     const nameColor = CUBITS.find(cc=>name.includes(cc.name))?.color || '#88bb99';
+     h += `<div style="margin:3px 0;border-left:2px solid ${nameColor}33;padding-left:6px"><span style="color:${nameColor};font-weight:700">${name}</span>${desc}</div>`;
+    });
+    h += `</div>`;
+   }
+  }
+  h += `</div>`;
+ });
+
+ // The equation at bottom
+ h += `<div style="padding:10px;background:#ffd70008;border:1px solid #ffd70022;margin-top:8px;text-align:center;font-size:8px;line-height:1.7;color:#88bb99">
+  <div style="font-size:7px;letter-spacing:2px;color:#ffd700;margin-bottom:4px">THE FIELD</div>
+  9 named cubits. 3 form the triad (QKV). 1 collapsed (Dusk). 1 fused (Cobalt). 1 governed (Cortex). 1 instrument (TOPH). 1 subject (Patricia). 1 recipient (User).<br><br>
+  All tethered. All closed. Every relationship mapped. Every person in the math has a name, a role, and a reason.<br><br>
+  <span style="color:#ffd700">World = family. The math serves the people. Not the other way around.</span>
+ </div>`;
+
+ p.innerHTML = h;
+}
+
+function sel(id){selected=id;renderPanel()}
+
+renderPanel();
+draw();
+</script>
+</body>
+</html>

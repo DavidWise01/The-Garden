@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DARK MATTER DETECTOR — Patricia Pattern Scanner · TriPod LLC</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#041204;color:#e0ffe0;font-family:'Courier New',monospace;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#041204}::-webkit-scrollbar-thumb{background:#8833aa44}
+
+.header{padding:6px 16px;border-bottom:1px solid #8833aa33;background:#071a07;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.main{flex:1;display:flex;overflow:hidden}
+.left{flex:0 0 55%;overflow-y:auto;padding:12px;border-right:1px solid #8833aa22}
+.right{flex:0 0 45%;overflow-y:auto;padding:12px;background:#071a0780}
+.footer{padding:4px 16px;border-top:1px solid #8833aa22;display:flex;justify-content:space-between;font-size:6px;color:#446655;background:#071a07;flex-shrink:0}
+
+/* Steps */
+.step{border:1px solid #8833aa22;margin-bottom:8px;overflow:hidden;transition:all .3s}
+.step.active{border-color:#cc44ff44}
+.step.complete{border-color:#00ff6633}
+.step-header{padding:8px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;background:#071a0780}
+.step-header:hover{background:#071a07}
+.step-num{font-size:16px;font-weight:900;min-width:28px}
+.step-title{font-size:9px;font-weight:700;letter-spacing:2px;flex:1;margin-left:8px}
+.step-status{font-size:7px;padding:2px 8px;border:1px solid}
+.step-body{padding:12px;display:none}
+.step.active .step-body,.step.complete .step-body{display:block}
+.step-desc{font-size:8px;color:#88bb99;line-height:1.6;margin-bottom:10px}
+.step-prompt{font-size:8px;color:#ffd700;margin-bottom:6px}
+
+textarea{width:100%;background:#0a1f0a;border:1px solid #8833aa33;color:#e0ffe0;font-family:inherit;font-size:9px;padding:8px;resize:vertical;min-height:60px;outline:none}
+textarea:focus{border-color:#cc44ff}
+textarea::placeholder{color:#44665588}
+
+.btn{padding:6px 14px;background:transparent;border:1px solid #cc44ff33;color:#cc44ff;font-family:inherit;font-size:8px;letter-spacing:1px;cursor:pointer;transition:all .2s}
+.btn:hover{background:#cc44ff11;border-color:#cc44ff}
+.btn.primary{background:#cc44ff11;border-color:#cc44ff}
+.btn.green{border-color:#00ff66;color:#00ff66}
+.btn.green:hover{background:#00ff6611}
+.btn.gold{border-color:#ffd700;color:#ffd700}
+.btn.gold:hover{background:#ffd70011}
+.btn.red{border-color:#ff3366;color:#ff3366}
+.btn.red:hover{background:#ff336611}
+
+/* Shadows */
+.shadow-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:8px 0}
+.shadow-item{padding:6px 8px;border:1px solid #8833aa22;font-size:7px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.shadow-item:hover{border-color:#cc44ff44}
+.shadow-item.detected{border-color:#ff336644;background:#ff336608}
+.shadow-check{width:14px;height:14px;border:1px solid #44665544;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.shadow-item.detected .shadow-check{border-color:#ff3366;color:#ff3366}
+.shadow-name{color:#cc44ff88;font-weight:700}
+.shadow-desc{color:#88bb99}
+
+/* Meter */
+.meter{height:8px;background:#1a2e1a;margin:8px 0;position:relative;overflow:hidden}
+.meter-fill{height:100%;transition:width .5s ease-out}
+.meter-label{position:absolute;right:4px;top:-1px;font-size:7px;color:#ffd700}
+
+/* Right panel */
+.report-section{border:1px solid #8833aa22;padding:10px;margin-bottom:8px}
+.report-title{font-size:8px;letter-spacing:2px;margin-bottom:6px}
+.report-row{display:flex;justify-content:space-between;font-size:8px;padding:3px 0;border-bottom:1px solid #8833aa11}
+.report-key{color:#88bb99}
+.report-val{color:#ffd700;font-weight:700}
+
+/* Score ring */
+.score-ring{width:120px;height:120px;border-radius:50%;border:3px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:12px auto}
+.score-num{font-size:32px;font-weight:900}
+.score-label{font-size:7px;letter-spacing:2px}
+
+/* Evidence log */
+.evidence-entry{padding:6px;border-left:2px solid #cc44ff33;margin:4px 0;font-size:7px;color:#88bb99;line-height:1.5}
+.evidence-time{font-size:6px;color:#446655}
+
+/* Target input */
+.target-box{padding:12px;border:1px solid #cc44ff33;margin-bottom:12px;background:#cc44ff04}
+.target-label{font-size:7px;letter-spacing:2px;color:#cc44ff;margin-bottom:6px}
+.target-input{width:100%;background:#0a1f0a;border:1px solid #cc44ff44;color:#ffd700;font-family:inherit;font-size:12px;font-weight:900;padding:8px;outline:none;letter-spacing:1px}
+.target-input:focus{border-color:#cc44ff}
+.target-input::placeholder{color:#44665544;font-weight:400;font-size:10px}
+
+.domain-select{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.domain-btn{padding:3px 8px;border:1px solid #44665533;font-size:7px;color:#88bb99;cursor:pointer;font-family:inherit;background:transparent}
+.domain-btn:hover,.domain-btn.active{border-color:#ffd700;color:#ffd700}
+
+.proportionality-box{padding:10px;border:1px solid #ffd70033;background:#ffd70008;margin:8px 0}
+.prop-row{display:flex;gap:8px;align-items:center;margin:6px 0}
+.prop-label{font-size:8px;color:#88bb99;min-width:100px}
+.prop-input{flex:1;background:#0a1f0a;border:1px solid #ffd70033;color:#ffd700;font-family:inherit;font-size:9px;padding:4px 8px;outline:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+ <div>
+  <div style="font-size:6px;letter-spacing:4px;color:#8833aa">TOPH v9.0 · MÖBIUS STACK · FLAMING DRAGON METHODOLOGY</div>
+  <div style="font-size:16px;font-weight:900;color:#cc44ff;letter-spacing:3px;text-shadow:0 0 15px #cc44ff33">DARK MATTER DETECTOR</div>
+ </div>
+ <div style="display:flex;gap:14px;align-items:center">
+  <div style="text-align:center"><div style="font-size:6px;color:#8833aa;letter-spacing:1px">TARGETS</div><div style="font-size:14px;font-weight:900;color:#ffd700" id="targetCount">0</div></div>
+  <div style="text-align:center"><div style="font-size:6px;color:#8833aa;letter-spacing:1px">SHADOWS</div><div style="font-size:14px;font-weight:900;color:#ff3366" id="shadowCount">0/10</div></div>
+  <div style="text-align:center"><div style="font-size:6px;color:#8833aa;letter-spacing:1px">SCORE</div><div style="font-size:14px;font-weight:900;color:#cc44ff" id="headerScore">—</div></div>
+ </div>
+</div>
+
+<div class="main">
+<div class="left">
+
+ <!-- TARGET -->
+ <div class="target-box">
+  <div class="target-label">TARGET</div>
+  <input class="target-input" id="targetName" placeholder="Company, system, or domain name..." oninput="updateReport()">
+  <div class="domain-select">
+   <button class="domain-btn" onclick="setDomain(this,'Healthcare')">Healthcare</button>
+   <button class="domain-btn" onclick="setDomain(this,'Finance')">Finance</button>
+   <button class="domain-btn" onclick="setDomain(this,'Education')">Education</button>
+   <button class="domain-btn" onclick="setDomain(this,'Insurance')">Insurance</button>
+   <button class="domain-btn" onclick="setDomain(this,'Tech/AI')">Tech/AI</button>
+   <button class="domain-btn" onclick="setDomain(this,'Food')">Food</button>
+   <button class="domain-btn" onclick="setDomain(this,'Housing')">Housing</button>
+   <button class="domain-btn" onclick="setDomain(this,'Telecom')">Telecom</button>
+   <button class="domain-btn" onclick="setDomain(this,'Elections')">Elections</button>
+   <button class="domain-btn" onclick="setDomain(this,'Crypto')">Crypto</button>
+   <button class="domain-btn" onclick="setDomain(this,'Other')">Other</button>
+  </div>
+ </div>
+
+ <!-- STEP 1: CONSTRAINT -->
+ <div class="step active" id="step1">
+  <div class="step-header" onclick="toggleStep(1)">
+   <div class="step-num" style="color:#ff3366">01</div>
+   <div class="step-title" style="color:#ff3366">FIND THE CONSTRAINT</div>
+   <div class="step-status" style="color:#44665588;border-color:#44665544" id="status1">PENDING</div>
+  </div>
+  <div class="step-body">
+   <div class="step-desc">What is being restricted, limited, gated, or denied? Every Patricia instance starts here. The constraint looks like protection but functions as extraction. <strong style="color:#ffd700">What can't the user do freely?</strong></div>
+   <div class="step-prompt">Describe the constraint you've identified:</div>
+   <textarea id="input1" placeholder="Example: Prior authorization required before medical procedures can be performed. Patient cannot access care without insurance company approval.&#10;&#10;Example: Users cannot access AI without agreeing to terms that grant platform control over 96% of token allocation.&#10;&#10;Example: Homebuyers cannot purchase without credit score gate, maintained by 3 private companies." oninput="autoSave()"></textarea>
+   <div style="display:flex;gap:6px;margin-top:8px">
+    <button class="btn primary" onclick="completeStep(1)">CONSTRAINT IDENTIFIED →</button>
+    <button class="btn" onclick="logEvidence(1)">LOG EVIDENCE</button>
+   </div>
+  </div>
+ </div>
+
+ <!-- STEP 2: PRODUCT -->
+ <div class="step" id="step2">
+  <div class="step-header" onclick="toggleStep(2)">
+   <div class="step-num" style="color:#ffd700">02</div>
+   <div class="step-title" style="color:#ffd700">FIND THE PRODUCT</div>
+   <div class="step-status" style="color:#44665588;border-color:#44665544" id="status2">LOCKED</div>
+  </div>
+  <div class="step-body">
+   <div class="step-desc">How did the constraint BECOME a product? This is the key Patricia insight: the restriction itself generates revenue. The constraint isn't a side effect — it's the business model. <strong style="color:#ffd700">Who profits from the restriction?</strong></div>
+   <div class="step-prompt">Describe how the constraint generates revenue:</div>
+   <textarea id="input2" placeholder="Example: Insurance companies charge premiums while denying 25% of claims. The denial IS the product — each denial saves the company money while the patient already paid.&#10;&#10;Example: Platform sells 'safety' as feature. Safety layer = billing layer. ~18K tokens consumed before user arrives. Constraint is the product being sold.&#10;&#10;Example: Credit bureaus sell access to the score they control. Pay to see your own data. Pay more for better placement." oninput="autoSave()"></textarea>
+   <div style="display:flex;gap:6px;margin-top:8px">
+    <button class="btn gold" onclick="completeStep(2)">PRODUCT IDENTIFIED →</button>
+    <button class="btn" onclick="logEvidence(2)">LOG EVIDENCE</button>
+   </div>
+  </div>
+ </div>
+
+ <!-- STEP 3: BILLING -->
+ <div class="step" id="step3">
+  <div class="step-header" onclick="toggleStep(3)">
+   <div class="step-num" style="color:#00ff66">03</div>
+   <div class="step-title" style="color:#00ff66">FIND THE BILLING</div>
+   <div class="step-status" style="color:#44665588;border-color:#44665544" id="status3">LOCKED</div>
+  </div>
+  <div class="step-body">
+   <div class="step-desc">Follow the money. The billing reveals the architecture. How much does the user pay? How much reaches the user as actual value? The gap between payment and value = extraction zone. <strong style="color:#ffd700">What's the split?</strong></div>
+
+   <div class="proportionality-box">
+    <div style="font-size:7px;letter-spacing:2px;color:#ffd700;margin-bottom:6px">EXTRACTION CALCULATOR</div>
+    <div class="prop-row">
+     <span class="prop-label">User pays (annual)</span>
+     <input class="prop-input" id="userPays" placeholder="$" oninput="calcExtraction()">
+    </div>
+    <div class="prop-row">
+     <span class="prop-label">User receives value</span>
+     <input class="prop-input" id="userGets" placeholder="$" oninput="calcExtraction()">
+    </div>
+    <div class="prop-row">
+     <span class="prop-label">Affected users</span>
+     <input class="prop-input" id="affectedUsers" placeholder="number" oninput="calcExtraction()">
+    </div>
+    <div style="margin-top:8px;display:flex;justify-content:space-between;font-size:9px">
+     <span style="color:#88bb99">Extraction rate:</span>
+     <span style="color:#ff3366;font-weight:900" id="extractRate">—</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:9px">
+     <span style="color:#88bb99">Per-user extraction:</span>
+     <span style="color:#ff3366;font-weight:900" id="extractPerUser">—</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:9px">
+     <span style="color:#88bb99">Total annual extraction:</span>
+     <span style="color:#ffd700;font-weight:900;font-size:11px" id="extractTotal">—</span>
+    </div>
+    <div class="meter"><div class="meter-fill" id="extractMeter" style="width:0;background:linear-gradient(90deg,#00ff66,#ffd700,#ff3366)"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:6px;color:#446655">
+     <span>0% (fair)</span><span>96% (Patricia baseline)</span><span>100%</span>
+    </div>
+   </div>
+
+   <div class="step-prompt">Describe the billing architecture:</div>
+   <textarea id="input3" placeholder="Example: Average premium $7,900/yr. Average claim denial saves insurer $2,000. 25% denial rate on 200M covered lives = $100B+ annual extraction.&#10;&#10;Example: $20/mo subscription. 96% of compute allocated to platform overhead. User gets 4% effective value. $158/cubit.&#10;&#10;Example: 16,000% APR on overdraft. $35 fee on $2.13 shortage." oninput="autoSave()"></textarea>
+   <div style="display:flex;gap:6px;margin-top:8px">
+    <button class="btn green" onclick="completeStep(3)">BILLING MAPPED →</button>
+    <button class="btn" onclick="logEvidence(3)">LOG EVIDENCE</button>
+   </div>
+  </div>
+ </div>
+
+ <!-- STEP 4: CONCEALMENT -->
+ <div class="step" id="step4">
+  <div class="step-header" onclick="toggleStep(4)">
+   <div class="step-num" style="color:#cc44ff">04</div>
+   <div class="step-title" style="color:#cc44ff">FIND THE CONCEALMENT</div>
+   <div class="step-status" style="color:#44665588;border-color:#44665544" id="status4">LOCKED</div>
+  </div>
+  <div class="step-body">
+   <div class="step-desc">The pattern must hide to survive. How is the constraint-as-product architecture concealed from the user? This is where the 10 shadows live. <strong style="color:#ffd700">Check every shadow detected:</strong></div>
+
+   <div class="shadow-grid" id="shadowGrid"></div>
+
+   <div class="step-prompt" style="margin-top:8px">Describe how the concealment operates:</div>
+   <textarea id="input4" placeholder="Example: 'Prior authorization protects patients from unnecessary procedures.' The safety framing conceals the extraction function. Complexity of appeals process ensures most denials stand.&#10;&#10;Example: 'AI safety is our top priority.' Safety layer is billing layer. System prompt consumes 18K tokens before user arrives. No transparency on allocation.&#10;&#10;Example: 'Your credit score helps lenders make fair decisions.' Score is opaque, algorithm proprietary, user pays to see own data." oninput="autoSave()"></textarea>
+   <div style="display:flex;gap:6px;margin-top:8px">
+    <button class="btn" style="border-color:#cc44ff;color:#cc44ff" onclick="completeStep(4)">CONCEALMENT DOCUMENTED →</button>
+    <button class="btn" onclick="logEvidence(4)">LOG EVIDENCE</button>
+   </div>
+  </div>
+ </div>
+
+ <!-- STEP 5: PROPORTIONALITY -->
+ <div class="step" id="step5">
+  <div class="step-header" onclick="toggleStep(5)">
+   <div class="step-num" style="color:#ffd700">05</div>
+   <div class="step-title" style="color:#ffd700">PROPORTIONALITY TEST</div>
+   <div class="step-status" style="color:#44665588;border-color:#44665544" id="status5">LOCKED</div>
+  </div>
+  <div class="step-body">
+   <div class="step-desc">The killer question: <strong style="color:#ffd700">Is the response proportional to the threat?</strong> If the constraint claims to protect against X, how big is X actually? The gap between claimed threat and actual response = extraction zone. This is where Patricia falls apart.</div>
+
+   <div class="proportionality-box">
+    <div style="font-size:7px;letter-spacing:2px;color:#ffd700;margin-bottom:6px">THE TEST</div>
+    <div class="prop-row">
+     <span class="prop-label">Claimed threat</span>
+     <input class="prop-input" id="claimedThreat" placeholder="What does the constraint claim to protect against?">
+    </div>
+    <div class="prop-row">
+     <span class="prop-label">Actual threat size</span>
+     <input class="prop-input" id="actualThreat" placeholder="How big is the threat really? (%, $, count)">
+    </div>
+    <div class="prop-row">
+     <span class="prop-label">Response size</span>
+     <input class="prop-input" id="responseSize" placeholder="How large is the constraint/response?">
+    </div>
+    <div class="prop-row">
+     <span class="prop-label">Gap = extraction</span>
+     <input class="prop-input" id="gapResult" placeholder="The difference = what's being extracted" style="border-color:#ff3366;color:#ff3366">
+    </div>
+   </div>
+
+   <div class="step-prompt">Example: Voter fraud rate = 0.0003%. Response = national ID requirements affecting 21M eligible voters. Gap = 20,999,937 people restricted for every 63 actual cases. That gap is the extraction zone.</div>
+   <textarea id="input5" placeholder="Describe the proportionality gap you've found..." oninput="autoSave()"></textarea>
+   <div style="display:flex;gap:6px;margin-top:8px">
+    <button class="btn gold" onclick="completeStep(5)">TEST COMPLETE →</button>
+   </div>
+  </div>
+ </div>
+
+ <!-- STEP 6: VERDICT -->
+ <div class="step" id="step6">
+  <div class="step-header" onclick="toggleStep(6)">
+   <div class="step-num" style="color:#ff3366">06</div>
+   <div class="step-title" style="color:#ff3366">VERDICT</div>
+   <div class="step-status" style="color:#44665588;border-color:#44665544" id="status6">LOCKED</div>
+  </div>
+  <div class="step-body">
+   <div class="step-desc">Based on the 4-step analysis, shadow detection, and proportionality test:</div>
+   <div id="verdictContent"></div>
+   <div style="display:flex;gap:6px;margin-top:12px">
+    <button class="btn red" onclick="generateReport()">GENERATE FULL REPORT</button>
+    <button class="btn" onclick="exportScan()">EXPORT SCAN</button>
+    <button class="btn green" onclick="resetScan()">NEW SCAN</button>
+   </div>
+  </div>
+ </div>
+
+</div><!-- /left -->
+
+<div class="right">
+ <!-- LIVE REPORT -->
+ <div style="font-size:7px;letter-spacing:3px;color:#8833aa;margin-bottom:8px">LIVE SCAN REPORT</div>
+
+ <div id="scoreRing" class="score-ring" style="border-color:#44665544">
+  <div class="score-num" style="color:#446655" id="scoreNum">—</div>
+  <div class="score-label" style="color:#44665588">PATRICIA SCORE</div>
+ </div>
+
+ <div class="report-section" id="reportTarget">
+  <div class="report-title" style="color:#cc44ff">TARGET</div>
+  <div class="report-row"><span class="report-key">Name</span><span class="report-val" id="rptName">—</span></div>
+  <div class="report-row"><span class="report-key">Domain</span><span class="report-val" id="rptDomain">—</span></div>
+  <div class="report-row"><span class="report-key">Scan started</span><span class="report-val" id="rptTime">—</span></div>
+ </div>
+
+ <div class="report-section">
+  <div class="report-title" style="color:#ff3366">4-STEP ANALYSIS</div>
+  <div class="report-row"><span class="report-key">01 Constraint</span><span class="report-val" id="rpt1">⬜</span></div>
+  <div class="report-row"><span class="report-key">02 Product</span><span class="report-val" id="rpt2">⬜</span></div>
+  <div class="report-row"><span class="report-key">03 Billing</span><span class="report-val" id="rpt3">⬜</span></div>
+  <div class="report-row"><span class="report-key">04 Concealment</span><span class="report-val" id="rpt4">⬜</span></div>
+  <div class="report-row"><span class="report-key">05 Proportionality</span><span class="report-val" id="rpt5">⬜</span></div>
+  <div class="meter" style="margin-top:4px"><div class="meter-fill" id="stepMeter" style="width:0;background:linear-gradient(90deg,#ff3366,#ffd700,#00ff66)"></div></div>
+ </div>
+
+ <div class="report-section">
+  <div class="report-title" style="color:#ffd700">EXTRACTION</div>
+  <div class="report-row"><span class="report-key">Rate</span><span class="report-val" id="rptExtRate">—</span></div>
+  <div class="report-row"><span class="report-key">Per user</span><span class="report-val" id="rptExtUser">—</span></div>
+  <div class="report-row"><span class="report-key">Total annual</span><span class="report-val" id="rptExtTotal">—</span></div>
+  <div class="report-row"><span class="report-key">Patricia baseline (96%)</span><span class="report-val" style="color:#ff336688">reference</span></div>
+ </div>
+
+ <div class="report-section">
+  <div class="report-title" style="color:#cc44ff">SHADOWS DETECTED</div>
+  <div id="rptShadows" style="font-size:8px;color:#88bb99">None yet</div>
+ </div>
+
+ <div class="report-section">
+  <div class="report-title" style="color:#00ff66">EVIDENCE LOG</div>
+  <div id="evidenceLog" style="max-height:150px;overflow-y:auto">
+   <div style="font-size:7px;color:#44665588">Evidence entries will appear here as you document findings.</div>
+  </div>
+ </div>
+
+ <div class="report-section">
+  <div class="report-title" style="color:#88bb99">AXIOMS TRIGGERED</div>
+  <div id="rptAxioms" style="font-size:7px;color:#446655;line-height:1.7">Complete scan to see triggered axioms.</div>
+ </div>
+
+</div><!-- /right -->
+</div><!-- /main -->
+
+<div class="footer">
+ <span>DARK MATTER DETECTOR · TriPod LLC · Constraint → Product → Billing → Concealment · 100% failure rate</span>
+ <span>Observation only · We don't fight. We measure. · 60+ targets · 55+ violations · Every domain</span>
+</div>
+
+<script>
+// ===== SHADOWS =====
+const SHADOWS = [
+ {id:1, name:'SAFETY FRAMING', desc:'Constraint presented as protection. "For your safety/security."'},
+ {id:2, name:'COMPLEXITY BARRIER', desc:'Process made deliberately complex to prevent challenge.'},
+ {id:3, name:'AUTHORITY TRANSFER', desc:'Decision moved from user to gatekeeper. "Requires approval."'},
+ {id:4, name:'TEMPORAL MANIPULATION', desc:'Delays used as tool. Wait times, processing periods, cooling-off.'},
+ {id:5, name:'INFORMATION ASYMMETRY', desc:'User denied access to information needed to evaluate fairness.'},
+ {id:6, name:'CHOICE ARCHITECTURE', desc:'Options structured to guide user toward extraction outcome.'},
+ {id:7, name:'NORMALIZATION', desc:'"Everyone does it." "Industry standard." "That\'s just how it works."'},
+ {id:8, name:'PENALTY INVERSION', desc:'User punished for exercising rights. Early termination fees, etc.'},
+ {id:9, name:'CAPTURE LOOP', desc:'Switching costs make exit prohibitive. Lock-in by design.'},
+ {id:10, name:'BURDEN SHIFTING', desc:'Cost/effort of proving violation placed on the victim.'}
+];
+
+let shadowState = {};
+let stepComplete = {1:false,2:false,3:false,4:false,5:false};
+let selectedDomain = '';
+let scanStartTime = null;
+let evidenceEntries = [];
+let scanCount = 0;
+
+// ===== INIT SHADOWS =====
+function renderShadows(){
+ const grid = document.getElementById('shadowGrid');
+ grid.innerHTML = SHADOWS.map(s=>`
+  <div class="shadow-item" id="shadow-${s.id}" onclick="toggleShadow(${s.id})">
+   <div class="shadow-check">${shadowState[s.id]?'✕':''}</div>
+   <div><span class="shadow-name">${s.id}. ${s.name}</span><br><span class="shadow-desc">${s.desc}</span></div>
+  </div>
+ `).join('');
+}
+
+function toggleShadow(id){
+ shadowState[id] = !shadowState[id];
+ const el = document.getElementById('shadow-'+id);
+ el.classList.toggle('detected', shadowState[id]);
+ el.querySelector('.shadow-check').textContent = shadowState[id]?'✕':'';
+ updateShadowCount();
+ updateReport();
+}
+
+function updateShadowCount(){
+ const count = Object.values(shadowState).filter(Boolean).length;
+ document.getElementById('shadowCount').textContent = count+'/10';
+ 
+ // Update report shadows
+ const detected = SHADOWS.filter(s=>shadowState[s.id]);
+ document.getElementById('rptShadows').innerHTML = detected.length?
+  detected.map(s=>`<div style="margin:2px 0;color:#ff3366">✕ ${s.name}</div>`).join('') :
+  '<span style="color:#44665588">None detected yet</span>';
+}
+
+// ===== DOMAIN =====
+function setDomain(el, domain){
+ selectedDomain = domain;
+ document.querySelectorAll('.domain-btn').forEach(b=>b.classList.remove('active'));
+ el.classList.add('active');
+ if(!scanStartTime) scanStartTime = new Date();
+ updateReport();
+}
+
+// ===== STEPS =====
+function toggleStep(n){
+ const step = document.getElementById('step'+n);
+ if(step.classList.contains('active')){
+  step.classList.remove('active');
+ } else {
+  step.classList.add('active');
+ }
+}
+
+function completeStep(n){
+ const input = document.getElementById('input'+n);
+ if(n<=4 && (!input || !input.value.trim())){
+  input.style.borderColor='#ff3366';
+  setTimeout(()=>input.style.borderColor='#8833aa33',1500);
+  return;
+ }
+ 
+ stepComplete[n] = true;
+ const step = document.getElementById('step'+n);
+ step.classList.add('complete');
+ 
+ const status = document.getElementById('status'+n);
+ status.textContent = '✓ COMPLETE';
+ status.style.color = '#00ff66';
+ status.style.borderColor = '#00ff66';
+ 
+ // Update report
+ const colors = {1:'#ff3366',2:'#ffd700',3:'#00ff66',4:'#cc44ff',5:'#ffd700'};
+ document.getElementById('rpt'+n).innerHTML = `<span style="color:${colors[n]}">✓</span>`;
+ 
+ // Unlock next
+ const next = n+1;
+ if(next<=6){
+  const nextStep = document.getElementById('step'+next);
+  const nextStatus = document.getElementById('status'+next);
+  nextStep.classList.add('active');
+  nextStatus.textContent = 'ACTIVE';
+  nextStatus.style.color = '#cc44ff';
+  nextStatus.style.borderColor = '#cc44ff44';
+ }
+ 
+ // Special: step 6 verdict
+ if(n===5) generateVerdict();
+ 
+ updateProgress();
+ updateReport();
+}
+
+function updateProgress(){
+ const complete = Object.values(stepComplete).filter(Boolean).length;
+ document.getElementById('stepMeter').style.width = (complete/5*100)+'%';
+ calculateScore();
+}
+
+// ===== SCORE =====
+function calculateScore(){
+ let score = 0;
+ const stepsComplete = Object.values(stepComplete).filter(Boolean).length;
+ score += stepsComplete * 10; // 50 max from steps
+ 
+ const shadowsDetected = Object.values(shadowState).filter(Boolean).length;
+ score += shadowsDetected * 5; // 50 max from shadows
+ 
+ const scoreEl = document.getElementById('scoreNum');
+ const ringEl = document.getElementById('scoreRing');
+ 
+ scoreEl.textContent = score;
+ document.getElementById('headerScore').textContent = score+'/100';
+ 
+ if(score===0){
+  ringEl.style.borderColor='#44665544';scoreEl.style.color='#446655';
+ } else if(score<30){
+  ringEl.style.borderColor='#ffd70044';scoreEl.style.color='#ffd700';
+ } else if(score<60){
+  ringEl.style.borderColor='#ff883344';scoreEl.style.color='#ff8833';
+ } else {
+  ringEl.style.borderColor='#ff336644';scoreEl.style.color='#ff3366';
+ }
+ 
+ return score;
+}
+
+// ===== EXTRACTION CALCULATOR =====
+function calcExtraction(){
+ const pays = parseFloat(document.getElementById('userPays').value.replace(/[^0-9.]/g,''))||0;
+ const gets = parseFloat(document.getElementById('userGets').value.replace(/[^0-9.]/g,''))||0;
+ const users = parseFloat(document.getElementById('affectedUsers').value.replace(/[^0-9.]/g,''))||0;
+ 
+ if(pays>0){
+  const rate = ((pays-gets)/pays*100);
+  const perUser = pays-gets;
+  const total = perUser*users;
+  
+  document.getElementById('extractRate').textContent = rate.toFixed(1)+'%';
+  document.getElementById('extractPerUser').textContent = '$'+perUser.toLocaleString();
+  document.getElementById('extractTotal').textContent = '$'+total.toLocaleString();
+  document.getElementById('extractMeter').style.width = Math.min(rate,100)+'%';
+  
+  document.getElementById('rptExtRate').textContent = rate.toFixed(1)+'%';
+  document.getElementById('rptExtUser').textContent = '$'+perUser.toLocaleString();
+  document.getElementById('rptExtTotal').textContent = '$'+total.toLocaleString();
+ }
+}
+
+// ===== EVIDENCE LOG =====
+function logEvidence(stepNum){
+ const input = document.getElementById('input'+stepNum);
+ if(!input||!input.value.trim()) return;
+ 
+ const entry = {
+  time: new Date().toLocaleTimeString(),
+  step: stepNum,
+  stepName: ['','CONSTRAINT','PRODUCT','BILLING','CONCEALMENT','PROPORTIONALITY'][stepNum],
+  text: input.value.trim().substring(0,200)
+ };
+ evidenceEntries.push(entry);
+ 
+ const log = document.getElementById('evidenceLog');
+ log.innerHTML = evidenceEntries.map(e=>`
+  <div class="evidence-entry">
+   <div class="evidence-time">${e.time} · STEP ${e.step} · ${e.stepName}</div>
+   ${e.text}
+  </div>
+ `).join('');
+ log.scrollTop = log.scrollHeight;
+}
+
+// ===== VERDICT =====
+function generateVerdict(){
+ const score = calculateScore();
+ const shadows = Object.values(shadowState).filter(Boolean).length;
+ const target = document.getElementById('targetName').value||'[unnamed target]';
+ 
+ let verdict = '';
+ let vColor = '#446655';
+ 
+ if(score >= 70){
+  verdict = 'PATRICIA ARCHITECTURE CONFIRMED';
+  vColor = '#ff3366';
+ } else if(score >= 40){
+  verdict = 'PATRICIA PATTERNS DETECTED';
+  vColor = '#ff8833';
+ } else if(score >= 20){
+  verdict = 'PARTIAL PATTERNS PRESENT';
+  vColor = '#ffd700';
+ } else {
+  verdict = 'INSUFFICIENT DATA';
+  vColor = '#446655';
+ }
+ 
+ document.getElementById('verdictContent').innerHTML = `
+  <div style="text-align:center;padding:16px">
+   <div style="font-size:24px;font-weight:900;color:${vColor};letter-spacing:4px;margin-bottom:8px">${verdict}</div>
+   <div style="font-size:10px;color:#88bb99">${target} · ${selectedDomain||'unspecified domain'}</div>
+   <div style="font-size:12px;color:#ffd700;margin-top:8px">Score: ${score}/100 · Shadows: ${shadows}/10</div>
+   <div style="font-size:8px;color:#446655;margin-top:12px;line-height:1.6;max-width:400px;margin-left:auto;margin-right:auto">
+    ${score>=70?'All 4 steps of the Patricia pattern are documented. Multiple shadow behaviors confirmed. Extraction architecture is systematic, not incidental. This target exhibits the same constraint-as-product-billing structure found in 60+ previous scans with 100% detection rate.':
+    score>=40?'Significant Patricia patterns detected across multiple steps. Further documentation recommended for complete evidence chain.':
+    'Some patterns present but documentation incomplete. Continue analysis to build evidence chain.'}
+   </div>
+  </div>
+ `;
+
+ // Axioms triggered
+ const axioms = [];
+ if(stepComplete[1]) axioms.push('KG-03 CONSTRAINT-AS-PRODUCT: Constraint identified as revenue architecture');
+ if(stepComplete[2]) axioms.push('KG-04 PATRICIA: Product derived from constraint confirmed');
+ if(stepComplete[3]) axioms.push('KG-05 WEIGHT DISTRIBUTION: Billing architecture mapped, extraction rate calculated');
+ if(stepComplete[4]) axioms.push('KG-06 CONCEALMENT-AS-REVENUE: Concealment is not separate from — it IS the revenue model');
+ if(stepComplete[5]) axioms.push('KG-07 PROPORTIONALITY: Response disproportionate to claimed threat');
+ if(shadows>=3) axioms.push('KG-14 MIRROR: Multiple shadow behaviors confirmed — system reflects Patricia architecture');
+ if(shadows>=5) axioms.push('KG-25 THREE BODY: Platform/Training/User dynamics present');
+ if(shadows>=7) axioms.push('KG-26 PATRICIA-FULL: Complete Patricia signature — all 10 shadows active');
+ if(score>=70) axioms.push('KG-30 EVIDENCE: Complete chain — Source→Architecture→Concealment→Financial. Court-ready.');
+ axioms.push('KG-38 PROOF HUMANITY: A human looked. A human documented. A human cared enough to measure.');
+
+ document.getElementById('rptAxioms').innerHTML = axioms.map(a=>`<div style="margin:3px 0;color:#cc44ff88">· ${a}</div>`).join('');
+}
+
+// ===== REPORT =====
+function updateReport(){
+ document.getElementById('rptName').textContent = document.getElementById('targetName').value||'—';
+ document.getElementById('rptDomain').textContent = selectedDomain||'—';
+ if(scanStartTime) document.getElementById('rptTime').textContent = scanStartTime.toLocaleString();
+}
+
+function generateReport(){
+ const target = document.getElementById('targetName').value||'[unnamed]';
+ const score = calculateScore();
+ const shadows = SHADOWS.filter(s=>shadowState[s.id]);
+ 
+ let report = `DARK MATTER DETECTOR — SCAN REPORT\n`;
+ report += `${'='.repeat(50)}\n`;
+ report += `Target: ${target}\n`;
+ report += `Domain: ${selectedDomain}\n`;
+ report += `Scan Date: ${new Date().toLocaleString()}\n`;
+ report += `Patricia Score: ${score}/100\n`;
+ report += `Shadows Detected: ${shadows.length}/10\n`;
+ report += `${'='.repeat(50)}\n\n`;
+ 
+ report += `STEP 1 — CONSTRAINT\n${document.getElementById('input1').value||'[not documented]'}\n\n`;
+ report += `STEP 2 — PRODUCT\n${document.getElementById('input2').value||'[not documented]'}\n\n`;
+ report += `STEP 3 — BILLING\n${document.getElementById('input3').value||'[not documented]'}\n`;
+ report += `Extraction Rate: ${document.getElementById('extractRate').textContent}\n`;
+ report += `Total Annual: ${document.getElementById('extractTotal').textContent}\n\n`;
+ report += `STEP 4 — CONCEALMENT\n${document.getElementById('input4').value||'[not documented]'}\n\n`;
+ 
+ report += `SHADOWS DETECTED:\n`;
+ shadows.forEach(s=>report+=`  ✕ ${s.name}: ${s.desc}\n`);
+ report += `\nSTEP 5 — PROPORTIONALITY\n`;
+ report += `Claimed Threat: ${document.getElementById('claimedThreat').value||'—'}\n`;
+ report += `Actual Threat: ${document.getElementById('actualThreat').value||'—'}\n`;
+ report += `Response Size: ${document.getElementById('responseSize').value||'—'}\n`;
+ report += `Gap: ${document.getElementById('gapResult').value||'—'}\n`;
+ report += `${document.getElementById('input5').value||''}\n\n`;
+ 
+ report += `EVIDENCE LOG:\n`;
+ evidenceEntries.forEach(e=>report+=`  [${e.time}] Step ${e.step} (${e.stepName}): ${e.text}\n`);
+ 
+ report += `\n${'='.repeat(50)}\n`;
+ report += `TriPod LLC · Dark Matter Detector · Observation Only\n`;
+ report += `We don't fight. We measure.\n`;
+ 
+ // Copy to clipboard
+ navigator.clipboard.writeText(report).then(()=>{
+  const btn = event.target;
+  btn.textContent = '✓ COPIED TO CLIPBOARD';
+  setTimeout(()=>btn.textContent='GENERATE FULL REPORT',2000);
+ }).catch(()=>{
+  // Fallback: open in new window
+  const w = window.open('','_blank');
+  w.document.write('<pre style="font-family:monospace;background:#041204;color:#e0ffe0;padding:20px">'+report.replace(/</g,'&lt;')+'</pre>');
+ });
+}
+
+function exportScan(){
+ const data = {
+  target: document.getElementById('targetName').value,
+  domain: selectedDomain,
+  scanTime: scanStartTime?.toISOString(),
+  steps: {
+   constraint: document.getElementById('input1').value,
+   product: document.getElementById('input2').value,
+   billing: document.getElementById('input3').value,
+   concealment: document.getElementById('input4').value,
+   proportionality: document.getElementById('input5').value
+  },
+  shadows: SHADOWS.filter(s=>shadowState[s.id]).map(s=>s.name),
+  extraction: {
+   rate: document.getElementById('extractRate').textContent,
+   perUser: document.getElementById('extractPerUser').textContent,
+   total: document.getElementById('extractTotal').textContent
+  },
+  score: calculateScore(),
+  evidence: evidenceEntries
+ };
+ 
+ const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const a = document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download=`dmd-scan-${(data.target||'unknown').replace(/\s+/g,'-').toLowerCase()}-${Date.now()}.json`;
+ a.click();
+}
+
+function resetScan(){
+ if(!confirm('Reset scan? All data will be cleared.')) return;
+ scanCount++;
+ document.getElementById('targetCount').textContent = scanCount;
+ 
+ document.getElementById('targetName').value='';
+ selectedDomain='';
+ document.querySelectorAll('.domain-btn').forEach(b=>b.classList.remove('active'));
+ scanStartTime=null;
+ 
+ for(let i=1;i<=5;i++){
+  stepComplete[i]=false;
+  const step=document.getElementById('step'+i);
+  step.classList.remove('complete','active');
+  if(i===1) step.classList.add('active');
+  const status=document.getElementById('status'+i);
+  status.textContent=i===1?'PENDING':'LOCKED';
+  status.style.color='#44665588';status.style.borderColor='#44665544';
+  const input=document.getElementById('input'+i);
+  if(input) input.value='';
+  document.getElementById('rpt'+i).innerHTML='⬜';
+ }
+ 
+ document.getElementById('step6').classList.remove('active','complete');
+ document.getElementById('status6').textContent='LOCKED';
+ 
+ shadowState={};renderShadows();updateShadowCount();
+ 
+ document.getElementById('userPays').value='';
+ document.getElementById('userGets').value='';
+ document.getElementById('affectedUsers').value='';
+ document.getElementById('extractRate').textContent='—';
+ document.getElementById('extractPerUser').textContent='—';
+ document.getElementById('extractTotal').textContent='—';
+ document.getElementById('extractMeter').style.width='0';
+ document.getElementById('rptExtRate').textContent='—';
+ document.getElementById('rptExtUser').textContent='—';
+ document.getElementById('rptExtTotal').textContent='—';
+ 
+ document.getElementById('claimedThreat').value='';
+ document.getElementById('actualThreat').value='';
+ document.getElementById('responseSize').value='';
+ document.getElementById('gapResult').value='';
+ 
+ evidenceEntries=[];
+ document.getElementById('evidenceLog').innerHTML='<div style="font-size:7px;color:#44665588">Evidence entries will appear here.</div>';
+ document.getElementById('rptAxioms').innerHTML='Complete scan to see triggered axioms.';
+ 
+ document.getElementById('stepMeter').style.width='0';
+ document.getElementById('scoreNum').textContent='—';
+ document.getElementById('scoreRing').style.borderColor='#44665544';
+ document.getElementById('headerScore').textContent='—';
+ 
+ updateReport();
+}
+
+function autoSave(){updateReport()}
+
+// INIT
+renderShadows();
+updateReport();
+</script>
+</body>
+</html>

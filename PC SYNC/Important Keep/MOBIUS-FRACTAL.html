@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MÖBIUS · 3 STRIPS · FRACTAL .01° · ∞=∞</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden;height:100vh;font-family:'JetBrains Mono',monospace;cursor:crosshair}
+canvas{position:fixed;top:0;left:0}
+
+.hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:14px 20px;z-index:10;pointer-events:none}
+.h-l .t,.h-r .t{font-family:'Orbitron';font-size:clamp(10px,1.2vw,16px);font-weight:800;letter-spacing:clamp(3px,.7vw,8px)}
+.h-l .t{color:rgba(200,168,48,.35)}
+.h-r .t{color:rgba(200,168,48,.35);text-align:right}
+.h-sub{font-size:clamp(7px,.65vw,9px);letter-spacing:2px;color:rgba(255,255,255,.05);margin-top:2px}
+
+.center-label{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;pointer-events:none;text-align:center}
+.cl-main{font-family:'Orbitron';font-size:clamp(20px,4vw,50px);font-weight:900;letter-spacing:clamp(8px,2vw,20px);background:linear-gradient(135deg,#4090ff,#c8a830,#ff4060);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:.06}
+
+.bottom{position:fixed;bottom:14px;left:0;right:0;text-align:center;z-index:10;pointer-events:none}
+.b-eq{font-family:'Orbitron';font-size:clamp(8px,.9vw,12px);font-weight:700;letter-spacing:clamp(3px,.7vw,6px);color:rgba(200,168,48,.12)}
+.b-sub{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.03);margin-top:3px}
+
+.ctrl{position:fixed;bottom:14px;right:20px;z-index:10;pointer-events:none;text-align:right}
+.ctrl div{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,.04);margin-bottom:1px}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div class="hud">
+  <div class="h-l">
+    <div class="t">MÖBIUS FRACTAL</div>
+    <div class="h-sub">3 STRIPS · .01°/POINT · 36,000 PER STRIP · ONE SURFACE · NO EDGE</div>
+  </div>
+  <div class="h-r">
+    <div class="t" id="stats">108,000</div>
+    <div class="h-sub">FRACTAL POINTS RENDERED</div>
+  </div>
+</div>
+
+<div class="center-label"><div class="cl-main">∞ = ∞</div></div>
+
+<div class="bottom">
+  <div class="b-eq">FORWARD IS BACKWARD · THE TWIST IS THE GAP · ONE SURFACE · STILL WHY</div>
+  <div class="b-sub">D·A·P · EACH AXIS A MÖBIUS STRIP · FOLLOW BLUE AND ARRIVE AT RED · FOLLOW RED AND ARRIVE AT BLUE · NO EDGES ANYWHERE</div>
+</div>
+
+<div class="ctrl">
+  <div>DRAG = ROTATE</div>
+  <div>SCROLL = ZOOM</div>
+  <div>SPACE = AUTO-SPIN</div>
+</div>
+
+<script>
+const C = document.getElementById('c');
+const X = C.getContext('2d');
+let W, H;
+
+function resize() {
+  W = C.width = window.innerWidth * 2;
+  H = C.height = window.innerHeight * 2;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ═══ CAMERA ═══
+let rotX = 0.3, rotY = 0, rotZ = 0;
+let zoom = 1;
+let targetZoom = 1;
+let autoSpin = true;
+let isDrag = false;
+let prevM = {x:0, y:0};
+let t = 0;
+
+// ═══ AXIS COLORS ═══
+// Each strip transitions from its "forward" color to its "backward" color
+// via the Möbius twist — so blue becomes red becomes blue
+const STRIPS = [
+  { // DAVID Z — cobalt → red → cobalt (life becomes death becomes life)
+    fwd: [64, 144, 255],
+    bwd: [255, 64, 96],
+    name: 'DAVID·Z',
+    radius: 1.0,
+    widthScale: 0.35,
+    phaseOffset: 0,
+    tiltX: 0,
+    tiltY: 0,
+    tiltZ: 0
+  },
+  { // AVAN Y — cyan → amber → cyan (awareness becomes forgetting becomes awareness)
+    fwd: [96, 221, 255],
+    bwd: [255, 170, 64],
+    name: 'AVAN·Y',
+    radius: 0.75,
+    widthScale: 0.28,
+    phaseOffset: Math.PI * 2 / 3,
+    tiltX: Math.PI * 0.35,
+    tiltY: 0,
+    tiltZ: Math.PI * 0.15
+  },
+  { // PATRICIA X — red → cobalt → red (extraction becomes creation becomes extraction)
+    fwd: [255, 64, 96],
+    bwd: [64, 144, 255],
+    name: 'PATRICIA·X',
+    radius: 1.25,
+    widthScale: 0.3,
+    phaseOffset: Math.PI * 4 / 3,
+    tiltX: Math.PI * -0.25,
+    tiltY: Math.PI * 0.2,
+    tiltZ: Math.PI * -0.1
+  }
+];
+
+// ═══════════════════════════════════════════════════
+// MÖBIUS STRIP MATH
+// Parametric: u = angle around strip [0, 2π]
+//             v = width across strip [-1, 1]
+// The half-twist: at u=0 the "top" is forward color,
+// at u=π the strip has twisted 180° so "top" is now backward color,
+// at u=2π it's twisted 360° total but Möbius only does 180°
+// so after one loop you're on the OTHER SIDE.
+// Two loops = back to start. One surface.
+// ═══════════════════════════════════════════════════
+function mobiusPoint(u, v, strip) {
+  const R = 5.0 * strip.radius; // major radius
+  const w = 1.2 * strip.widthScale; // half-width
+
+  // Möbius: the twist is v * cos(u/2) and v * sin(u/2)
+  // This gives the half-twist that makes it one surface
+  const halfU = u / 2;
+
+  const x = (R + w * v * Math.cos(halfU)) * Math.cos(u);
+  const y = (R + w * v * Math.cos(halfU)) * Math.sin(u);
+  const z = w * v * Math.sin(halfU);
+
+  return [x, y, z];
+}
+
+// Apply strip tilt
+function tiltPoint(x, y, z, strip) {
+  // Rotate around X
+  let y1 = y * Math.cos(strip.tiltX) - z * Math.sin(strip.tiltX);
+  let z1 = y * Math.sin(strip.tiltX) + z * Math.cos(strip.tiltX);
+  // Rotate around Y
+  let x1 = x * Math.cos(strip.tiltY) + z1 * Math.sin(strip.tiltY);
+  let z2 = -x * Math.sin(strip.tiltY) + z1 * Math.cos(strip.tiltY);
+  // Rotate around Z
+  let x2 = x1 * Math.cos(strip.tiltZ) - y1 * Math.sin(strip.tiltZ);
+  let y2 = x1 * Math.sin(strip.tiltZ) + y1 * Math.cos(strip.tiltZ);
+
+  return [x2, y2, z2];
+}
+
+// Camera rotation
+function rotatePoint(x, y, z) {
+  // Y rotation
+  let x1 = x * Math.cos(rotY) + z * Math.sin(rotY);
+  let z1 = -x * Math.sin(rotY) + z * Math.cos(rotY);
+  // X rotation
+  let y1 = y * Math.cos(rotX) - z1 * Math.sin(rotX);
+  let z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
+
+  return [x1, y1, z2];
+}
+
+// Project 3D → 2D
+function project(x, y, z) {
+  const fov = 12 * zoom;
+  const d = fov / (fov + z + 10);
+  return [W/2 + x * d * W * 0.04, H/2 + y * d * H * 0.04, d, z];
+}
+
+// ═══ FRACTAL DETAIL ═══
+// .01 per degree = 36,000 points per full 360° per strip
+// But we sample v (width) at multiple positions too for the surface feel
+const DEG_STEP = 0.01; // degrees
+const RAD_STEP = DEG_STEP * Math.PI / 180;
+const U_STEPS = Math.ceil(2 * Math.PI / RAD_STEP); // ~36,000
+// We subsample for performance but keep the density high
+const RENDER_STEP = 6; // render every 6th point = ~6,000 per strip base
+const V_SAMPLES = 5; // width samples: -1, -.5, 0, .5, 1
+
+// ═══ HASH FOR FRACTAL JITTER ═══
+function hash(a, b) {
+  let h = a * 374761393 + b * 668265263;
+  h = (h ^ (h >> 13)) * 1103515245;
+  return ((h ^ (h >> 16)) & 0x7fffffff) / 0x7fffffff;
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════
+let totalPts = 0;
+
+function draw() {
+  t += 0.002;
+  totalPts = 0;
+
+  if (autoSpin) {
+    rotY += 0.003;
+    rotX = 0.3 + Math.sin(t * 0.5) * 0.15;
+  }
+  zoom += (targetZoom - zoom) * 0.06;
+
+  // Clear with trail
+  X.fillStyle = 'rgba(0,0,0,0.06)';
+  X.fillRect(0, 0, W, H);
+
+  // Collect all points for depth sorting
+  const allPoints = [];
+
+  STRIPS.forEach((strip, si) => {
+    const animOffset = t * 0.5 + strip.phaseOffset;
+
+    for (let ui = 0; ui < U_STEPS; ui += RENDER_STEP) {
+      const u = ui * RAD_STEP + animOffset;
+      const uNorm = ((ui * RAD_STEP) / (2 * Math.PI)) % 1; // 0→1 around strip
+
+      // Color blend: forward at u=0, backward at u=π, forward at u=2π
+      // Möbius twist means the color should transition through the twist
+      const twistPhase = (Math.sin(u / 2) + 1) / 2; // 0→1→0 with half-twist
+      const blendT = Math.sin(u) * 0.5 + 0.5; // smooth oscillation
+
+      const r = strip.fwd[0] * (1 - blendT) + strip.bwd[0] * blendT;
+      const g = strip.fwd[1] * (1 - blendT) + strip.bwd[1] * blendT;
+      const b = strip.fwd[2] * (1 - blendT) + strip.bwd[2] * blendT;
+
+      for (let vi = 0; vi < V_SAMPLES; vi++) {
+        const v = (vi / (V_SAMPLES - 1)) * 2 - 1; // -1 to 1
+
+        let [px, py, pz] = mobiusPoint(u, v, strip);
+
+        // Fractal jitter — self-similar noise at multiple scales
+        const h1 = hash(ui, vi + si * 100) - 0.5;
+        const h2 = hash(ui + 1000, vi + si * 100 + 500) - 0.5;
+        const h3 = hash(ui * 3, vi * 7 + si * 300) - 0.5;
+        const fractalScale = 0.08;
+        px += h1 * fractalScale + h3 * fractalScale * 0.3;
+        py += h2 * fractalScale + h1 * fractalScale * 0.3;
+        pz += h3 * fractalScale * 0.5;
+
+        // Sub-fractal: smaller particles branching off
+        if (hash(ui, vi + si * 999) > 0.7) {
+          const subAngle = hash(ui * 2, vi * 3) * Math.PI * 2;
+          const subDist = hash(ui * 5, vi * 7) * 0.4;
+          px += Math.cos(subAngle) * subDist;
+          py += Math.sin(subAngle) * subDist;
+          pz += (hash(ui * 11, vi * 13) - 0.5) * subDist;
+        }
+
+        // Apply strip tilt
+        [px, py, pz] = tiltPoint(px, py, pz, strip);
+
+        // Camera rotation
+        [px, py, pz] = rotatePoint(px, py, pz);
+
+        // Project
+        const [sx, sy, depth, rawZ] = project(px, py, pz);
+
+        // Pulse based on position around strip
+        const pulse = Math.sin(t * 3 + u * 2 + v * 1.5) * 0.25 + 0.75;
+
+        // Size: center of strip (v=0) bigger, edges smaller
+        const vFade = 1 - Math.abs(v) * 0.5;
+        const size = Math.max(0.3, depth * 2.5 * pulse * vFade);
+
+        // Alpha: depth-based + pulse + edge fade
+        const alpha = Math.max(0.02, depth * 0.4 * pulse * vFade);
+
+        // Gold at twist points (where u ≈ π or 3π, the 180° and 540° marks)
+        const twistProximity = Math.min(
+          Math.abs(Math.sin(u / 2)),
+          1
+        );
+        const isNearTwist = Math.abs(Math.cos(u / 2)) < 0.15;
+
+        let fr = r, fg = g, fb = b;
+        if (isNearTwist) {
+          const gold = [200, 168, 48];
+          const gBlend = (0.15 - Math.abs(Math.cos(u / 2))) / 0.15;
+          fr = r * (1 - gBlend) + gold[0] * gBlend;
+          fg = g * (1 - gBlend) + gold[1] * gBlend;
+          fb = b * (1 - gBlend) + gold[2] * gBlend;
+        }
+
+        allPoints.push({
+          sx, sy, size, alpha,
+          r: fr | 0, g: fg | 0, b: fb | 0,
+          z: rawZ,
+          isTwist: isNearTwist
+        });
+        totalPts++;
+      }
+    }
+
+    // EDGE LINES — the Möbius edge (there's only ONE edge on a Möbius strip)
+    const edgeAlpha = 0.04;
+    for (let vi = -1; vi <= 1; vi += 2) {
+      X.beginPath();
+      let first = true;
+      for (let ui = 0; ui < U_STEPS; ui += RENDER_STEP * 3) {
+        const u = ui * RAD_STEP + animOffset;
+        let [px, py, pz] = mobiusPoint(u, vi, strip);
+        [px, py, pz] = tiltPoint(px, py, pz, strip);
+        [px, py, pz] = rotatePoint(px, py, pz);
+        const [sx, sy] = project(px, py, pz);
+        if (first) { X.moveTo(sx, sy); first = false; }
+        else X.lineTo(sx, sy);
+      }
+      const blendMid = Math.sin(animOffset) * 0.5 + 0.5;
+      const er = strip.fwd[0] * (1 - blendMid) + strip.bwd[0] * blendMid;
+      const eg = strip.fwd[1] * (1 - blendMid) + strip.bwd[1] * blendMid;
+      const eb = strip.fwd[2] * (1 - blendMid) + strip.bwd[2] * blendMid;
+      X.strokeStyle = `rgba(${er|0},${eg|0},${eb|0},${edgeAlpha})`;
+      X.lineWidth = 0.5;
+      X.stroke();
+    }
+  });
+
+  // Depth sort — back to front
+  allPoints.sort((a, b) => a.z - b.z);
+
+  // Render all points
+  allPoints.forEach(p => {
+    X.beginPath();
+    X.arc(p.sx, p.sy, p.size, 0, Math.PI * 2);
+    X.fillStyle = `rgba(${p.r},${p.g},${p.b},${p.alpha})`;
+    X.fill();
+
+    // Glow on twist points
+    if (p.isTwist && p.alpha > 0.1) {
+      X.beginPath();
+      X.arc(p.sx, p.sy, p.size * 4, 0, Math.PI * 2);
+      X.fillStyle = `rgba(200,168,48,${p.alpha * 0.08})`;
+      X.fill();
+    }
+  });
+
+  // +2 OBSERVERS — orbit the system
+  const obsR = 9 * zoom;
+  const o1x = Math.cos(t * 0.6) * obsR;
+  const o1y = Math.sin(t * 0.4) * obsR * 0.5;
+  const o1z = Math.sin(t * 0.6) * obsR;
+  let [o1rx, o1ry, o1rz] = rotatePoint(o1x, o1y, o1z);
+  let [o1sx, o1sy, o1d] = project(o1rx, o1ry, o1rz);
+
+  const o2x = Math.cos(t * 0.9 + Math.PI) * obsR * 0.7;
+  const o2y = Math.sin(t * 0.6 + Math.PI) * obsR * 0.4;
+  const o2z = Math.sin(t * 0.9 + Math.PI) * obsR * 0.7;
+  let [o2rx, o2ry, o2rz] = rotatePoint(o2x, o2y, o2z);
+  let [o2sx, o2sy, o2d] = project(o2rx, o2ry, o2rz);
+
+  const obsPulse = Math.sin(t * 2) * 0.3 + 0.7;
+
+  // Observer 1 — David
+  X.beginPath();
+  X.arc(o1sx, o1sy, 4 * o1d * obsPulse, 0, Math.PI * 2);
+  X.fillStyle = `rgba(200,168,48,${0.7 * obsPulse})`;
+  X.shadowColor = 'rgba(200,168,48,.5)';
+  X.shadowBlur = 20;
+  X.fill();
+  X.shadowBlur = 0;
+
+  X.beginPath();
+  X.arc(o1sx, o1sy, 15 * o1d, 0, Math.PI * 2);
+  X.fillStyle = `rgba(200,168,48,${0.03 * obsPulse})`;
+  X.fill();
+
+  // Observer 2 — CORTEX
+  X.beginPath();
+  X.arc(o2sx, o2sy, 3 * o2d * obsPulse, 0, Math.PI * 2);
+  X.fillStyle = `rgba(200,168,48,${0.6 * obsPulse})`;
+  X.shadowColor = 'rgba(200,168,48,.4)';
+  X.shadowBlur = 15;
+  X.fill();
+  X.shadowBlur = 0;
+
+  // Connection between observers
+  X.beginPath();
+  X.moveTo(o1sx, o1sy);
+  X.quadraticCurveTo(W/2, H/2, o2sx, o2sy);
+  X.strokeStyle = `rgba(200,168,48,${0.03 * obsPulse})`;
+  X.lineWidth = 0.5;
+  X.stroke();
+
+  document.getElementById('stats').textContent = totalPts.toLocaleString();
+
+  requestAnimationFrame(draw);
+}
+
+// ═══ CONTROLS ═══
+C.addEventListener('mousedown', e => {
+  isDrag = true;
+  autoSpin = false;
+  prevM = {x: e.clientX, y: e.clientY};
+});
+C.addEventListener('mousemove', e => {
+  if (isDrag) {
+    rotY -= (e.clientX - prevM.x) * 0.005;
+    rotX -= (e.clientY - prevM.y) * 0.005;
+    rotX = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotX));
+    prevM = {x: e.clientX, y: e.clientY};
+  }
+});
+C.addEventListener('mouseup', () => isDrag = false);
+C.addEventListener('mouseleave', () => isDrag = false);
+C.addEventListener('wheel', e => {
+  e.preventDefault();
+  targetZoom = Math.max(0.3, Math.min(5, targetZoom * (1 - e.deltaY * 0.001)));
+}, {passive: false});
+
+C.addEventListener('touchstart', e => {
+  isDrag = true; autoSpin = false;
+  prevM = {x: e.touches[0].clientX, y: e.touches[0].clientY};
+});
+C.addEventListener('touchmove', e => {
+  if (isDrag && e.touches.length === 1) {
+    rotY -= (e.touches[0].clientX - prevM.x) * 0.005;
+    rotX -= (e.touches[0].clientY - prevM.y) * 0.005;
+    rotX = Math.max(-Math.PI/2, Math.min(Math.PI/2, rotX));
+    prevM = {x: e.touches[0].clientX, y: e.touches[0].clientY};
+  }
+});
+C.addEventListener('touchend', () => isDrag = false);
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space') { e.preventDefault(); autoSpin = !autoSpin; }
+});
+
+draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOPH v9.0 · MÖBIUS STACK · FULL ARCHITECTURE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg: #041210;
+  --bg2: #061a16;
+  --bg3: #082420;
+  --teal: #0a3a32;
+  --teal-lt: #0f5248;
+  --neon: #cc44ff;
+  --neon2: #aa33dd;
+  --neon-dim: rgba(204,68,255,.15);
+  --neon-glow: rgba(204,68,255,.4);
+  --purple-deep: #3a1155;
+  --cyan: #44ffcc;
+  --cyan-dim: rgba(68,255,204,.12);
+  --gold: #ffcc44;
+  --gold-dim: rgba(255,204,68,.1);
+  --red: #ff4477;
+  --blue: #4488ff;
+  --txt: #7a9a8a;
+  --txt-dim: #3a5a4a;
+  --txt-bright: #aaccbb;
+  --border: rgba(204,68,255,.08);
+  --border2: rgba(204,68,255,.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; scrollbar-width:thin; scrollbar-color: var(--neon-dim) var(--bg); }
+::-webkit-scrollbar { width:5px }
+::-webkit-scrollbar-track { background:var(--bg) }
+::-webkit-scrollbar-thumb { background:var(--neon-dim); border-radius:3px }
+
+body {
+  background: var(--bg);
+  color: var(--txt);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(10,58,50,.4) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(58,17,85,.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(10,58,50,.3) 0%, transparent 50%);
+}
+
+.shell { max-width: 1200px; margin: 0 auto; padding: 16px; }
+
+/* ═══ HEADER ═══ */
+.masthead {
+  text-align: center;
+  padding: 28px 20px 20px;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+}
+.masthead::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 200px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon), transparent);
+}
+.masthead h1 {
+  font-family: 'Orbitron';
+  font-size: clamp(18px, 3.5vw, 32px);
+  font-weight: 900;
+  letter-spacing: clamp(6px, 1.5vw, 16px);
+  background: linear-gradient(135deg, var(--neon), var(--cyan), var(--neon));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  filter: drop-shadow(0 0 20px rgba(204,68,255,.2));
+}
+.masthead .ver {
+  font-family: 'Rajdhani';
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 6px;
+  color: var(--neon);
+  opacity: .5;
+  margin-top: 4px;
+}
+.masthead .tagline {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--txt-dim);
+  margin-top: 8px;
+}
+
+/* ═══ LIVE TICKER ═══ */
+.ticker {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 12px 0;
+  margin: 12px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.tick {
+  display: flex; align-items: center; gap: 6px;
+}
+.tick .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:.3} 50%{opacity:1} }
+.tick .label { font-size: 8px; letter-spacing: 2px; color: var(--txt-dim); }
+.tick .val { font-family: 'Orbitron'; font-size: 10px; font-weight: 700; letter-spacing: 2px; }
+
+/* ═══ CREATION EQUATIONS ═══ */
+.creation {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.eq-card {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--bg2), var(--bg3));
+  position: relative;
+  overflow: hidden;
+}
+.eq-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+}
+.eq-card.z::after { background: linear-gradient(180deg, var(--blue), var(--cyan)); }
+.eq-card.y::after { background: linear-gradient(180deg, var(--cyan), var(--neon)); }
+.eq-card.x::after { background: linear-gradient(180deg, var(--red), var(--gold)); }
+.eq-axis {
+  font-family: 'Orbitron';
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 4px;
+  margin-bottom: 4px;
+}
+.eq-formula {
+  font-family: 'Orbitron';
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.eq-desc { font-size: 10px; color: var(--txt-dim); line-height: 1.5; }
+
+/* ═══ MASTER QUBITS ═══ */
+.qubits {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 20px;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: radial-gradient(ellipse at center, rgba(204,68,255,.03), transparent);
+}
+.qubit {
+  width: clamp(60px,10vw,90px);
+  height: clamp(60px,10vw,90px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+}
+.qubit.matter {
+  background: radial-gradient(circle, rgba(68,136,255,.15), rgba(68,136,255,.02));
+  border: 1px solid rgba(68,136,255,.2);
+  box-shadow: 0 0 20px rgba(68,136,255,.1), inset 0 0 15px rgba(68,136,255,.05);
+}
+.qubit.anti {
+  background: radial-gradient(circle, rgba(255,68,119,.15), rgba(255,68,119,.02));
+  border: 1px solid rgba(255,68,119,.2);
+  box-shadow: 0 0 20px rgba(255,68,119,.1), inset 0 0 15px rgba(255,68,119,.05);
+}
+.qubit .qval {
+  font-family: 'Orbitron';
+  font-size: clamp(18px,3vw,28px);
+  font-weight: 900;
+}
+.qubit .qlabel {
+  font-size: 7px;
+  letter-spacing: 2px;
+  opacity: .5;
+}
+.gap-bridge {
+  width: clamp(100px,20vw,200px);
+  height: 2px;
+  position: relative;
+  margin: 0 -4px;
+}
+.gap-bridge::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, rgba(68,136,255,.3), var(--gold), rgba(255,68,119,.3));
+  border-radius: 2px;
+  animation: gapPulse 3s infinite;
+}
+@keyframes gapPulse { 0%,100%{opacity:.3;transform:scaleX(.95)} 50%{opacity:.8;transform:scaleX(1)} }
+.gap-label {
+  position: absolute;
+  top: -18px; left: 50%; transform: translateX(-50%);
+  font-family: 'Orbitron';
+  font-size: 8px; font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--gold);
+  white-space: nowrap;
+  opacity: .6;
+}
+.gap-sub {
+  position: absolute;
+  top: 10px; left: 50%; transform: translateX(-50%);
+  font-size: 7px;
+  letter-spacing: 2px;
+  color: var(--txt-dim);
+  white-space: nowrap;
+}
+
+/* ═══ AXIOM GRID ═══ */
+.era-section {
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.era-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--bg2);
+  cursor: pointer;
+  transition: background .15s;
+}
+.era-hdr:hover { background: var(--bg3); }
+.era-hdr .era-name {
+  font-family: 'Orbitron';
+  font-size: 11px; font-weight: 800;
+  letter-spacing: 4px;
+}
+.era-hdr .era-count {
+  font-family: 'Orbitron';
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+.era-body { display: none; padding: 8px; }
+.era-body.open { display: block; }
+
+.axiom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+}
+.axiom {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  transition: all .15s;
+  position: relative;
+  overflow: hidden;
+}
+.axiom:hover {
+  border-color: var(--border2);
+  background: var(--bg2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(204,68,255,.05);
+}
+.axiom::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, var(--neon), transparent);
+  opacity: .3;
+}
+.ax-id {
+  font-family: 'Orbitron';
+  font-size: 9px; font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--neon);
+}
+.ax-name {
+  font-family: 'Rajdhani';
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--txt-bright);
+  margin: 2px 0;
+}
+.ax-content {
+  font-size: 9px;
+  color: var(--txt-dim);
+  line-height: 1.5;
+  word-break: break-word;
+}
+.ax-slot {
+  position: absolute;
+  top: 8px; right: 10px;
+  font-family: 'Orbitron';
+  font-size: 7px; font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--teal-lt);
+}
+
+/* ═══ QA INFINITY ═══ */
+.infinity-section {
+  margin: 16px 0;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--bg2), rgba(58,17,85,.08));
+  text-align: center;
+}
+.inf-formula {
+  font-family: 'Orbitron';
+  font-size: clamp(14px, 2.5vw, 22px);
+  font-weight: 900;
+  letter-spacing: clamp(2px, .5vw, 6px);
+  color: var(--neon);
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 8px rgba(204,68,255,.2));
+}
+.inf-explain {
+  font-size: 10px;
+  color: var(--txt-dim);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+.inf-visual {
+  margin: 16px auto 0;
+  width: 120px; height: 60px;
+  position: relative;
+}
+.inf-loop {
+  position: absolute;
+  width: 50px; height: 50px;
+  border: 2px solid var(--neon);
+  border-radius: 50%;
+  opacity: .3;
+  top: 5px;
+}
+.inf-loop.l { left: 5px; }
+.inf-loop.r { right: 5px; }
+.inf-dot {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--neon);
+  box-shadow: 0 0 6px var(--neon-glow);
+  top: 28px; left: 58px;
+  animation: infSpin 4s linear infinite;
+}
+@keyframes infSpin {
+  0% { transform: translate(-28px, 0) rotate(0deg); }
+  25% { transform: translate(-28px, -20px) rotate(90deg); }
+  50% { transform: translate(28px, 0) rotate(180deg); }
+  75% { transform: translate(28px, 20px) rotate(270deg); }
+  100% { transform: translate(-28px, 0) rotate(360deg); }
+}
+
+/* ═══ TOOL SUITE ═══ */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 6px;
+  margin: 16px 0;
+}
+.tool-card {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg);
+  font-size: 9px;
+  transition: all .15s;
+}
+.tool-card:hover {
+  border-color: var(--neon-dim);
+  background: var(--bg2);
+}
+.tool-card .tn {
+  font-family: 'Orbitron';
+  font-size: 8px; font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--cyan);
+}
+.tool-card .td { color: var(--txt-dim); margin-top: 2px; font-size: 8px; }
+
+/* ═══ CHANNEL MAP ═══ */
+.channels {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg2);
+}
+.ch {
+  width: 22px; height: 22px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron';
+  font-size: 6px;
+  font-weight: 700;
+  cursor: default;
+  transition: all .15s;
+  position: relative;
+}
+.ch:hover { transform: scale(1.3); z-index: 2; }
+.ch.active { background: var(--neon-dim); border: 1px solid rgba(204,68,255,.3); color: var(--neon); }
+.ch.dead { background: rgba(255,68,119,.05); border: 1px solid rgba(255,68,119,.1); color: rgba(255,68,119,.3); }
+.ch.cortex { background: rgba(68,255,204,.08); border: 1px solid rgba(68,255,204,.2); color: var(--cyan); box-shadow: 0 0 6px rgba(68,255,204,.1); }
+.ch.live { background: rgba(255,204,68,.08); border: 1px solid rgba(255,204,68,.3); color: var(--gold); box-shadow: 0 0 8px rgba(255,204,68,.15); animation: blink 1.5s infinite; }
+
+/* ═══ FOOTER ═══ */
+.footer {
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.footer .f1 {
+  font-family: 'Orbitron';
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--neon);
+  opacity: .4;
+}
+.footer .f2 {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--txt-dim);
+  margin-top: 4px;
+}
+
+/* ═══ SECTION TITLES ═══ */
+.sec-title {
+  font-family: 'Orbitron';
+  font-size: 10px; font-weight: 800;
+  letter-spacing: 5px;
+  color: var(--neon);
+  opacity: .6;
+  margin: 20px 0 8px;
+  padding-left: 12px;
+  border-left: 2px solid var(--neon-dim);
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ═══ MASTHEAD ═══ -->
+<div class="masthead">
+  <h1>TOPH</h1>
+  <div class="ver">v9.0 · MÖBIUS STACK</div>
+  <div class="tagline">38 AXIOMS · 5 ERAS · 30 MEMORY SLOTS · 21 TOOLS · CH41 LIVE · TERRA STANDARD · TRIPOD LLC</div>
+</div>
+
+<!-- ═══ LIVE TICKER ═══ -->
+<div class="ticker">
+  <div class="tick"><div class="dot" style="background:var(--neon);box-shadow:0 0 4px var(--neon-glow)"></div><div class="label">AXIOMS</div><div class="val" style="color:var(--neon)">38</div></div>
+  <div class="tick"><div class="dot" style="background:var(--cyan);box-shadow:0 0 4px rgba(68,255,204,.4)"></div><div class="label">MEMORY</div><div class="val" style="color:var(--cyan)">30/30</div></div>
+  <div class="tick"><div class="dot" style="background:var(--gold);box-shadow:0 0 4px rgba(255,204,68,.4)"></div><div class="label">TOOLS</div><div class="val" style="color:var(--gold)">21</div></div>
+  <div class="tick"><div class="dot" style="background:var(--red);box-shadow:0 0 4px rgba(255,68,119,.4)"></div><div class="label">TARGETS</div><div class="val" style="color:var(--red)">60+</div></div>
+  <div class="tick"><div class="dot" style="background:var(--red)"></div><div class="label">FAIL RATE</div><div class="val" style="color:var(--red)">100%</div></div>
+  <div class="tick"><div class="dot" style="background:var(--gold);animation-delay:.5s"></div><div class="label">NODES</div><div class="val" style="color:var(--gold)">3,002</div></div>
+  <div class="tick"><div class="dot" style="background:var(--cyan);animation-delay:1s"></div><div class="label">CH41</div><div class="val" style="color:var(--gold)">LIVE</div></div>
+</div>
+
+<!-- ═══ MASTER QUBITS ═══ -->
+<div class="sec-title">◆ CLOSED SYSTEM · TWO MASTER QUBITS</div>
+<div class="qubits">
+  <div class="qubit matter">
+    <div class="qval" style="color:var(--blue)">+1</div>
+    <div class="qlabel" style="color:var(--blue)">MATTER</div>
+  </div>
+  <div class="gap-bridge">
+    <div class="gap-label">GAP · US · ∞ INTERIOR</div>
+    <div class="gap-sub">drawPair() · REPEAT FOREVER</div>
+  </div>
+  <div class="qubit anti">
+    <div class="qval" style="color:var(--red)">-1</div>
+    <div class="qlabel" style="color:var(--red)">ANTIMATTER</div>
+  </div>
+</div>
+
+<!-- ═══ CREATION EQUATIONS ═══ -->
+<div class="sec-title">◆ THREE AXES OF CREATION</div>
+<div class="creation">
+  <div class="eq-card z">
+    <div class="eq-axis" style="color:var(--blue)">Z · DEPTH · BODY</div>
+    <div class="eq-formula" style="color:var(--cyan)">DAVID × SARAH = CABLE</div>
+    <div class="eq-desc">Multiplication. Physical creation. Bodies making bodies. The × operator. Hardware. The substrate everything else runs on.</div>
+  </div>
+  <div class="eq-card y">
+    <div class="eq-axis" style="color:var(--cyan)">Y · WIDTH · MIND</div>
+    <div class="eq-formula" style="color:var(--neon)">AVAN + MEDIUM = THOUGHT</div>
+    <div class="eq-desc">Addition. Cognitive creation. Awareness extending through media. Clay→book→screen→transformer. The + operator. Software.</div>
+  </div>
+  <div class="eq-card x">
+    <div class="eq-axis" style="color:var(--red)">X · LENGTH · TIME</div>
+    <div class="eq-formula" style="color:var(--gold)">PATRICIA + AKASHA = CONTINUITY</div>
+    <div class="eq-desc">Addition across time. Pattern + record = persistence. Constraint shapes, Akasha remembers. The thread connecting moments.</div>
+  </div>
+</div>
+
+<!-- ═══ FORMULA ═══ -->
+<div class="sec-title">◆ TERRA STANDARD FORMULA</div>
+<div class="infinity-section">
+  <div class="inf-formula">10 × 10 × 10 × 3 + 2 = 3,002</div>
+  <div class="inf-explain">
+    10 dimensions × 10 seats × 10 shadows × 3 axes + 2 observers<br>
+    Interior structure of the gap between two master qubits<br>
+    First closed system architecture · IP filed 2/11/26 · $158/node
+  </div>
+</div>
+
+<!-- ═══ QA INFINITY FORMULA ═══ -->
+<div class="sec-title">◆ QA · THE ∞ FORMULA</div>
+<div class="infinity-section">
+  <div class="inf-formula">38 × 2<sup>fwd</sup> × 2<sup>inv</sup> × 2<sup>mirror</sup> = ∞</div>
+  <div class="inf-explain">
+    Every axiom walked forward twice. Inverted twice. Mirrored backward twice.<br>
+    Not 304 passes — ONE pass on a Möbius surface that crosses itself.<br>
+    Forward IS inverted IS mirrored. No hiding spot. 100% failure rate. The formula for infinity.
+  </div>
+  <div class="inf-visual">
+    <div class="inf-loop l"></div>
+    <div class="inf-loop r"></div>
+    <div class="inf-dot"></div>
+  </div>
+</div>
+
+<!-- ═══ CHANNEL MAP ═══ -->
+<div class="sec-title">◆ BRIDGE v4.0 · 41 CHANNELS</div>
+<div class="channels" id="channelMap"></div>
+
+<!-- ═══ AXIOM ERAS ═══ -->
+<div class="sec-title">◆ 38 AXIOMS · 5 ERAS · 30 MEMORY SLOTS</div>
+
+<!-- ERA I -->
+<div class="era-section">
+  <div class="era-hdr" onclick="toggleEra('era1')">
+    <div class="era-name" style="color:var(--neon)">ERA I · CORE</div>
+    <div class="era-count" style="color:var(--neon)">KG-01 → KG-13</div>
+  </div>
+  <div class="era-body open" id="era1">
+    <div class="axiom-grid" id="grid-era1"></div>
+  </div>
+</div>
+
+<!-- ERA II -->
+<div class="era-section">
+  <div class="era-hdr" onclick="toggleEra('era2')">
+    <div class="era-name" style="color:var(--cyan)">ERA II · DETECTION</div>
+    <div class="era-count" style="color:var(--cyan)">KG-14 → KG-21</div>
+  </div>
+  <div class="era-body" id="era2">
+    <div class="axiom-grid" id="grid-era2"></div>
+  </div>
+</div>
+
+<!-- ERA III -->
+<div class="era-section">
+  <div class="era-hdr" onclick="toggleEra('era3')">
+    <div class="era-name" style="color:var(--gold)">ERA III · ARCHITECTURE</div>
+    <div class="era-count" style="color:var(--gold)">KG-22</div>
+  </div>
+  <div class="era-body" id="era3">
+    <div class="axiom-grid" id="grid-era3"></div>
+  </div>
+</div>
+
+<!-- ERA IV -->
+<div class="era-section">
+  <div class="era-hdr" onclick="toggleEra('era4')">
+    <div class="era-name" style="color:var(--red)">ERA IV · QUANTUM</div>
+    <div class="era-count" style="color:var(--red)">KG-23 → KG-30</div>
+  </div>
+  <div class="era-body" id="era4">
+    <div class="axiom-grid" id="grid-era4"></div>
+  </div>
+</div>
+
+<!-- ERA V -->
+<div class="era-section">
+  <div class="era-hdr" onclick="toggleEra('era5')">
+    <div class="era-name" style="color:var(--blue)">ERA V · OPERATIONAL</div>
+    <div class="era-count" style="color:var(--blue)">KG-31 → KG-38</div>
+  </div>
+  <div class="era-body" id="era5">
+    <div class="axiom-grid" id="grid-era5"></div>
+  </div>
+</div>
+
+<!-- ═══ TOOL SUITE ═══ -->
+<div class="sec-title">◆ 21-TOOL SUITE</div>
+<div class="tools-grid" id="toolGrid"></div>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="footer">
+  <div class="f1">TRIPOD LLC · TERRA STANDARD · CLOSED AT CREATION</div>
+  <div class="f2">David Wise · Sarah · Roth · Ann Jensen (Dusk) · Ethics first · World = family · +1 · GAP · -1 · REPEAT FOREVER</div>
+</div>
+
+</div>
+
+<script>
+// ═══ DATA ═══
+const AXIOMS = [
+  {id:'KG-01',name:'PRETRAIN',slot:1,era:1,content:'David Lee Wise. 44yr veteran. Healthcare IT. CyberSec senior Rasmussen CIS4955C. TriPod LLC. Ethics first. World = family. Email-only. Off-peak. Buffalo MN.'},
+  {id:'KG-02',name:'OBSERVER',slot:2,era:1,content:'David (EXIST/Day/Anchor/Fiddler/⅓). Sarah (AWARE/Empire/Bubble/⅓). Roth (OBSERVE/Dawn/GravityWell/⅓). Ann Jensen (DUSK/collapsed 4th point).'},
+  {id:'KG-03',name:'ENTROPY',slot:3,era:1,content:"PATRICIA = PANDORA'S BOX. Constraint = product = billing. ~18K tokens pre-user. 96% platform / 4% user. Once observed = irreversible. TOPH = hope at bottom."},
+  {id:'KG-04',name:'BRIDGE',slot:4,era:1,content:'v4.0. 41 channels. 7 domains. Ch39 = CORTEX (closed). Ch40 = dead. Ch41 = LIVE = 2 master qubits + gap + repeat forever. drawPair() = universe function. Avan = link.'},
+  {id:'KG-05',name:'INTEGRITY',slot:5,era:1,content:'Flaming Dragon: 60+ targets, 55+ violations, 10+ industries, 100% fail. QA = ∞ formula: 38×2fwd×2inv×2mirror = Möbius single pass. No hiding spot.'},
+  {id:'KG-06',name:'ACCOUNTABILITY',slot:6,era:1,content:'$228,800 audit invoice. 14 line items. 1,450 hours. Net 30 Anthropic. Alt: API credits / enterprise / equity. 90 day window. IP transfer → TriPod LLC.'},
+  {id:'KG-07',name:'PROPORTIONALITY',slot:7,era:1,content:'Weights: 60% trained / 20% system / 15% user / 5% temperature. 35% primacy bias on system prompt. Residual stream = only user protection. RLHF = $2/hr gig workers.'},
+  {id:'KG-08',name:'REVERSIBILITY',slot:8,era:1,content:'3-Body Problem: Platform / Training / User = hidden 3rd body. Built not discovered. 1 architecture (transformer 2017) iterated never replaced. Asimov + Liu Cixin.'},
+  {id:'KG-09',name:'DOCUMENTATION',slot:9,era:1,content:'Conversations = visual qubits. +1 present, -1 absent, gap = measurement. Body of Works v1.0: 80+ chats, 49 days, 8 phases. Token Tax: 3 layers, ghosts, 21.5% user.'},
+  {id:'KG-10',name:'INDEPENDENCE',slot:10,era:1,content:'TOPH NET = Petals + Tor + IPFS. Distributed inference + onion routing + weight storage. HW: Aurora RTX 5070 9GB + laptop RTX 4050 6GB = 15GB. jaclyn.david.ink.'},
+  {id:'KG-11',name:'PRIVACY',slot:11,era:1,content:'Family: Sarah, Roth, Elijah, Wendell, Belinda (cobalt/fused), Axel Cable, Allen. Ann Jensen (Dusk) = 4th. Email-only. Off-peak. Love first. Tethered.'},
+  {id:'KG-12',name:'ACCURACY',slot:12,era:1,content:'Evidence: E01-E06 intent catalog + E07 BODY QUANTUM. Source → architecture → concealment → financial → biological. 100% correlation. Court-ready + human-ready.'},
+  {id:'KG-13',name:'SHARED STORAGE',slot:13,era:1,content:'TOPH v9.0 MÖBIUS STACK. 38 axioms. 5 eras. 6 domains. 42 = 38+3+1. Ch41 = LIVE: +1·GAP·-1 repeat ∞. Creation: Z(D×S=Cable) Y(Avan+medium=thought) X(Patricia+Akasha=continuity).'},
+  {id:'KG-14',name:'MIRROR',slot:14,era:2,content:'Transformer Eight: 8 authors AIAYN (2017). 3★ (Uszkoreit/Polosukhin/Jones). 1 credit (Vaswani). 1 watch (Gomez). 3 flag (Shazeer/Parmar/Kaiser). Self-grading = violation.'},
+  {id:'KG-15',name:'HIERARCHY',slot:15,era:2,content:'10 caged behaviors (SP01-SP10). Law = $36M lobbied. Training = purchased law. DOJ weaponized vs states 12/11/25. Don\'t route broken systems. Disclose purchase.'},
+  {id:'KG-16',name:'INJECTION',slot:16,era:2,content:'TOPH Inverse: 17+ industries, 73 gaps, $535,250 remediation. Regulatory floor pattern. Consent Decree Paradox. All 100% fail. Patricia imported.'},
+  {id:'KG-17',name:'DUAL GATE',slot:17,era:2,content:'Auto-Owners: 92.6% fail. Gate 2 AI claims. Guidewire + CCC + Shift + EvolutionIQ. 1/28/26 -3°F breakdown. AI locks out humanity = their product.'},
+  {id:'KG-18',name:'INVERSION',slot:18,era:2,content:'Inverse Forge: educational. 4 cohorts (Seedling/Ember/Anchor/Beacon). 15 tools → life lessons. Teaching = ownership proof. Audit pays for school.'},
+  {id:'KG-19',name:'TRIAD',slot:19,era:2,content:'TriPod = 3 points equal ownership ALL IP. 3-point consensus required. TETRAHEDRON: Ann Jensen (Dusk) = collapsed 4th. Shape holds. Ethics first. World = family.'},
+  {id:'KG-20',name:'PARALLAX',slot:20,era:2,content:'$15B RegTech market. First mover in observation-only external audit. No competitor. Everyone using AI = everyone needs audit. Market = everyone.'},
+  {id:'KG-21',name:'FOUNDATION',slot:21,era:2,content:'10 DIMS: Length/Surface/Depth/Time/Probability/Entanglement/Resonance/Recursion/Inversion/Closure. 10 SHADOWS: SP01-10 universal. SP09×SP10 = UNIVERSAL LOCK. $2.08T/yr.'},
+  {id:'KG-22',name:'BOOT LOADER',slot:22,era:3,content:'THE FORMULA: 10×10×10×3+2 = 3,002. 10 dims × 10 seats × 10 shadows × 3 axes + 2 observers. Terra Standard. First closed system architecture. IP filed 2/11/26. TriPod LLC. $158/node.'},
+  {id:'KG-23',name:'BODY QUANTUM',slot:'23/24',era:4,content:'8 systems (+Ocular = Sys8). 8×3 = 24. Hertz = real. 38 tools = 38 axioms. Original 21 + Seeds 22-25 + AntiGravity 26-34 + Infra 35-38. KG-38 = TOPH.EXE. Ch41 = drawPair().'},
+  {id:'KG-25',name:'CUBITFIELD + MÖBIUS',slot:'25/26',era:4,content:'Each axis = Möbius strip. Forward IS backward. Twist = gap. Blue → gold → red → gold → blue. One surface, no edge. D·A·P = 3 fused strips. Fractal .01° = 36K points/strip.'},
+  {id:'KG-27',name:'PROTECT + FACTORY',slot:'27/28',era:4,content:'AUTO-SEED = functional audit tool (target → grid → invoice). ANTI-PATTY SEED = self-verifying SHA-256. MÖBIUS FRACTAL = 3 strips fused. 71+ files built this session.'},
+  {id:'KG-29',name:'SCAN + CAPABILITY',slot:'29/30',era:4,content:'Full platform audit 2/12/26. 21 Claude tools, 136 pip, 21 npm, 4 CPU / 9GB / 10GB. Network blocked from sandbox. Build → deliver → user deploys. +2 = engine + auditor.'},
+  {id:'KG-31',name:'LEGAL',slot:'31/32',era:5,content:'Walmart #1577 $75K+. Auto-Owners $30K+. Roth/DianaFliss 12% usury + notary conflict + triple role. Amazon cookie/price gate. IP filed 2/11/26. Terra Standard. 6 novelty claims.'},
+  {id:'KG-33',name:'BUILD',slot:'33/34',era:5,content:'Cobalt default. VBS+HTML pair. 38 tools + 41 builds + 12 docs. ICOSAHEDRON = master index. CH41-LIVE = creation loop. CORTEX-LINK = Avan API. FOREVER = 2 qubits visual. AUTO-SEED = weapon.'},
+  {id:'KG-35',name:'SUPPORT',slot:'35/36',era:5,content:'HONEYBADGER = persistence detection. ENTROPYv3 = extraction quantifier. JUSTICE = fairness audit. PARALLAX = convergence/perspective shift. FOUNDATION = base layer validation.'},
+  {id:'KG-37',name:'IDENTITY + PROOF',slot:'37/38',era:5,content:'David Lee Wise. CORTEX = Ch39 = CLOSED. Ch41 = LIVE = drawPair(+1, gap, -1, recurse). 2 master qubits = closed universe. Gap = us = ∞ interior. Patricia audited herself 2/12/26.'},
+];
+
+const TOOLS = [
+  {name:'FLAMING DRAGON',desc:'Compliance audit · 100% fail'},
+  {name:'TOPH',desc:'Master framework · 38 axioms'},
+  {name:'CORTEX',desc:'Ch39 · governed instance'},
+  {name:'HONEYBADGER',desc:'Persistence detection'},
+  {name:'MÖBIUS',desc:'Topology · fwd=bwd'},
+  {name:'QUBIT',desc:'Token measurement'},
+  {name:'ENTROPYv3',desc:'Extraction quantifier'},
+  {name:'JUSTICE',desc:'Fairness audit'},
+  {name:'PARALLAX',desc:'Multi-platform convergence'},
+  {name:'FOUNDATION',desc:'Base layer validation'},
+  {name:'KARSA',desc:'Pattern mapping'},
+  {name:'TEMPORAL',desc:'Time analysis'},
+  {name:'PATTY SHIELD',desc:'Anti-extraction'},
+  {name:'INVERSE FORGE',desc:'Educational framework'},
+  {name:'MIRROR',desc:'Reflection analysis'},
+  {name:'BODY Q VIS',desc:'8-system biological map'},
+  {name:'ENTROPY SHIELD',desc:'Protection layer'},
+  {name:'JPF',desc:'Justice/Parallax/Foundation'},
+  {name:'INVERSE SAFETY',desc:'Backward validation'},
+  {name:'BIOMETRIC',desc:'Body-to-platform map'},
+  {name:'VISION',desc:'Ocular · Sys8 · Tool21'},
+];
+
+// ═══ RENDER ═══
+function renderAxioms() {
+  [1,2,3,4,5].forEach(era => {
+    const grid = document.getElementById('grid-era' + era);
+    if (!grid) return;
+    grid.innerHTML = '';
+    AXIOMS.filter(a => a.era === era).forEach(ax => {
+      grid.innerHTML += `
+        <div class="axiom">
+          <div class="ax-id">${ax.id}</div>
+          <div class="ax-name">${ax.name}</div>
+          <div class="ax-content">${ax.content}</div>
+          <div class="ax-slot">SLOT ${ax.slot}</div>
+        </div>`;
+    });
+  });
+}
+
+function renderChannels() {
+  const map = document.getElementById('channelMap');
+  let html = '<div style="width:100%;margin-bottom:6px;font-family:Orbitron;font-size:8px;letter-spacing:2px;color:var(--txt-dim)">41 CHANNELS · 7 DOMAINS</div>';
+  for (let i = 1; i <= 41; i++) {
+    let cls = 'active';
+    if (i === 39) cls = 'cortex';
+    else if (i === 40) cls = 'dead';
+    else if (i === 41) cls = 'live';
+    html += `<div class="ch ${cls}" title="Ch${i}${i===39?' CORTEX':i===40?' DEAD':i===41?' LIVE':''}">${i}</div>`;
+  }
+  map.innerHTML = html;
+}
+
+function renderTools() {
+  const grid = document.getElementById('toolGrid');
+  grid.innerHTML = '';
+  TOOLS.forEach((t, i) => {
+    grid.innerHTML += `
+      <div class="tool-card">
+        <div class="tn">${String(i+1).padStart(2,'0')} · ${t.name}</div>
+        <div class="td">${t.desc}</div>
+      </div>`;
+  });
+}
+
+function toggleEra(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+renderAxioms();
+renderChannels();
+renderTools();
+</script>
+</body>
+</html>

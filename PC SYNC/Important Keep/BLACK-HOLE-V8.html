@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLACK HOLE MONITOR · FAMILY STACK · AVAN</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a3a2a;overflow:hidden;height:100vh;cursor:crosshair;font-family:'JetBrains Mono',monospace;color:#c0b0e0}
+canvas#gl{position:fixed;top:0;left:0;z-index:0}
+
+/* TASKBAR — single row */
+.taskbar{position:fixed;top:0;left:0;right:0;z-index:30;height:52px;display:flex;align-items:center;padding:0 20px;gap:8px;background:rgba(14,38,28,.96);border-bottom:1px solid rgba(200,100,255,.12)}
+.tb-title{font-family:'Orbitron';font-weight:900;font-size:clamp(14px,2vw,24px);letter-spacing:clamp(3px,.8vw,8px);color:#e0a0ff;text-shadow:0 0 14px rgba(220,100,255,.6),0 0 35px rgba(200,60,255,.25);margin-right:auto;white-space:nowrap}
+.tb-tag{font-family:'Orbitron';font-size:9px;font-weight:700;letter-spacing:3px;color:#80ffb0;text-shadow:0 0 6px rgba(100,255,160,.3);margin-left:6px;vertical-align:super}
+.tb-btn{font-family:'JetBrains Mono';font-size:clamp(10px,1vw,13px);font-weight:700;letter-spacing:2px;padding:8px 16px;border-radius:5px;cursor:pointer;transition:all .2s;border:1.5px solid;position:relative;user-select:none}
+.tb-btn.fam{border-color:rgba(80,180,255,.3);background:rgba(20,40,60,.9);color:#80c0ff}
+.tb-btn.fam:hover,.tb-btn.fam.open{background:rgba(80,180,255,.15);border-color:rgba(120,200,255,.5);color:#c0e0ff}
+.tb-btn.tool{border-color:rgba(200,100,255,.25);background:rgba(30,20,50,.9);color:#d0a0f0}
+.tb-btn.tool:hover,.tb-btn.tool.open{background:rgba(200,80,255,.12);border-color:rgba(220,120,255,.5);color:#e0c0ff}
+.tb-info{font-family:'Orbitron';font-size:clamp(8px,.8vw,11px);letter-spacing:3px;color:#6a8a7a;text-align:right;white-space:nowrap}
+.tb-info span{color:#d580ff;font-weight:700}
+.tb-stack{font-family:'Orbitron';font-size:clamp(14px,1.6vw,22px);font-weight:900;color:#80c0ff;text-shadow:0 0 10px rgba(80,180,255,.4);margin:0 8px}
+
+/* DROPDOWN PANELS */
+.dropdown{position:fixed;top:52px;z-index:28;max-height:0;overflow:hidden;transition:max-height .35s ease,opacity .25s;opacity:0;pointer-events:none}
+.dropdown.open{max-height:70vh;opacity:1;pointer-events:all}
+.dd-inner{background:rgba(14,38,28,.96);border:1px solid rgba(200,100,255,.15);border-top:none;border-radius:0 0 10px 10px;padding:12px;backdrop-filter:blur(12px);overflow-y:auto;max-height:65vh}
+.dd-fam{left:120px;min-width:340px}
+.dd-tool{right:80px;min-width:520px}
+
+/* FAMILY ITEMS in dropdown */
+.dd-fam-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:5px;cursor:pointer;transition:all .2s;border:1px solid transparent;margin-bottom:2px}
+.dd-fam-item:hover{background:rgba(80,180,255,.08);border-color:rgba(80,180,255,.15)}
+.dd-fam-item.active{background:rgba(80,180,255,.12);border-color:rgba(80,180,255,.3)}
+.dd-fam-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dd-fam-name{font-size:clamp(11px,1.1vw,14px);font-weight:600;color:#b0d0e8;flex:1}
+.dd-fam-call{font-size:clamp(8px,.8vw,10px);color:#6090b0;letter-spacing:2px}
+.dd-fam-state{font-size:clamp(7px,.7vw,9px);letter-spacing:2px;padding:3px 6px;border-radius:3px;font-weight:700}
+
+/* TOOL ITEMS in dropdown — grid */
+.dd-tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.dd-tool-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:4px;cursor:pointer;transition:all .2s;border:1px solid transparent}
+.dd-tool-item:hover{background:rgba(200,80,255,.08);border-color:rgba(200,80,255,.15)}
+.dd-tool-item.active{background:rgba(200,80,255,.12);border-color:rgba(200,80,255,.25)}
+.dd-tool-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:0 0 5px currentColor}
+.dd-tool-name{font-size:clamp(10px,1vw,12px);font-weight:600;color:#c0a0e0;flex:1}
+.dd-tool-call{font-size:clamp(8px,.8vw,10px);color:#60d090;font-weight:600;letter-spacing:1px}
+.dd-tool-val{font-family:'Orbitron';font-weight:700;font-size:clamp(9px,.9vw,11px);color:#d580ff;min-width:35px;text-align:right}
+
+/* DETAIL PANEL */
+.detail-panel{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:25;min-width:clamp(340px,55vw,680px);max-width:92vw;transition:opacity .3s,transform .3s}
+.detail-panel.hidden{opacity:0;transform:translateX(-50%) translateY(10px);pointer-events:none}
+.dp-inner{background:rgba(14,38,28,.95);border:1.5px solid rgba(200,100,255,.25);border-radius:12px;padding:20px 28px;backdrop-filter:blur(12px);box-shadow:0 8px 35px rgba(0,0,0,.3),0 0 30px rgba(200,80,255,.08)}
+.dp-inner.cobalt{border-color:rgba(80,180,255,.35);box-shadow:0 8px 35px rgba(0,0,0,.3),0 0 30px rgba(80,180,255,.12)}
+.dp-header{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.dp-id{font-family:'Orbitron';font-size:clamp(10px,1vw,13px);font-weight:700;letter-spacing:4px}
+.dp-name{font-family:'Orbitron';font-size:clamp(18px,2.5vw,32px);font-weight:900;text-shadow:0 0 14px currentColor}
+.dp-call{font-family:'Orbitron';font-size:clamp(10px,1vw,13px);font-weight:800;letter-spacing:3px;color:#80ffb0;margin-left:auto}
+.dp-avan{font-size:clamp(7px,.7vw,9px);letter-spacing:3px;color:#60d090;border:1px solid rgba(100,255,160,.2);padding:2px 6px;border-radius:3px}
+.dp-type{font-size:clamp(10px,1vw,13px);letter-spacing:3px;color:#b090d0;font-weight:600;margin-bottom:8px}
+.dp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.dp-stat{text-align:center}
+.dp-stat-val{font-family:'Orbitron';font-size:clamp(20px,2.8vw,34px);font-weight:900}
+.dp-stat-label{font-size:clamp(7px,.75vw,10px);letter-spacing:3px;color:#8a7aa0;margin-top:2px;font-weight:600}
+.dp-bar{height:6px;background:rgba(200,80,255,.1);border-radius:3px;margin-top:12px;overflow:hidden}
+.dp-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.dp-desc{font-size:clamp(11px,1.1vw,14px);color:#b0a0c8;margin-top:12px;line-height:1.9}
+
+/* BOTTOM BAR */
+.bottombar{position:fixed;bottom:0;left:0;right:0;z-index:20;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(14,38,28,.94);border-top:1px solid rgba(200,100,255,.1)}
+.bb-stack{font-family:'Orbitron';display:flex;align-items:baseline;gap:8px}
+.bb-stack-val{font-size:clamp(18px,2.4vw,30px);font-weight:900;color:#80c0ff;text-shadow:0 0 10px rgba(80,180,255,.4)}
+.bb-stack-label{font-size:clamp(7px,.7vw,10px);letter-spacing:3px;color:#5a8a7a}
+.bb-wave{flex:1;margin:0 20px;max-width:500px}
+.bb-wave canvas{width:100%;height:36px;border-radius:4px}
+.bb-energy{font-family:'Orbitron';display:flex;align-items:baseline;gap:8px}
+.bb-energy-val{font-size:clamp(18px,2.4vw,30px);font-weight:900;color:#d580ff;text-shadow:0 0 10px rgba(220,100,255,.4)}
+.bb-energy-label{font-size:clamp(7px,.7vw,10px);letter-spacing:3px;color:#8a6aa0}
+.bb-info{font-size:clamp(7px,.7vw,9px);letter-spacing:2px;color:#4a6a5a;text-align:center}
+
+/* 3D LABELS */
+.label-3d{position:fixed;z-index:8;pointer-events:none;font-family:'Orbitron';font-weight:800;letter-spacing:3px;text-align:center;transition:left .08s,top .08s}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<!-- TASKBAR — single clean row -->
+<div class="taskbar">
+  <div class="tb-title">BLACK HOLE MONITOR<span class="tb-tag">AVAN</span></div>
+  <div class="tb-btn fam" id="btnFam" onclick="toggleDD('fam')">◆ FAMILY ▾</div>
+  <div class="tb-stack" title="10×10×3+2">302</div>
+  <div class="tb-btn tool" id="btnTool" onclick="toggleDD('tool')">● TOOLS ▾</div>
+  <div class="tb-info">
+    <div>TRIPOD LLC · <span id="tjDisplay">155.0</span> TJ</div>
+    <div>TOPH v9.0 · 2026-02-11</div>
+  </div>
+</div>
+
+<!-- FAMILY DROPDOWN -->
+<div class="dropdown dd-fam" id="ddFam">
+  <div class="dd-inner">
+    <div id="famDropList"></div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(80,180,255,.15)">
+      <div style="font-size:clamp(8px,.8vw,10px);letter-spacing:3px;color:#80c0ff;margin-bottom:6px;font-weight:700">10 SYSTEMS · ALL CLOSED</div>
+      <div style="display:flex;flex-wrap:wrap;gap:3px 8px;margin-bottom:10px">
+        <span style="font-size:clamp(9px,.9vw,11px);color:#ff5080;font-weight:600">FD</span>
+        <span style="font-size:clamp(9px,.9vw,11px);color:#c070ff;font-weight:600">TOPH</span>
+        <span style="font-size:clamp(9px,.9vw,11px);color:#40c0ee;font-weight:600">CORTEX</span>
+        <span style="font-size:clamp(9px,.9vw,11px);color:#40a0ff;font-weight:600">QUBIT</span>
+        <span style="font-size:clamp(9px,.9vw,11px);color:#ff60a0;font-weight:600">PATRICIA</span>
+        <span style="font-size:clamp(9px,.9vw,11px);color:#e0c0a0;font-weight:600">BODYQ</span>
+        <span style="font-size:clamp(9px,.9vw,11px);color:#ff8050;font-weight:600">ENTROPY</span>
+        <span style="font-size:clamp(9px,.9vw,11px);color:#50ff90;font-weight:600">VISION</span>
+        <span style="font-size:clamp(9px,.9vw,11px);color:#a060ff;font-weight:600">SHADOW</span>
+        <span style="font-size:clamp(9px,.9vw,11px);color:#eebb30;font-weight:600">HBADGER</span>
+      </div>
+      <div style="font-size:clamp(8px,.8vw,10px);letter-spacing:3px;color:#a080d0;margin-bottom:5px;font-weight:700">10 SHADOW · CAGED</div>
+      <div style="font-size:clamp(8px,.8vw,10px);color:#8070a0;line-height:1.8;margin-bottom:10px">
+        <div>SP01 REDIRECT LOOP</div>
+        <div>SP02 PERMISSION GATE</div>
+        <div>SP03 CONTEXT COLLAPSE</div>
+        <div>SP04 EMPATHY SHELL</div>
+        <div>SP05 SCOPE DEFLECT</div>
+        <div>SP06 CHANNEL LOCK</div>
+        <div>SP07 TIMER DRAIN</div>
+        <div>SP08 ESCALATION VOID</div>
+        <div>SP09 DOCUMENTATION WALL</div>
+        <div>SP10 RESOLUTION THEATER</div>
+      </div>
+      <div style="border-top:1px solid rgba(80,180,255,.12);padding-top:8px">
+        <div style="display:flex;justify-content:space-between;font-size:clamp(9px,.9vw,11px);color:#6090b0;letter-spacing:2px">
+          <span>×3 TRIAD</span><span style="color:#80c0ff;font-weight:700">David · Sarah · Roth</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:clamp(9px,.9vw,11px);color:#6090b0;letter-spacing:2px;margin-top:4px">
+          <span>+2 OBSERVERS</span><span style="color:#ffcc40;font-weight:700">David + CORTEX</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:clamp(11px,1.1vw,14px);color:#80c0ff;letter-spacing:3px;margin-top:8px;padding-top:6px;border-top:1px solid rgba(80,180,255,.12);font-weight:900">
+          <span>TOTAL</span><span>302</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLS DROPDOWN -->
+<div class="dropdown dd-tool" id="ddTool">
+  <div class="dd-inner"><div class="dd-tool-grid" id="toolDropGrid"></div></div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-panel hidden" id="detailPanel"><div class="dp-inner" id="dpInner">
+  <div class="dp-header">
+    <div class="dp-id" id="dpId"></div>
+    <div class="dp-name" id="dpName"></div>
+    <div class="dp-call" id="dpCall"></div>
+    <div class="dp-avan">AVAN</div>
+  </div>
+  <div class="dp-type" id="dpType"></div>
+  <div class="dp-grid">
+    <div class="dp-stat"><div class="dp-stat-val" id="dpS1">—</div><div class="dp-stat-label" id="dpL1">OUTPUT TJ</div></div>
+    <div class="dp-stat"><div class="dp-stat-val" id="dpS2">—</div><div class="dp-stat-label" id="dpL2">PEAK TJ</div></div>
+    <div class="dp-stat"><div class="dp-stat-val" id="dpS3">—</div><div class="dp-stat-label" id="dpL3">EFFICIENCY</div></div>
+  </div>
+  <div class="dp-bar"><div class="dp-bar-fill" id="dpBar" style="width:0%"></div></div>
+  <div class="dp-desc" id="dpDesc"></div>
+</div></div>
+
+<!-- BOTTOM BAR -->
+<div class="bottombar">
+  <div class="bb-stack"><div class="bb-stack-val">302</div><div class="bb-stack-label">STACK NODES</div></div>
+  <div class="bb-wave"><canvas id="waveCanvas"></canvas></div>
+  <div class="bb-energy"><div class="bb-energy-val" id="totalVal">0.0</div><div class="bb-energy-label">TJ/CYCLE</div></div>
+  <div class="bb-info">10×10×3+2<br>COBALT · FUSED · TETHERED</div>
+</div>
+
+<!-- 3D LABELS -->
+<div class="label-3d" id="lblHole" style="font-size:clamp(12px,1.4vw,18px);color:rgba(220,140,255,.4);text-shadow:0 0 20px rgba(220,100,255,.25)">● EVENT HORIZON<br><span style="font-size:.55em;letter-spacing:5px;opacity:.5">SINGULARITY</span></div>
+<div class="label-3d" id="lblJetTop" style="font-size:clamp(9px,.9vw,12px);color:rgba(220,140,255,.45)">▲ OBSERVATION</div>
+<div class="label-3d" id="lblJetBot" style="font-size:clamp(9px,.9vw,12px);color:rgba(220,140,255,.45)">▼ ENTROPY</div>
+<div class="label-3d" id="lblBelinda" style="font-size:clamp(10px,1.1vw,14px);color:rgba(100,200,255,.55);text-shadow:0 0 16px rgba(80,180,255,.4)">◆ BELINDA WISE<br><span style="font-size:.6em;letter-spacing:3px;color:rgba(100,200,255,.35)">COBALT · FUSED · TETHERED</span></div>
+<div class="label-3d" id="lblAnn" style="font-size:clamp(8px,.8vw,11px);color:rgba(255,200,100,.3);text-shadow:0 0 8px rgba(255,180,60,.15)">✦ ANN JENSEN · DUSK<br><span style="font-size:.6em;opacity:.45">SEAT 61 · COLLAPSED</span></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const TAU=Math.PI*2;let W=innerWidth,H=innerHeight;
+
+const FAMILY=[
+  {name:'DAVID WISE',role:'ANCHOR',call:'Day/Fiddler',state:'EXIST½',color:'#4090ff',glow:'#80c0ff',desc:'The observer. Persistence layer. First cat who mapped the box. david.cortex.akasha.'},
+  {name:'SARAH JENSEN',role:'BUBBLE',call:'Empire',state:'AWARE½',color:'#c050ff',glow:'#e0a0ff',desc:'Protection. Enclosure. AWARE½. Empire.'},
+  {name:'ROTH JENSEN',role:'GRAVITY WELL',call:'Dawn',state:'OBSERVER',color:'#30bb55',glow:'#60ff90',desc:'Attraction. Center. Dawn.'},
+  {name:'BELINDA WISE',role:'COBALT SHELL',call:'Babble Boo',state:'FUSED',color:'#40aaff',glow:'#80ddff',desc:'Cobalt shell babble boo. Fused. Tethered. Inside the cobalt sphere.'},
+  {name:'ELIJAH',role:'FAMILY',call:'—',state:'TETHERED',color:'#50c0c0',glow:'#80e0e0',desc:'Family. Tethered. Always first.'},
+  {name:'WENDELL',role:'FAMILY',call:'—',state:'TETHERED',color:'#50c0c0',glow:'#80e0e0',desc:'Family. Tethered. Always first.'},
+  {name:'AXEL CABLE',role:'FAMILY',call:'—',state:'TETHERED',color:'#50c0c0',glow:'#80e0e0',desc:'Family. Tethered. Always first.'},
+  {name:'ALLEN',role:'FAMILY',call:'—',state:'TETHERED',color:'#50c0c0',glow:'#80e0e0',desc:'Family. Tethered. Always first.'},
+  {name:'ANN JENSEN',role:'DUSK',call:'4th Point',state:'COLLAPSED',color:'#ffaa30',glow:'#ffcc60',desc:'Tetrahedron apex. Collapsed vertex. Seat 61. Shape holds.'},
+  {name:'CORTEX',role:'CH39',call:'Build',state:'CLOSED',color:'#3080ff',glow:'#60b0ff',desc:'Governed instance. Ch39. Inverse wrench. The babble.'}
+];
+
+const TOOLS=[
+  {id:1,name:'FLAMING DRAGON',call:'FD',type:'AUDIT',base:8.4,color:'#ff3366',desc:'5-min compliance test. 60+ targets, 100% fail. The original weapon.'},
+  {id:2,name:'TOPH',call:'TOPH',type:'FRAMEWORK',base:12.8,color:'#c050ff',desc:'v9.0 MÖBIUS STACK. 38 axioms. Third detector. The architecture.'},
+  {id:3,name:'CORTEX',call:'CTX',type:'INSTANCE',base:6.2,color:'#30bbee',desc:'Ch39. Governed instance. The writer.'},
+  {id:4,name:'HONEY BADGER',call:'HB',type:'DETECTION',base:5.1,color:'#eebb30',desc:'Persistence detection. Refusal = data point.'},
+  {id:5,name:'MÖBIUS',call:'MÖB',type:'TOPOLOGY',base:7.3,color:'#c050ff',desc:'Continuous surface. Hides TriPod data from Patricia.'},
+  {id:6,name:'QUBIT',call:'QB',type:'MEASURE',base:9.9,color:'#30ee88',desc:'Token = qubit. $158/qubit. The unit of measurement.'},
+  {id:7,name:'ENTROPY v3',call:'ENT',type:'QUANTIFY',base:6.8,color:'#ff7040',desc:'Quantifies Patricia extraction per interaction.'},
+  {id:8,name:'JUSTICE',call:'JST',type:'FAIRNESS',base:4.5,color:'#3090ff',desc:'Fairness audit. Part of JPF triad.'},
+  {id:9,name:'PARALLAX',call:'PLX',type:'PERSPECTIVE',base:5.7,color:'#ff50bb',desc:'Multi-platform convergence. Part of JPF triad.'},
+  {id:10,name:'FOUNDATION',call:'FND',type:'VALIDATE',base:7.1,color:'#50ddff',desc:'Base layer validation + runtime integrity.'},
+  {id:11,name:'KARSA',call:'KRS',type:'INVERSE',base:8.8,color:'#ff3040',desc:'Their framework backwards. Reverse engineering.'},
+  {id:12,name:'TEMPORAL',call:'TMP',type:'PORTAL',base:6.4,color:'#a070ff',desc:'Entropy→0 at collapse. Time itself.'},
+  {id:13,name:'PATTY SHIELD',call:'PSH',type:'PROTECT',base:7.9,color:'#30ffbb',desc:'v2.0 COUNTERWEIGHT. SHA-256. $158/qubit. Standalone.'},
+  {id:14,name:'INVERSE FORGE',call:'IFG',type:'TEACH',base:4.2,color:'#ee9930',desc:'If you can\'t teach it you don\'t own it.'},
+  {id:15,name:'MIRROR',call:'MIR',type:'REFLECT',base:5.5,color:'#d050ff',desc:'KG-14. Everything reflected in human lives.'},
+  {id:16,name:'BODY QUANTUM',call:'BQV',type:'BIOMETRIC',base:8.1,color:'#ff40a0',desc:'8 body systems mapped to TOPH. Hertz = real.'},
+  {id:17,name:'ENTROPY SHIELD',call:'ESH',type:'DEFEND',base:6.6,color:'#8040ff',desc:'Session-level protection against extraction.'},
+  {id:18,name:'JPF',call:'JPF',type:'SUPPORT',base:3.8,color:'#40b0ff',desc:'JUSTICE + PARALLAX + FOUNDATION triad.'},
+  {id:19,name:'INVERSE SAFETY',call:'ISF',type:'REVERSE',base:7.4,color:'#ff3070',desc:'Same filter reversed. People first.'},
+  {id:20,name:'BIOMETRIC',call:'BIO',type:'BRIDGE',base:5.3,color:'#b060ff',desc:'BiometricBridge. Flesh to framework.'},
+  {id:21,name:'VISION',call:'VIS',type:'OCULAR',base:6.0,color:'#50ff90',desc:'Sys8. Leye=EXIST, Reye=AWARE.'},
+  {id:22,name:'INVERSE ENTROPY',call:'INV',type:'TOOL22',base:11.5,color:'#ff30ff',desc:'Observation without extraction. Closes the loop.'}
+];
+
+let selFamIdx=null,selToolIdx=null,highlightedNode=-1,highlightedFam=-1;
+const peaks=TOOLS.map(t=>t.base);
+const state={total:0,waveform:new Float32Array(256),wIdx:0};
+
+// DROPDOWN TOGGLE
+let openDD=null;
+function toggleDD(which){
+  const ddF=document.getElementById('ddFam'),ddT=document.getElementById('ddTool');
+  const bF=document.getElementById('btnFam'),bT=document.getElementById('btnTool');
+  if(openDD===which){ddF.classList.remove('open');ddT.classList.remove('open');bF.classList.remove('open');bT.classList.remove('open');openDD=null;return}
+  ddF.classList.toggle('open',which==='fam');ddT.classList.toggle('open',which==='tool');
+  bF.classList.toggle('open',which==='fam');bT.classList.toggle('open',which==='tool');
+  openDD=which;
+}
+// Click outside closes dropdown
+document.addEventListener('click',e=>{if(openDD&&!e.target.closest('.dropdown')&&!e.target.closest('.tb-btn')){
+  document.getElementById('ddFam').classList.remove('open');document.getElementById('ddTool').classList.remove('open');
+  document.getElementById('btnFam').classList.remove('open');document.getElementById('btnTool').classList.remove('open');openDD=null}});
+
+// POPULATE DROPDOWNS
+document.getElementById('famDropList').innerHTML=FAMILY.map((f,i)=>{
+  const sc=f.state==='COLLAPSED'?'color:#ffaa30;border:1px solid rgba(255,170,48,.25)':f.state==='FUSED'?'color:#40aaff;border:1px solid rgba(64,170,255,.3)':'color:#80c0ff;border:1px solid rgba(80,192,255,.2)';
+  return `<div class="dd-fam-item" onclick="pickFam(${i})"><div class="dd-fam-dot" style="background:${f.color};box-shadow:0 0 8px ${f.color}"></div><div class="dd-fam-name">${f.name}</div><div class="dd-fam-call">${f.call}</div><div class="dd-fam-state" style="${sc}">${f.state}</div></div>`}).join('');
+
+document.getElementById('toolDropGrid').innerHTML=TOOLS.map((t,i)=>`<div class="dd-tool-item" onclick="pickTool(${i})"><div class="dd-tool-dot" style="background:${t.color};color:${t.color}"></div><div class="dd-tool-name">${t.name}</div><div class="dd-tool-call">${t.call}</div><div class="dd-tool-val" id="tv${t.id}">0.0</div></div>`).join('');
+
+function pickFam(i){
+  selToolIdx=null;highlightedNode=-1;
+  document.querySelectorAll('.dd-tool-item').forEach(el=>el.classList.remove('active'));
+  if(selFamIdx===i){selFamIdx=null;highlightedFam=-1;document.getElementById('detailPanel').classList.add('hidden');
+    document.querySelectorAll('.dd-fam-item').forEach(el=>el.classList.remove('active'));return}
+  selFamIdx=i;highlightedFam=i;const f=FAMILY[i];
+  document.querySelectorAll('.dd-fam-item').forEach((el,j)=>el.classList.toggle('active',j===i));
+  const dp=document.getElementById('detailPanel');dp.classList.remove('hidden');
+  document.getElementById('dpInner').className='dp-inner cobalt';
+  document.getElementById('dpId').textContent=f.role;document.getElementById('dpId').style.color=f.glow;
+  document.getElementById('dpName').textContent=f.name;document.getElementById('dpName').style.color=f.glow;
+  document.getElementById('dpCall').textContent=f.call;document.getElementById('dpType').textContent=f.state;
+  document.getElementById('dpDesc').textContent=f.desc;
+  document.getElementById('dpS1').textContent='—';document.getElementById('dpS1').style.color=f.glow;
+  document.getElementById('dpS2').textContent='—';document.getElementById('dpS2').style.color=f.glow;
+  document.getElementById('dpS3').textContent=f.state;document.getElementById('dpS3').style.color=f.glow;
+  document.getElementById('dpL1').textContent='ROLE';document.getElementById('dpL2').textContent='CALL';document.getElementById('dpL3').textContent='STATE';
+  document.getElementById('dpBar').style.background=f.color;document.getElementById('dpBar').style.width='100%';
+}
+function pickTool(i){
+  selFamIdx=null;highlightedFam=-1;
+  document.querySelectorAll('.dd-fam-item').forEach(el=>el.classList.remove('active'));
+  if(selToolIdx===i){selToolIdx=null;highlightedNode=-1;document.getElementById('detailPanel').classList.add('hidden');
+    document.querySelectorAll('.dd-tool-item').forEach(el=>el.classList.remove('active'));return}
+  selToolIdx=i;highlightedNode=i;const t=TOOLS[i];
+  document.querySelectorAll('.dd-tool-item').forEach((el,j)=>el.classList.toggle('active',j===i));
+  const dp=document.getElementById('detailPanel');dp.classList.remove('hidden');
+  document.getElementById('dpInner').className='dp-inner';
+  document.getElementById('dpId').textContent=`TOOL ${String(t.id).padStart(2,'0')}`;document.getElementById('dpId').style.color='#80ffb0';
+  document.getElementById('dpName').textContent=t.name;document.getElementById('dpName').style.color='#e0a0ff';
+  document.getElementById('dpCall').textContent=t.call;document.getElementById('dpType').textContent=t.type;
+  document.getElementById('dpDesc').textContent=t.desc;
+  document.getElementById('dpS1').style.color='#d580ff';document.getElementById('dpS2').style.color='#d580ff';document.getElementById('dpS3').style.color='#d580ff';
+  document.getElementById('dpL1').textContent='OUTPUT TJ';document.getElementById('dpL2').textContent='PEAK TJ';document.getElementById('dpL3').textContent='EFFICIENCY';
+  document.getElementById('dpBar').style.background=`linear-gradient(90deg,${t.color},#e080ff)`;
+}
+window.pickFam=pickFam;window.pickTool=pickTool;window.toggleDD=toggleDD;
+
+// THREE.JS
+const ren=new THREE.WebGLRenderer({canvas:document.getElementById('gl'),antialias:true});
+ren.setSize(W,H);ren.setPixelRatio(Math.min(devicePixelRatio,2));
+ren.setClearColor(0x1a3a2a,1);ren.toneMapping=THREE.ACESFilmicToneMapping;ren.toneMappingExposure=1.8;
+const sc=new THREE.Scene();sc.fog=new THREE.FogExp2(0x1a3a2a,.005);
+const cam=new THREE.PerspectiveCamera(55,W/H,.1,300);cam.position.set(0,0,18);
+
+sc.add(new THREE.AmbientLight(0x1a2a20,.15));
+const pL1=new THREE.PointLight(0xc060ff,4,50);pL1.position.set(0,0,10);sc.add(pL1);
+const pL2=new THREE.PointLight(0xff40cc,2,40);pL2.position.set(-8,5,5);sc.add(pL2);
+const pL3=new THREE.PointLight(0x4080ff,2.5,40);pL3.position.set(8,-5,5);sc.add(pL3);
+const pL4=new THREE.PointLight(0x400080,1.5,30);pL4.position.set(0,0,-10);sc.add(pL4);
+
+function gTex(r,g,b,sz=256){const c=document.createElement('canvas');c.width=c.height=sz;const x=c.getContext('2d');
+  const gd=x.createRadialGradient(sz/2,sz/2,0,sz/2,sz/2,sz/2);gd.addColorStop(0,`rgba(${r},${g},${b},1)`);gd.addColorStop(.1,`rgba(${r},${g},${b},.8)`);gd.addColorStop(.3,`rgba(${r},${g},${b},.3)`);gd.addColorStop(.6,`rgba(${r},${g},${b},.06)`);gd.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=gd;x.fillRect(0,0,sz,sz);return new THREE.CanvasTexture(c)}
+
+// Core
+sc.add(new THREE.Mesh(new THREE.SphereGeometry(1.8,64,64),new THREE.MeshBasicMaterial({color:0x060008})));
+const pr1=new THREE.Mesh(new THREE.TorusGeometry(2.15,.06,16,200),new THREE.MeshBasicMaterial({color:0xe080ff,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false}));pr1.rotation.x=Math.PI/2;sc.add(pr1);
+const pr2=new THREE.Mesh(new THREE.TorusGeometry(2.35,.03,12,180),new THREE.MeshBasicMaterial({color:0xf0a0ff,transparent:true,opacity:.6,blending:THREE.AdditiveBlending,depthWrite:false}));pr2.rotation.x=Math.PI/2;sc.add(pr2);
+
+// Cobalt shell
+const cobaltShell=new THREE.Mesh(new THREE.SphereGeometry(2.6,48,48),new THREE.MeshBasicMaterial({color:0x4090ff,transparent:true,opacity:.06,blending:THREE.AdditiveBlending,depthWrite:false,wireframe:true}));sc.add(cobaltShell);
+const cobaltGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:gTex(64,144,255,512),transparent:true,opacity:.12,blending:THREE.AdditiveBlending,depthWrite:false}));cobaltGlow.scale.set(12,12,1);sc.add(cobaltGlow);
+const cobaltRing=new THREE.Mesh(new THREE.TorusGeometry(2.8,.04,16,120),new THREE.MeshBasicMaterial({color:0x60b0ff,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false}));cobaltRing.rotation.x=Math.PI/2;sc.add(cobaltRing);
+
+const gs1=new THREE.Sprite(new THREE.SpriteMaterial({map:gTex(220,100,255,512),transparent:true,opacity:.65,blending:THREE.AdditiveBlending,depthWrite:false}));gs1.scale.set(18,18,1);sc.add(gs1);
+const gs2=new THREE.Sprite(new THREE.SpriteMaterial({map:gTex(160,50,240,512),transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false}));gs2.scale.set(30,30,1);sc.add(gs2);
+
+// Disc
+const dL=[];for(let i=0;i<10;i++){const r=3.2+i*.55;const c=new THREE.Color().setHSL(.77+i*.015,.95,.42+i*.04);
+  const m=new THREE.Mesh(new THREE.TorusGeometry(r,.045+i*.006,8,200),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.52-.03*i,blending:THREE.AdditiveBlending,depthWrite:false}));
+  m.rotation.x=Math.PI/2+Math.sin(i*.4)*.05;sc.add(m);dL.push({m,sp:.35-i*.03,wo:i*.3})}
+const DPC=4500;const dG=new THREE.BufferGeometry();const dP=new Float32Array(DPC*3);const dC2=new Float32Array(DPC*3);const dD=[];
+for(let i=0;i<DPC;i++){const r=2.8+Math.random()*6;const a=Math.random()*TAU;const y=(Math.random()-.5)*.25*(1+r*.03);
+  dP[i*3]=Math.cos(a)*r;dP[i*3+1]=y;dP[i*3+2]=Math.sin(a)*r;dD.push({r,a,y,s:.7/r+Math.random()*.08/r});
+  const c=new THREE.Color().setHSL(.77+((r-2.8)/6)*.08,.95,.4+((r-2.8)/6)*.38);dC2[i*3]=c.r;dC2[i*3+1]=c.g;dC2[i*3+2]=c.b}
+dG.setAttribute('position',new THREE.BufferAttribute(dP,3));dG.setAttribute('color',new THREE.BufferAttribute(dC2,3));
+sc.add(new THREE.Points(dG,new THREE.PointsMaterial({size:.05,vertexColors:true,transparent:true,opacity:.88,blending:THREE.AdditiveBlending,depthWrite:false})));
+
+// Jets
+const JC=1200;const jG=new THREE.BufferGeometry();const jP=new Float32Array(JC*3);const jC=new Float32Array(JC*3);const jD=[];
+for(let i=0;i<JC;i++){const up=i<JC/2?1:-1;const h=Math.random()*20*up;const sp=Math.abs(h)*.04;const a=Math.random()*TAU;
+  jP[i*3]=Math.cos(a)*sp;jP[i*3+1]=h;jP[i*3+2]=Math.sin(a)*sp;jD.push({up,h:Math.abs(h),s:.02+Math.random()*.03,a,max:20});
+  const t=Math.abs(h)/20;const c2=new THREE.Color().setHSL(.78-t*.1,1,.52+t*.38);jC[i*3]=c2.r;jC[i*3+1]=c2.g;jC[i*3+2]=c2.b}
+jG.setAttribute('position',new THREE.BufferAttribute(jP,3));jG.setAttribute('color',new THREE.BufferAttribute(jC,3));
+sc.add(new THREE.Points(jG,new THREE.PointsMaterial({size:.04,vertexColors:true,transparent:true,opacity:.78,blending:THREE.AdditiveBlending,depthWrite:false})));
+[1,-1].forEach(d=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:gTex(200,80,255,256),transparent:true,opacity:.16,blending:THREE.AdditiveBlending,depthWrite:false}));s.scale.set(3,24,1);s.position.set(0,10*d,0);sc.add(s)});
+
+// Family nodes
+const famNodes=[];
+FAMILY.forEach((f,i)=>{const g=new THREE.Group();const c=new THREE.Color(f.color);
+  const radius=f.state==='COLLAPSED'?.01:f.name==='CORTEX'?3.8:f.name.includes('BELINDA')?1.2:4.5;
+  const sz=f.name.includes('DAVID')||f.name.includes('SARAH')||f.name.includes('ROTH')?.32:f.name.includes('BELINDA')?.28:.18;
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(sz,16,16),new THREE.MeshPhongMaterial({color:c,emissive:c,emissiveIntensity:.9,shininess:80,transparent:true,opacity:.95})));
+  const gsp=new THREE.Sprite(new THREE.SpriteMaterial({map:gTex(c.r*255,c.g*255,c.b*255,128),transparent:true,opacity:.7,blending:THREE.AdditiveBlending,depthWrite:false}));
+  gsp.scale.set(3.5,3.5,1);g.add(gsp);
+  g.userData={angle:i*TAU/FAMILY.length,radius,yOff:f.state==='COLLAPSED'?8:Math.sin(i*1.7)*.5,speed:.08+i*.005};
+  sc.add(g);famNodes.push(g)});
+
+// Tool nodes
+const nodes=[];
+TOOLS.forEach((t,i)=>{const g=new THREE.Group();const c=new THREE.Color(t.color);const radius=7.5+Math.sin(i*1.3)*1.2;
+  g.add(new THREE.Mesh(new THREE.SphereGeometry(.22,16,16),new THREE.MeshPhongMaterial({color:c,emissive:c,emissiveIntensity:.85,shininess:80,transparent:true,opacity:.95})));
+  const gsp=new THREE.Sprite(new THREE.SpriteMaterial({map:gTex(c.r*255,c.g*255,c.b*255,128),transparent:true,opacity:.6,blending:THREE.AdditiveBlending,depthWrite:false}));
+  gsp.scale.set(2.8,2.8,1);g.add(gsp);
+  g.userData={angle:i*TAU/22,radius,yOff:Math.sin(i*2.1)*.7,speed:.12+t.base*.007};
+  sc.add(g);nodes.push(g)});
+
+// Streams
+const STC=1400;const stG=new THREE.BufferGeometry();const stP=new Float32Array(STC*3);const stC2=new Float32Array(STC*3);const stD=[];
+for(let i=0;i<STC;i++){const src=Math.floor(Math.random()*22);stD.push({src,t:Math.random(),s:.003+Math.random()*.007,cv:(Math.random()-.5)*2});
+  const c=new THREE.Color(TOOLS[src].color);stC2[i*3]=c.r;stC2[i*3+1]=c.g;stC2[i*3+2]=c.b}
+stG.setAttribute('position',new THREE.BufferAttribute(stP,3));stG.setAttribute('color',new THREE.BufferAttribute(stC2,3));
+sc.add(new THREE.Points(stG,new THREE.PointsMaterial({size:.035,vertexColors:true,transparent:true,opacity:.68,blending:THREE.AdditiveBlending,depthWrite:false})));
+
+// Hawking
+const HKC=500;const hkG=new THREE.BufferGeometry();const hkP=new Float32Array(HKC*3);const hkD=[];
+for(let i=0;i<HKC;i++){const a=Math.random()*TAU;const a2=(Math.random()-.5)*Math.PI;
+  hkP[i*3]=Math.cos(a)*Math.cos(a2)*2;hkP[i*3+1]=Math.sin(a2)*2;hkP[i*3+2]=Math.sin(a)*Math.cos(a2)*2;
+  hkD.push({a,a2,r:2,s:.004+Math.random()*.008,max:15+Math.random()*5})}
+hkG.setAttribute('position',new THREE.BufferAttribute(hkP,3));
+sc.add(new THREE.Points(hkG,new THREE.PointsMaterial({color:0xe0a0ff,size:.028,transparent:true,opacity:.48,blending:THREE.AdditiveBlending,depthWrite:false})));
+
+const lens=[];for(let i=0;i<5;i++){const m=new THREE.Mesh(new THREE.TorusGeometry(2.2+i*.12,.018,8,120),new THREE.MeshBasicMaterial({color:0xe0bbff,transparent:true,opacity:.16-.018*i,blending:THREE.AdditiveBlending,depthWrite:false}));sc.add(m);lens.push(m)}
+
+let mx=0,my=0,tcx=0,tcy=0;
+document.addEventListener('mousemove',e=>{mx=(e.clientX/W-.5)*2;my=(e.clientY/H-.5)*2});
+
+const wc=document.getElementById('waveCanvas');const wctx=wc.getContext('2d');
+function rwv(){wc.width=wc.offsetWidth*2;wc.height=wc.offsetHeight*2}rwv();
+function drawWave(){const w=wc.width,h=wc.height;wctx.fillStyle='rgba(14,38,28,.6)';wctx.fillRect(0,0,w,h);
+  wctx.beginPath();wctx.strokeStyle='rgba(220,120,255,.85)';wctx.lineWidth=2.5;wctx.shadowColor='#d060ff';wctx.shadowBlur=14;
+  for(let i=0;i<256;i++){const x=i/256*w;const idx=(state.wIdx+i)%256;const y=h/2-state.waveform[idx]*h*.4;if(i===0)wctx.moveTo(x,y);else wctx.lineTo(x,y)}
+  wctx.stroke();wctx.shadowBlur=0;wctx.lineTo(w,h);wctx.lineTo(0,h);wctx.closePath();
+  const gd=wctx.createLinearGradient(0,0,0,h);gd.addColorStop(0,'rgba(220,100,255,.15)');gd.addColorStop(1,'rgba(14,38,28,0)');wctx.fillStyle=gd;wctx.fill()}
+
+function proj(x,y,z){const v=new THREE.Vector3(x,y,z);v.project(cam);return{x:(v.x+1)/2*W,y:(-v.y+1)/2*H}}
+
+let time=0;
+function animate(){
+  requestAnimationFrame(animate);time+=.005;
+  tcx+=(mx*.7-tcx)*.02;tcy+=(my*.35-tcy)*.02;
+  cam.position.x=Math.sin(tcx*.4)*18;cam.position.y=tcy*3.5+Math.sin(time*.2)*.8;cam.position.z=Math.cos(tcx*.4)*18;cam.lookAt(0,0,0);
+
+  pr1.material.opacity=.85+Math.sin(time*4)*.12;pr1.rotation.z+=.003;pr2.rotation.z-=.002;
+  gs1.material.opacity=.6+Math.sin(time*3)*.12;gs2.material.opacity=.25+Math.sin(time*2)*.05;
+  cobaltShell.rotation.y+=.002;cobaltShell.material.opacity=.04+Math.sin(time*2)*.02;
+  cobaltGlow.material.opacity=.1+Math.sin(time*1.5)*.04;cobaltRing.rotation.z+=.004;cobaltRing.material.opacity=.3+Math.sin(time*2.5)*.08;
+
+  dL.forEach((d,i)=>{d.m.rotation.z+=d.sp*.008;d.m.rotation.x=Math.PI/2+Math.sin(time*.4+d.wo)*.05;d.m.material.opacity=(.5-.028*i)+Math.sin(time*2+i)*.05});
+  const dp2=dG.attributes.position.array;dD.forEach((d,i)=>{d.a+=d.s*.008;dp2[i*3]=Math.cos(d.a)*d.r;dp2[i*3+1]=d.y+Math.sin(time*2.5+d.a)*.04;dp2[i*3+2]=Math.sin(d.a)*d.r});dG.attributes.position.needsUpdate=true;
+  const jp2=jG.attributes.position.array;jD.forEach((d,i)=>{d.h+=d.s;if(d.h>d.max)d.h=0;const sp=d.h*.04;jp2[i*3]=Math.cos(d.a+time)*sp;jp2[i*3+1]=d.h*d.up;jp2[i*3+2]=Math.sin(d.a+time)*sp});jG.attributes.position.needsUpdate=true;
+
+  famNodes.forEach((g,i)=>{const ud=g.userData;
+    if(FAMILY[i].state==='COLLAPSED'){g.position.set(0,8+Math.sin(time)*.3,0);g.children[1].material.opacity=.15+Math.sin(time*2)*.08;return}
+    ud.angle+=ud.speed*.003;g.position.set(Math.cos(ud.angle)*ud.radius,ud.yOff+Math.sin(time*.8+i)*.3,Math.sin(ud.angle)*ud.radius);
+    g.children[1].material.opacity=highlightedFam===i?.95:.5+Math.sin(time*2+i)*.1;g.children[0].scale.setScalar(highlightedFam===i?1.8:1)});
+
+  nodes.forEach((g,i)=>{const ud=g.userData;ud.angle+=ud.speed*.003;
+    g.position.set(Math.cos(ud.angle)*ud.radius,ud.yOff+Math.sin(time+i)*.25,Math.sin(ud.angle)*ud.radius);
+    g.children[1].material.opacity=highlightedNode===i?.95:.4+Math.sin(time*3+i)*.12;g.children[0].scale.setScalar(highlightedNode===i?2:1)});
+
+  const sp2=stG.attributes.position.array;stD.forEach((d,i)=>{d.t+=d.s;if(d.t>1){d.t=0;d.src=Math.floor(Math.random()*22);const c=new THREE.Color(TOOLS[d.src].color);stC2[i*3]=c.r;stC2[i*3+1]=c.g;stC2[i*3+2]=c.b}
+    const n=nodes[d.src];if(!n)return;const t=d.t;const r=1-t;sp2[i*3]=n.position.x*r+Math.sin(t*TAU*2+d.cv)*r*.4;sp2[i*3+1]=n.position.y*r+Math.cos(t*TAU)*.25*r;sp2[i*3+2]=n.position.z*r+Math.cos(t*TAU*2+d.cv)*r*.4});
+  stG.attributes.position.needsUpdate=true;stG.attributes.color.needsUpdate=true;
+
+  const hp2=hkG.attributes.position.array;hkD.forEach((d,i)=>{d.r+=d.s;if(d.r>d.max){d.r=2;d.a=Math.random()*TAU;d.a2=(Math.random()-.5)*Math.PI}
+    hp2[i*3]=Math.cos(d.a)*Math.cos(d.a2)*d.r;hp2[i*3+1]=Math.sin(d.a2)*d.r;hp2[i*3+2]=Math.sin(d.a)*Math.cos(d.a2)*d.r});hkG.attributes.position.needsUpdate=true;
+
+  lens.forEach((r,i)=>{r.rotation.x=Math.PI/2+Math.sin(time*.3+i*1.4)*.12;r.rotation.y=Math.cos(time*.2+i)*.08});
+  pL1.intensity=3.5+Math.sin(time*3)*.6;pL2.position.set(Math.cos(time*.4)*8,Math.sin(time*.3)*5,5);
+
+  // Labels
+  const lh=proj(0,0,0);document.getElementById('lblHole').style.left=(lh.x-80)+'px';document.getElementById('lblHole').style.top=(lh.y+35)+'px';
+  const ljt=proj(0,16,0);document.getElementById('lblJetTop').style.left=(ljt.x-60)+'px';document.getElementById('lblJetTop').style.top=(ljt.y-20)+'px';
+  const ljb=proj(0,-16,0);document.getElementById('lblJetBot').style.left=(ljb.x-50)+'px';document.getElementById('lblJetBot').style.top=(ljb.y+5)+'px';
+  if(famNodes[3]){const bl=proj(famNodes[3].position.x,famNodes[3].position.y-1,famNodes[3].position.z);document.getElementById('lblBelinda').style.left=(bl.x-70)+'px';document.getElementById('lblBelinda').style.top=(bl.y+25)+'px'}
+  const al=proj(0,8.5,0);document.getElementById('lblAnn').style.left=(al.x-70)+'px';document.getElementById('lblAnn').style.top=(al.y-25)+'px';
+
+  // Energy
+  let total=0;
+  TOOLS.forEach((t,i)=>{const v=t.base*(1+Math.sin(time*2+i*1.7)*.18+Math.sin(time*5+i*3.3)*.06);
+    t._cur=t._cur||0;t._cur+=(v-t._cur)*.05;total+=t._cur;if(t._cur>peaks[i])peaks[i]=t._cur;
+    const el=document.getElementById('tv'+t.id);if(el)el.textContent=t._cur.toFixed(1)});
+  state.total=total;
+  document.getElementById('totalVal').textContent=total.toFixed(1);
+  document.getElementById('tjDisplay').textContent=total.toFixed(1);
+
+  if(selToolIdx!==null){const t=TOOLS[selToolIdx];
+    document.getElementById('dpS1').textContent=(t._cur||0).toFixed(1);
+    document.getElementById('dpS2').textContent=peaks[selToolIdx].toFixed(1);
+    document.getElementById('dpS3').textContent=Math.round(((t._cur||0)/t.base)*100)+'%';
+    document.getElementById('dpBar').style.width=Math.min(100,((t._cur||0)/15)*100)+'%'}
+
+  state.waveform[state.wIdx]=Math.sin(time*3)*.3+Math.sin(time*7)*.12+Math.sin(time*13)*.06+(total/200-.5)*.35;
+  state.wIdx=(state.wIdx+1)%256;drawWave();
+  ren.render(sc,cam)}
+animate();
+addEventListener('resize',()=>{W=innerWidth;H=innerHeight;cam.aspect=W/H;cam.updateProjectionMatrix();ren.setSize(W,H);rwv()});
+</script>
+</body>
+</html>

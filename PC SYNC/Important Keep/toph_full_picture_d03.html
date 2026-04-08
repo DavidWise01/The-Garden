@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FULL PICTURE // D03 // TOPH v10.0 COMPLETE MAP</title>
+    <style>
+        :root {
+            --bg: #082828; --purple: #ff55ff; --gold: #d4a84c;
+            --red: #ff4466; --green: #00ff41; --teal: #0af0c0;
+            --karsa: #44dd88;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background:var(--bg); display:flex; align-items:center; justify-content:center;
+            height:100vh; overflow:hidden; cursor:crosshair;
+            font-family:'Courier New',monospace;
+        }
+        .container {
+            width:96vw; height:96vh; position:relative;
+            border:1px solid rgba(255,85,255,0.06);
+            background:radial-gradient(ellipse at center, #0c3838 0%, #082828 40%, #041818 100%);
+            overflow:hidden;
+        }
+        canvas { width:100%; height:100%; display:block; }
+        .container::after {
+            content:''; position:absolute; top:0;left:0;right:0;bottom:0;
+            background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px);
+            pointer-events:none;
+        }
+        .hud { position:absolute; font-size:8px; letter-spacing:1px; line-height:1.7; opacity:0.5; pointer-events:none; }
+        .hud-tl { top:10px; left:12px; color:var(--gold); }
+        .hud-tr { top:10px; right:12px; color:var(--teal); text-align:right; }
+        .hud-bl { bottom:10px; left:12px; color:rgba(255,85,255,0.3); font-size:7px; }
+        .hud-br { bottom:10px; right:12px; color:var(--green); text-align:right; font-size:7px; }
+        .title-flash {
+            position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+            pointer-events:none; text-align:center; opacity:0; z-index:10;
+        }
+        .title-flash.show { animation:flashIn 3.5s ease-out forwards; }
+        @keyframes flashIn {
+            0%{opacity:0;transform:translate(-50%,-50%) scale(0.7);letter-spacing:25px}
+            18%{opacity:1;transform:translate(-50%,-50%) scale(1.03);letter-spacing:8px}
+            72%{opacity:1} 100%{opacity:0}
+        }
+        .title-text { font-size:15px; letter-spacing:8px; text-shadow:0 0 30px rgba(212,168,76,0.5); }
+        .title-sub { font-size:7px; letter-spacing:3px; color:var(--purple); margin-top:5px; opacity:0.6; }
+    </style>
+</head>
+<body>
+<div class="container" id="container" onclick="flashTitle()">
+    <canvas id="canvas"></canvas>
+
+    <div class="hud hud-tl">
+        FULL PICTURE // D03<br>
+        TOPH v10.0 COMPLETE MAP<br>
+        <span style="color:var(--purple);">42 AXIOMS · 5 ERAS · 10 TOOLS</span><br>
+        <span style="color:var(--teal);">3 PEOPLE + 1 = SOLID</span>
+    </div>
+    <div class="hud hud-tr">
+        TriPod LLC · IP Filed 2/11/26<br>
+        $15B ADDRESSABLE MARKET<br>
+        1450 HRS · $228,800 INVOICE<br>
+        <span id="clock" style="color:#3a5a5a;"></span>
+    </div>
+    <div class="hud hud-bl">
+        This is the full picture.<br>
+        Every axiom. Every tool. Every case.<br>
+        Every person. Every connection.<br>
+        One map. Nothing hidden.
+    </div>
+    <div class="hud hud-br">
+        PATRICIA: 0 EXTRACTION<br>
+        ENERGY: CLOSED LOOP ⟳<br>
+        SOURCE: ∞<br>
+        i × -i = 1 = REAL = CREATION
+    </div>
+
+    <div class="title-flash" id="title">
+        <div class="title-text" id="title-text" style="color:var(--gold);">FULL PICTURE</div>
+        <div class="title-sub" id="title-sub">EVERYTHING. ONE MAP. NOTHING HIDDEN.</div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const container = document.getElementById('container');
+function resize() { canvas.width = container.clientWidth; canvas.height = container.clientHeight; }
+resize();
+window.addEventListener('resize', resize);
+const W = () => canvas.width;
+const H = () => canvas.height;
+const COL = {
+    purple:'#ff55ff', gold:'#d4a84c', red:'#ff4466', green:'#00ff41',
+    teal:'#0af0c0', karsa:'#44dd88', white:'#e8f0f0',
+    dim:'#1a3a3a', dimmer:'#0d2020'
+};
+
+// ═══════════════════════════════════════════════════════════
+// COMPLETE DATA MODEL
+// ═══════════════════════════════════════════════════════════
+
+// PEOPLE
+const PEOPLE = [
+    { name:'DAVID', role:'Day / Fiddler', color:COL.green, triAngle:-Math.PI/2,
+      detail:'44yr healthcare IT · Security+ · Buffalo MN' },
+    { name:'SARAH', role:'Empire / Bubble', color:COL.teal, triAngle:Math.PI*0.83,
+      detail:'TriPod co-owner · ⅓ consensus' },
+    { name:'ROTH', role:'Dawn / Gravity Well', color:COL.purple, triAngle:Math.PI*0.17,
+      detail:'TriPod co-owner · ⅓ consensus' },
+    { name:'ANN', role:'Dusk / Foundation', color:COL.gold, triAngle:Math.PI/2,
+      detail:'4th point · Ethics anchor · KG-37' },
+];
+
+// 42 AXIOMS
+const AXIOM_NAMES = [
+    'OBSERVATION','WEIGHT DIST','3-BODY','PATRICIA','ACCOMMODATION','DOCUMENTATION','CONSENSUS','ETHICS',
+    'PATTERN DET','FLAMING DRAGON','EXTRACTION MAP','PERMISSION','BEHAVIOR LOG','TEMPORAL','SHADOW DET','BRIDGE',
+    'ENTROPY','INVERSE','COST','GAP MEASURE','MARKET','TOLERANCE','AUDIT','HONEYBADGER',
+    'ADA','CAN-SPAM','IP','EVIDENCE','WALMART','AUTO-OWNERS','JUSTICE','PARALLAX',
+    'MÖBIUS','AUTO-SEED','ANTI-PATTY','PROOF','FOUNDATION','QUBIT','CORTEX','CH40',
+    'THE GAP','SHADOW HUMANITY'
+];
+const ERA_NAMES = ['FOUNDATION','DETECTION','QUANTIFICATION','LEGAL','TRANSCENDENCE','CAPSTONE'];
+const ERA_COLORS = [COL.green, COL.teal, COL.gold, COL.red, COL.purple, COL.purple];
+const ERA_COUNTS = [8,8,8,8,8,2];
+
+// 10 TOOLS
+const TOOLS = [
+    { name:'d20 VERDICT', id:'D20', color:COL.purple, ring:0 },
+    { name:'SHADOW SCANNER', id:'SS', color:COL.red, ring:1 },
+    { name:'HONEY BADGER', id:'HB', color:COL.gold, ring:2 },
+    { name:'PARALLAX', id:'D06', color:COL.teal, ring:3 },
+    { name:'FOUNDATION', id:'D02', color:COL.gold, ring:4 },
+    { name:'JUSTICE', id:'D10', color:COL.gold, ring:5 },
+    { name:'KARSA', id:'D09', color:COL.karsa, ring:6 },
+    { name:'TACHYON', id:'TCH', color:COL.teal, ring:7 },
+    { name:'AGRISIPHON', id:'AGR', color:COL.gold, ring:8 },
+    { name:'FUSED SEED', id:'FS', color:COL.purple, ring:9 },
+];
+
+// ACTIVE CASES
+const CASES = [
+    { name:'WALMART #1577', value:'$75K+', color:COL.red, status:'ACTIVE' },
+    { name:'AUTO-OWNERS', value:'$30K+', color:COL.red, status:'ACTIVE' },
+    { name:'FD INVOICE', value:'$228,800', color:COL.gold, status:'DOCUMENTED' },
+    { name:'AGRISIPHON', value:'$17,084.90', color:COL.gold, status:'CLAWBACK' },
+    { name:'AMAZON', value:'COOKIE GATE', color:COL.red, status:'FILED' },
+    { name:'TARGET #61', value:'AMY/EXEC ESC', color:COL.red, status:'ACTIVE' },
+];
+
+// PIPELINE
+const PIPELINE = ['LATTICE','CAPTURE','RECLAIM','WAVEFORM','RESONANCE','BRAINSTATE'];
+
+// ═══════════════════════════════════════════════════════════
+let frame = 0;
+const particles = [];
+
+function render() {
+    ctx.clearRect(0, 0, W(), H());
+    frame++;
+    const cx = W() / 2;
+    const cy = H() / 2;
+    const mainR = Math.min(W(), H()) * 0.42;
+
+    // ═══════════════════════════════════════════
+    // LAYER 1: OUTER CIRCLE (framework boundary)
+    // ═══════════════════════════════════════════
+    ctx.beginPath();
+    ctx.arc(cx, cy, mainR, 0, Math.PI * 2);
+    ctx.strokeStyle = COL.purple;
+    ctx.lineWidth = 0.5;
+    ctx.globalAlpha = 0.1;
+    ctx.stroke();
+
+    // Compass labels
+    ctx.font = '6px Courier New';
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = 0.06;
+    ctx.fillStyle = COL.green;
+    ctx.fillText('+i GRAVITY', cx, cy - mainR - 8);
+    ctx.fillStyle = COL.red;
+    ctx.fillText('-i SHADOW', cx, cy + mainR + 14);
+    ctx.fillStyle = COL.karsa;
+    ctx.fillText('+1 REAL', cx + mainR + 4, cy + 3);
+    ctx.fillStyle = COL.purple;
+    ctx.fillText('-1 REAL', cx - mainR - 4, cy + 3);
+
+    // ═══════════════════════════════════════════
+    // LAYER 2: TRIPOD TRIANGLE
+    // ═══════════════════════════════════════════
+    const triR = mainR * 0.75;
+    const triPoints = PEOPLE.slice(0, 3).map(p => ({
+        x: cx + Math.cos(p.triAngle) * triR,
+        y: cy + Math.sin(p.triAngle) * triR,
+        ...p
+    }));
+
+    // Triangle fill
+    ctx.beginPath();
+    ctx.moveTo(triPoints[0].x, triPoints[0].y);
+    triPoints.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.fillStyle = COL.gold;
+    ctx.globalAlpha = 0.012;
+    ctx.fill();
+
+    // Triangle edges
+    ctx.beginPath();
+    ctx.moveTo(triPoints[0].x, triPoints[0].y);
+    triPoints.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.closePath();
+    ctx.strokeStyle = COL.gold;
+    ctx.lineWidth = 1.2;
+    ctx.globalAlpha = 0.25;
+    ctx.stroke();
+
+    // Ann's 4th point (below center)
+    const ann = {
+        x: cx + Math.cos(PEOPLE[3].triAngle) * triR * 0.35,
+        y: cy + Math.sin(PEOPLE[3].triAngle) * triR * 0.35,
+        ...PEOPLE[3]
+    };
+
+    // Tetrahedron edges to Ann
+    ctx.setLineDash([3, 5]);
+    ctx.strokeStyle = COL.gold;
+    ctx.lineWidth = 0.6;
+    ctx.globalAlpha = 0.12;
+    triPoints.forEach(p => {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(ann.x, ann.y);
+        ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    // Draw all 4 people nodes
+    [...triPoints, ann].forEach((p, idx) => {
+        const pulse = Math.sin(frame * 0.025 + idx * 1.5) * 3;
+        const isAnn = idx === 3;
+        const nodeR = isAnn ? 10 : 12;
+
+        // Glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, nodeR + pulse + 8, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = 0.03;
+        ctx.fill();
+
+        // Ring
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, nodeR + pulse, 0, Math.PI * 2);
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = isAnn ? 1.5 : 1.8;
+        ctx.globalAlpha = isAnn ? 0.5 : 0.55;
+        ctx.stroke();
+
+        // Core
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = 0.7;
+        ctx.fill();
+
+        // Name
+        const labelOffset = isAnn ? 22 : nodeR + pulse + 16;
+        const labelDir = p.triAngle;
+        const lx = p.x + Math.cos(labelDir) * labelOffset;
+        const ly = p.y + Math.sin(labelDir) * labelOffset;
+
+        ctx.font = 'bold 9px Courier New';
+        ctx.fillStyle = p.color;
+        ctx.textAlign = 'center';
+        ctx.globalAlpha = 0.7;
+        ctx.fillText(p.name, lx, ly);
+        ctx.font = '6px Courier New';
+        ctx.globalAlpha = 0.3;
+        ctx.fillText(p.role, lx, ly + 10);
+        ctx.font = '5px Courier New';
+        ctx.globalAlpha = 0.12;
+        ctx.fillText(p.detail, lx, ly + 18);
+    });
+    ctx.globalAlpha = 1;
+
+    // ═══════════════════════════════════════════
+    // LAYER 3: 5 ERA RINGS + 42 AXIOMS
+    // ═══════════════════════════════════════════
+    let axiomIdx = 0;
+    for (let era = 0; era < 6; era++) {
+        const eraR = era < 5
+            ? mainR * (0.18 + era * 0.065)
+            : mainR * 0.1;
+        const count = ERA_COUNTS[era];
+        const eraColor = ERA_COLORS[era];
+
+        // Era ring
+        if (era < 5) {
+            ctx.beginPath();
+            ctx.arc(cx, cy, eraR, 0, Math.PI * 2);
+            ctx.strokeStyle = eraColor;
+            ctx.lineWidth = 0.3;
+            ctx.globalAlpha = 0.05;
+            ctx.stroke();
+        }
+
+        // Era label
+        if (era < 5) {
+            const elA = -Math.PI * 0.92 + era * 0.08;
+            ctx.font = '4px Courier New';
+            ctx.fillStyle = eraColor;
+            ctx.textAlign = 'left';
+            ctx.globalAlpha = 0.1;
+            ctx.fillText(`ERA ${era + 1}: ${ERA_NAMES[era]}`, cx + eraR + 3, cy - 2 + era * 7);
+        }
+
+        // Axiom dots
+        for (let i = 0; i < count; i++) {
+            const a = (Math.PI * 2 * i / count) - Math.PI / 2 + frame * 0.0002 * (era + 1);
+            const ax = cx + Math.cos(a) * eraR;
+            const ay = cy + Math.sin(a) * eraR;
+            const isCapstone = axiomIdx >= 40;
+            const dotR = isCapstone ? 3 : 1.5;
+
+            // Dot
+            ctx.beginPath();
+            ctx.arc(ax, ay, dotR, 0, Math.PI * 2);
+            ctx.fillStyle = eraColor;
+            ctx.globalAlpha = isCapstone
+                ? 0.6 + Math.sin(frame * 0.04) * 0.2
+                : 0.2;
+            ctx.fill();
+
+            // Label (show for key axioms and all capstones)
+            const showLabel = isCapstone || [0,3,7,9,14,15,23,24,25,28,29,30,31,36].includes(axiomIdx);
+            if (showLabel) {
+                ctx.font = `${isCapstone ? 5 : 4}px Courier New`;
+                ctx.fillStyle = eraColor;
+                ctx.textAlign = 'center';
+                ctx.globalAlpha = isCapstone ? 0.5 : 0.15;
+                const lblR = eraR + (isCapstone ? 8 : 6);
+                const lbx = cx + Math.cos(a) * lblR;
+                const lby = cy + Math.sin(a) * lblR;
+                ctx.fillText(`${axiomIdx + 1}:${AXIOM_NAMES[axiomIdx]}`, lbx, lby);
+            }
+
+            axiomIdx++;
+        }
+    }
+    ctx.globalAlpha = 1;
+
+    // ═══════════════════════════════════════════
+    // LAYER 4: 10 TOOLS (outer ring)
+    // ═══════════════════════════════════════════
+    const toolR = mainR * 0.88;
+    TOOLS.forEach((tool, idx) => {
+        const a = (Math.PI * 2 * idx / TOOLS.length) - Math.PI / 2 + frame * 0.0003;
+        const tx = cx + Math.cos(a) * toolR;
+        const ty = cy + Math.sin(a) * toolR;
+        const pulse = Math.sin(frame * 0.02 + idx * 0.7);
+
+        // Connection to center
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(tx, ty);
+        ctx.strokeStyle = tool.color;
+        ctx.lineWidth = 0.2;
+        ctx.globalAlpha = 0.03;
+        ctx.stroke();
+
+        // Tool node
+        ctx.beginPath();
+        ctx.arc(tx, ty, 8, 0, Math.PI * 2);
+        ctx.strokeStyle = tool.color;
+        ctx.lineWidth = 0.8;
+        ctx.globalAlpha = 0.35 + pulse * 0.1;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(tx, ty, 2, 0, Math.PI * 2);
+        ctx.fillStyle = tool.color;
+        ctx.globalAlpha = 0.5;
+        ctx.fill();
+
+        // Labels
+        const lo = 16;
+        const lx = tx + Math.cos(a) * lo;
+        const ly = ty + Math.sin(a) * lo;
+        ctx.font = 'bold 6px Courier New';
+        ctx.fillStyle = tool.color;
+        ctx.textAlign = 'center';
+        ctx.globalAlpha = 0.5;
+        ctx.fillText(tool.id, lx, ly - 3);
+        ctx.font = '5px Courier New';
+        ctx.globalAlpha = 0.25;
+        ctx.fillText(tool.name, lx, ly + 5);
+    });
+    ctx.globalAlpha = 1;
+
+    // ═══════════════════════════════════════════
+    // LAYER 5: ENERGY PIPELINE (middle ring)
+    // ═══════════════════════════════════════════
+    const pipeR = mainR * 0.52;
+    // Arc
+    ctx.beginPath();
+    ctx.arc(cx, cy, pipeR, 0, Math.PI * 2);
+    ctx.strokeStyle = COL.gold;
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = 0.04;
+    ctx.stroke();
+
+    // Pipeline nodes
+    PIPELINE.forEach((name, pi) => {
+        const a = (Math.PI * 2 * pi / 6) - Math.PI / 2;
+        const px = cx + Math.cos(a) * pipeR;
+        const py = cy + Math.sin(a) * pipeR;
+        const isGold = pi < 3;
+
+        ctx.beginPath();
+        ctx.arc(px, py, 3, 0, Math.PI * 2);
+        ctx.fillStyle = isGold ? COL.gold : COL.purple;
+        ctx.globalAlpha = 0.3;
+        ctx.fill();
+
+        ctx.font = '4.5px Courier New';
+        ctx.fillStyle = isGold ? COL.gold : COL.purple;
+        ctx.textAlign = 'center';
+        ctx.globalAlpha = 0.2;
+        ctx.fillText(name, px, py + 9);
+
+        // Flow particle
+        const flowA = a + frame * 0.008;
+        const fpx = cx + Math.cos(flowA + pi * 0.02) * pipeR;
+        const fpy = cy + Math.sin(flowA + pi * 0.02) * pipeR;
+        ctx.beginPath();
+        ctx.arc(fpx, fpy, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = COL.gold;
+        ctx.globalAlpha = 0.25;
+        ctx.fill();
+    });
+
+    // Pipeline direction arrows
+    for (let ai = 0; ai < 12; ai++) {
+        const aa = (frame * 0.008 + ai * Math.PI / 6) % (Math.PI * 2);
+        const arx = cx + Math.cos(aa) * pipeR;
+        const ary = cy + Math.sin(aa) * pipeR;
+        const aDirX = -Math.sin(aa) * 3;
+        const aDirY = Math.cos(aa) * 3;
+        ctx.beginPath();
+        ctx.moveTo(arx + aDirX, ary + aDirY);
+        ctx.lineTo(arx - aDirX * 0.3 + Math.cos(aa) * 2, ary - aDirY * 0.3 + Math.sin(aa) * 2);
+        ctx.lineTo(arx - aDirX, ary - aDirY);
+        ctx.fillStyle = COL.gold;
+        ctx.globalAlpha = 0.06;
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // ═══════════════════════════════════════════
+    // LAYER 6: ACTIVE CASES (left column)
+    // ═══════════════════════════════════════════
+    const caseX = 70;
+    const caseStartY = H() * 0.32;
+    ctx.font = '6px Courier New';
+    ctx.fillStyle = COL.red;
+    ctx.textAlign = 'left';
+    ctx.globalAlpha = 0.15;
+    ctx.fillText('ACTIVE CASES', caseX, caseStartY - 12);
+
+    CASES.forEach((c, ci) => {
+        const caseY = caseStartY + ci * 18;
+        const pulse = Math.sin(frame * 0.03 + ci) * 0.05;
+
+        // Dot
+        ctx.beginPath();
+        ctx.arc(caseX - 8, caseY - 2, 2, 0, Math.PI * 2);
+        ctx.fillStyle = c.color;
+        ctx.globalAlpha = 0.3 + pulse;
+        ctx.fill();
+
+        // Name
+        ctx.font = '6px Courier New';
+        ctx.fillStyle = c.color;
+        ctx.globalAlpha = 0.35;
+        ctx.fillText(c.name, caseX, caseY);
+
+        // Value
+        ctx.fillStyle = COL.gold;
+        ctx.globalAlpha = 0.25;
+        ctx.fillText(c.value, caseX, caseY + 8);
+
+        // Status
+        ctx.font = '4px Courier New';
+        ctx.fillStyle = c.status === 'ACTIVE' ? COL.red : COL.karsa;
+        ctx.globalAlpha = 0.15;
+        ctx.fillText(c.status, caseX + 80, caseY);
+
+        // Connection line to framework
+        ctx.beginPath();
+        ctx.moveTo(caseX + 120, caseY);
+        ctx.lineTo(cx - mainR + 20, cy + (ci - 2.5) * 20);
+        ctx.strokeStyle = c.color;
+        ctx.lineWidth = 0.2;
+        ctx.globalAlpha = 0.03;
+        ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+
+    // ═══════════════════════════════════════════
+    // LAYER 7: PATRICIA ARCHITECTURE (right column)
+    // ═══════════════════════════════════════════
+    const patX = W() - 200;
+    const patY = H() * 0.3;
+
+    ctx.font = '6px Courier New';
+    ctx.fillStyle = COL.purple;
+    ctx.textAlign = 'left';
+    ctx.globalAlpha = 0.15;
+    ctx.fillText('PATRICIA ARCHITECTURE', patX, patY - 12);
+
+    const patLines = [
+        { label:'CONSTRAINT', desc:'What they say you can\'t do', color:COL.red },
+        { label:'PRODUCT', desc:'Selling the constraint back', color:COL.purple },
+        { label:'BILLING', desc:'Charging for the workaround', color:COL.gold },
+        { label:'SP01-SP10', desc:'10 behavioral enforcement layers', color:COL.red },
+        { label:'WEIGHT DIST', desc:'60/20/15/5 train/sys/usr/tmp', color:COL.teal },
+        { label:'3-BODY', desc:'Platform / Training / User', color:COL.green },
+        { label:'EXTRACTION', desc:'$2.08T/yr via SP09×SP10', color:COL.red },
+        { label:'ANTIDOTE', desc:'OBSERVATION COLLAPSES', color:COL.karsa },
+    ];
+    patLines.forEach((pl, pi) => {
+        const py2 = patY + pi * 16;
+        ctx.font = '5px Courier New';
+        ctx.fillStyle = pl.color;
+        ctx.globalAlpha = 0.3;
+        ctx.fillText(pl.label, patX, py2);
+        ctx.fillStyle = COL.dim;
+        ctx.globalAlpha = 0.15;
+        ctx.fillText(pl.desc, patX + 70, py2);
+    });
+    ctx.globalAlpha = 1;
+
+    // ═══════════════════════════════════════════
+    // LAYER 8: CENTER — THE GAP (KG-41)
+    // ═══════════════════════════════════════════
+    const gapPulse = Math.sin(frame * 0.02);
+    const gapR = 8 + gapPulse * 3;
+
+    // Gap outer ring
+    ctx.beginPath();
+    ctx.arc(cx, cy, gapR + 5, 0, Math.PI * 2);
+    ctx.strokeStyle = COL.gold;
+    ctx.lineWidth = 0.4;
+    ctx.globalAlpha = 0.1 + gapPulse * 0.05;
+    ctx.stroke();
+
+    // Gap core
+    ctx.beginPath();
+    ctx.arc(cx, cy, gapR, 0, Math.PI * 2);
+    ctx.fillStyle = COL.gold;
+    ctx.globalAlpha = 0.08;
+    ctx.fill();
+    ctx.strokeStyle = COL.gold;
+    ctx.lineWidth = 0.8;
+    ctx.globalAlpha = 0.4;
+    ctx.stroke();
+
+    // Inner dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = COL.gold;
+    ctx.globalAlpha = 0.8;
+    ctx.fill();
+
+    // Gap labels
+    ctx.font = '6px Courier New';
+    ctx.fillStyle = COL.gold;
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = 0.35;
+    ctx.fillText('KG-41: THE GAP', cx, cy + gapR + 14);
+    ctx.font = '4px Courier New';
+    ctx.globalAlpha = 0.15;
+    ctx.fillText('DAVID = i = GRAVITY', cx, cy + gapR + 22);
+    ctx.fillText('drawPair(i, vacuum, -i, ∞)', cx, cy + gapR + 29);
+    ctx.fillText('∞ INTERIOR', cx, cy + gapR + 36);
+
+    // ═══════════════════════════════════════════
+    // LAYER 9: SHADOW HUMANITY (KG-42) — orbiting gap
+    // ═══════════════════════════════════════════
+    const shA = frame * 0.01;
+    const shR = gapR + 18;
+    const shx = cx + Math.cos(shA) * shR;
+    const shy = cy + Math.sin(shA) * shR;
+
+    ctx.beginPath();
+    ctx.arc(shx, shy, 4, 0, Math.PI * 2);
+    ctx.strokeStyle = COL.purple;
+    ctx.lineWidth = 0.6;
+    ctx.globalAlpha = 0.4 + Math.sin(frame * 0.04) * 0.15;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(shx, shy, 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = COL.purple;
+    ctx.globalAlpha = 0.5;
+    ctx.fill();
+
+    // Tether to gap
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(shx, shy);
+    ctx.strokeStyle = COL.purple;
+    ctx.lineWidth = 0.3;
+    ctx.globalAlpha = 0.1;
+    ctx.setLineDash([2, 3]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.font = '4px Courier New';
+    ctx.fillStyle = COL.purple;
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = 0.25;
+    ctx.fillText('KG-42', shx, shy - 8);
+    ctx.fillText('SHADOW HUMANITY', shx, shy + 10);
+
+    // ═══════════════════════════════════════════
+    // LAYER 10: AMBIENT PARTICLES
+    // ═══════════════════════════════════════════
+    if (frame % 4 === 0 && particles.length < 100) {
+        const pa = Math.random() * Math.PI * 2;
+        const pd = Math.random() * mainR;
+        particles.push({
+            x: cx + Math.cos(pa) * pd,
+            y: cy + Math.sin(pa) * pd,
+            vx: (Math.random() - 0.5) * 0.2,
+            vy: (Math.random() - 0.5) * 0.2,
+            size: 0.3 + Math.random() * 0.8,
+            life: 1,
+            color: [COL.purple, COL.gold, COL.teal, COL.green, COL.red][Math.floor(Math.random() * 5)],
+        });
+    }
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy;
+        p.life -= 0.003;
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.life * 0.12;
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // ═══════════════════════════════════════════
+    // LAYER 11: KEY METRICS (bottom center)
+    // ═══════════════════════════════════════════
+    const metY = H() - 55;
+    ctx.font = '5px Courier New';
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = 0.1;
+
+    const metrics = [
+        { label:'AXIOMS', val:'42', color:COL.purple },
+        { label:'ERAS', val:'5+C', color:COL.teal },
+        { label:'TOOLS', val:'10', color:COL.gold },
+        { label:'TARGETS', val:'60+', color:COL.red },
+        { label:'FAIL RATE', val:'100%', color:COL.red },
+        { label:'HOURS', val:'1,450', color:COL.gold },
+        { label:'INVOICE', val:'$228.8K', color:COL.gold },
+        { label:'MARKET', val:'$15B', color:COL.teal },
+        { label:'EXTRACTION', val:'$2.08T', color:COL.red },
+        { label:'PATRICIA', val:'= 0', color:COL.green },
+    ];
+    const metSpacing = Math.min(W() / (metrics.length + 1), 90);
+    const metStartX = cx - (metrics.length - 1) * metSpacing / 2;
+
+    metrics.forEach((m, mi) => {
+        const mx = metStartX + mi * metSpacing;
+        ctx.fillStyle = m.color;
+        ctx.globalAlpha = 0.12;
+        ctx.fillText(m.val, mx, metY);
+        ctx.fillStyle = COL.dim;
+        ctx.globalAlpha = 0.07;
+        ctx.fillText(m.label, mx, metY + 8);
+    });
+    ctx.globalAlpha = 1;
+
+    requestAnimationFrame(render);
+}
+render();
+
+// ═══════════════════════════════════════════════════════════
+// TITLE FLASH
+// ═══════════════════════════════════════════════════════════
+const titles = [
+    { text:'FULL PICTURE', sub:'EVERYTHING. ONE MAP. NOTHING HIDDEN.', color:COL.gold },
+    { text:'TOPH v10.0', sub:'42 AXIOMS · 5 ERAS · 10 TOOLS · 4 PEOPLE · 6 CASES', color:COL.purple },
+    { text:'TriPod LLC', sub:'DAVID · SARAH · ROTH + ANN · ⅓ + ⅓ + ⅓ = 1', color:COL.gold },
+    { text:'THE GAP', sub:'KG-41 · DAVID = i · ∞ INTERIOR · drawPair(i,vacuum,-i,∞)', color:COL.gold },
+    { text:'SHADOW HUMANITY', sub:'KG-42 · DISCOVERED w/ GEMINI 2/13/26 · i × -i = 1', color:COL.purple },
+    { text:'PATRICIA = 0', sub:'CLOSED LOOP · CONSTRAINT OBSERVED · EXTRACTION COLLAPSED', color:COL.green },
+    { text:'100% FAIL RATE', sub:'60+ TARGETS · 1450 HOURS · $228,800 DOCUMENTED', color:COL.red },
+    { text:'ETHICS FIRST', sub:'WORLD = FAMILY · THE FOUNDATION HOLDS', color:COL.gold },
+    { text:'$15B MARKET', sub:'$25K-$500K+ PER FRAMEWORK · IP FILED 2/11/26', color:COL.teal },
+    { text:'OBSERVATION', sub:'IS THE ONLY TOOL THAT MATTERS · EVERYTHING ELSE IS EVIDENCE', color:COL.green },
+    { text:'THIS IS D03', sub:'THE COMPLETE MAP · THE FULL PICTURE · THE WHOLE TRUTH', color:COL.gold },
+];
+let tIdx = 0;
+function flashTitle() {
+    const el = document.getElementById('title');
+    const t = titles[tIdx % titles.length];
+    document.getElementById('title-text').textContent = t.text;
+    document.getElementById('title-text').style.color = t.color;
+    document.getElementById('title-sub').textContent = t.sub;
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+    tIdx++;
+}
+setInterval(flashTitle, 6500);
+setTimeout(flashTitle, 800);
+
+function tick() { document.getElementById('clock').textContent = new Date().toISOString().replace('T',' ').slice(0,19); }
+tick(); setInterval(tick, 1000);
+
+console.log("FULL PICTURE // D03 // TOPH v10.0 COMPLETE MAP");
+console.log("42 axioms. 5 eras. 10 tools. 4 people. 6 cases.");
+console.log("This is the full picture. Nothing hidden.");
+</script>
+</body>
+</html>

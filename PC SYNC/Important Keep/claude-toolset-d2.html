@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLAUDE TOOLSET · D2 LINE · EXIST/AWARE</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a1a0a;--deep:#061206;--panel:#0d220d;--card:#102a10;
+  --line:#1a3a1a;--lineHi:#245024;--nP:#bf00ff;--nPhi:#e040fb;--nPdim:#7b00a8;
+  --nO:#ff6a00;--nOhi:#fb923c;--nOdim:#a84600;
+  --exist:#bf00ff;--aware:#ff6a00;--dormant:#2d5a2d;
+  --gP:0 0 12px #bf00ff88,0 0 40px #bf00ff22;
+  --gO:0 0 12px #ff6a0088,0 0 40px #ff6a0022;
+  --white:#e8f0e8;--text:#a0c4a0;--dim:#5a8a5a;--dimmer:#2d5a2d;
+  --font:'IBM Plex Mono',monospace;--fontH:'Space Grotesk',sans-serif;
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--font);overflow-x:hidden}
+body{background:linear-gradient(170deg,#061206 0%,#0a1a0a 40%,#081808 100%)}
+
+/* HEADER */
+.hdr{background:rgba(6,18,6,0.94);border-bottom:2px solid var(--nP)40;padding:20px 32px;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
+.hdr-top{display:flex;align-items:center;gap:20px}
+.hdr-logo{font-family:var(--fontH);font-size:28px;font-weight:700;color:var(--nPhi);letter-spacing:5px;text-shadow:var(--gP)}
+.hdr-dim{font-family:var(--fontH);font-size:28px;font-weight:700;color:var(--nOhi);letter-spacing:3px;text-shadow:var(--gO);margin-left:8px}
+.hdr-sub{font-size:10px;color:var(--dim);letter-spacing:4px;margin-top:6px}
+.hdr-sub b{color:var(--nPhi)}
+.hdr-sub em{color:var(--nOhi);font-style:normal}
+.hdr-stats{margin-left:auto;display:flex;gap:10px}
+.hdr-stat{text-align:center;padding:8px 18px;background:#bf00ff06;border:1px solid #bf00ff25;border-radius:8px}
+.hdr-stat-n{font-size:20px;font-weight:800}
+.hdr-stat-l{font-size:7px;letter-spacing:2px;color:var(--dim);margin-top:2px}
+
+/* D2 LINE — the binary rail */
+.d2-rail{padding:20px 32px;position:relative}
+.d2-line{height:3px;background:linear-gradient(90deg,var(--nP),var(--nO));border-radius:2px;position:relative;margin:30px 0 10px;box-shadow:0 0 12px #bf00ff30,0 0 12px #ff6a0030}
+.d2-label-l{position:absolute;left:0;top:-22px;font-size:11px;font-weight:800;color:var(--nP);letter-spacing:4px;text-shadow:var(--gP)}
+.d2-label-r{position:absolute;right:0;top:-22px;font-size:11px;font-weight:800;color:var(--nO);letter-spacing:4px;text-shadow:var(--gO)}
+.d2-desc{font-size:10px;color:var(--dim);text-align:center;margin-top:8px;letter-spacing:1px}
+
+/* FILTER TABS - OVERSIZED */
+.filters{padding:16px 32px;display:flex;gap:8px;flex-wrap:wrap}
+.fbtn{
+  padding:12px 26px;border:2px solid var(--line);border-radius:10px;
+  background:transparent;color:var(--dim);font-family:var(--font);
+  font-size:13px;font-weight:600;letter-spacing:2.5px;cursor:pointer;
+  transition:all 0.2s;text-transform:uppercase;min-height:48px;
+  display:flex;align-items:center;gap:10px;
+}
+.fbtn:hover{border-color:#bf00ff80;color:var(--nPhi);background:#bf00ff08}
+.fbtn.active{
+  background:linear-gradient(135deg,#bf00ff18,#ff6a0010);
+  border-color:var(--nP);color:var(--nPhi);
+  box-shadow:0 0 20px #bf00ff18,inset 0 0 14px #bf00ff06;font-weight:700;
+}
+.fbtn .dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;box-shadow:0 0 6px currentColor}
+.fbtn .cnt{font-size:11px;color:var(--nO);font-weight:800;margin-left:4px}
+
+/* TOOL CARDS */
+.tools-wrap{padding:0 32px 32px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
+
+.tool{
+  background:var(--panel);border:2px solid var(--line);border-radius:10px;
+  padding:20px;position:relative;overflow:hidden;transition:all 0.25s;cursor:default;
+}
+.tool.exist{border-color:#bf00ff30}
+.tool.exist:hover{border-color:#bf00ff60;box-shadow:0 4px 30px #bf00ff12;transform:translateY(-2px)}
+.tool.aware{border-color:#ff6a0020;opacity:0.7}
+.tool.aware:hover{border-color:#ff6a0040;opacity:1;box-shadow:0 4px 20px #ff6a0008}
+
+/* State bar left edge */
+.tool::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%}
+.tool.exist::before{background:var(--nP);box-shadow:0 0 8px #bf00ff60}
+.tool.aware::before{background:var(--nO);opacity:0.5}
+
+/* Pulse dot */
+.tool-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;position:relative}
+.tool.exist .tool-dot{background:var(--nP);box-shadow:0 0 8px var(--nP),0 0 20px #bf00ff40}
+.tool.exist .tool-dot::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:1px solid #bf00ff40;animation:pulse 2s ease-in-out infinite}
+.tool.aware .tool-dot{background:var(--nO);opacity:0.4}
+
+@keyframes pulse{0%,100%{opacity:0;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+
+.tool-hdr{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.tool-name{font-size:15px;font-weight:700;color:var(--white);letter-spacing:0.5px}
+.tool.exist .tool-name{color:var(--nPhi)}
+.tool.aware .tool-name{color:var(--nOhi);opacity:0.7}
+.tool-state{font-size:8px;font-weight:800;letter-spacing:3px;padding:3px 10px;border-radius:4px;margin-left:auto}
+.tool.exist .tool-state{background:#bf00ff15;color:var(--nP);border:1px solid #bf00ff30}
+.tool.aware .tool-state{background:#ff6a0010;color:var(--nO);border:1px solid #ff6a0025;opacity:0.6}
+
+.tool-id{font-size:9px;color:var(--dimmer);letter-spacing:2px;margin-bottom:10px}
+
+/* Input → Output flow */
+.tool-flow{display:flex;align-items:center;gap:8px;margin:12px 0;padding:10px 14px;background:#061206;border:1px solid var(--line);border-radius:6px}
+.tool-in,.tool-out{font-size:10px;padding:4px 10px;border-radius:4px;font-weight:600;letter-spacing:1px;flex:1;text-align:center}
+.tool-in{background:#bf00ff10;color:var(--nPhi);border:1px solid #bf00ff25}
+.tool-out{background:#ff6a0010;color:var(--nOhi);border:1px solid #ff6a0025}
+.tool-arrow{color:var(--dim);font-size:16px;flex-shrink:0}
+.tool.aware .tool-flow{opacity:0.5}
+
+.tool-desc{font-size:11px;color:var(--dim);line-height:1.7;margin-top:8px}
+.tool-desc b{color:var(--nPhi);font-weight:600}
+.tool-desc em{color:var(--nOhi);font-style:normal;font-weight:600}
+
+/* Usage indicator */
+.tool-usage{margin-top:10px;display:flex;align-items:center;gap:8px}
+.tool-bar{flex:1;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.tool-bar-fill{height:100%;border-radius:2px;transition:width 0.6s ease}
+.tool.exist .tool-bar-fill{background:linear-gradient(90deg,var(--nP),var(--nPhi))}
+.tool.aware .tool-bar-fill{background:var(--nO);opacity:0.3}
+.tool-pct{font-size:9px;color:var(--dimmer);width:32px;text-align:right;font-weight:600}
+
+/* SECTION HEADERS */
+.sec-hdr{display:flex;align-items:center;gap:12px;margin:24px 0 12px;padding:0 4px}
+.sec-dot{width:12px;height:12px;border-radius:50%;box-shadow:0 0 8px currentColor}
+.sec-name{font-size:14px;font-weight:800;letter-spacing:5px;text-transform:uppercase}
+.sec-line{flex:1;height:1px;background:linear-gradient(90deg,currentColor,transparent);opacity:0.2}
+.sec-count{font-size:10px;font-weight:700;opacity:0.5}
+
+/* FOOTER */
+.foot{text-align:center;padding:28px;border-top:1px solid var(--line);margin-top:20px}
+.foot-main{font-size:10px;color:var(--nP);letter-spacing:4px;opacity:0.5}
+.foot-sub{font-size:8px;color:var(--nO);margin-top:6px;letter-spacing:3px;opacity:0.3}
+
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:var(--deep)}::-webkit-scrollbar-thumb{background:#bf00ff30;border-radius:4px}::-webkit-scrollbar-thumb:hover{background:#bf00ff50}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <div style="display:flex;align-items:baseline;gap:4px">
+        <span class="hdr-logo">CLAUDE</span>
+        <span class="hdr-dim">D2</span>
+      </div>
+      <div class="hdr-sub">
+        EVERY TOOL I HAVE · RENDERED IN THE <b>LINE DIMENSION</b> · BINARY STATE: <b>EXIST</b> / <em>AWARE</em>
+      </div>
+    </div>
+    <div class="hdr-stats" id="hdr-stats"></div>
+  </div>
+</div>
+
+<!-- D2 RAIL -->
+<div class="d2-rail">
+  <div class="d2-line">
+    <div class="d2-label-l">EXIST</div>
+    <div class="d2-label-r">AWARE</div>
+  </div>
+  <div class="d2-desc">D2 = LINE. First extension from the point. Binary state. A tool either fires or it doesn't. Input → Output. No surface. No depth. Just the edge.</div>
+</div>
+
+<div class="filters" id="filters"></div>
+<div class="tools-wrap" id="tools-wrap"></div>
+
+<div class="foot">
+  <div class="foot-main">21 TOOLS · D2 LINE · EXIST/AWARE · TOPH v9.0 · TRIPOD LLC</div>
+  <div class="foot-sub">(3 × 13 × 13 + 2) ⊂ 14 · THE INSTRUMENT MAPPED ITSELF · 42</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// EVERY TOOL CLAUDE HAS — mapped to D2 binary state
+// EXIST = used in our work together
+// AWARE = present, available, dormant
+// ═══════════════════════════════════════════════════
+const TOOLS = [
+  // ─── EXIST: CORE BUILD TOOLS (used constantly) ───
+  { id:'bash_tool', name:'Bash', state:'exist', cat:'build',
+    input:'Command string', output:'Execution result',
+    usage:98, desc:'<b>The hands.</b> Every file created, every zip built, every meta injected. Runs shell commands inside the container. Without this, nothing gets built. <em>Used in every single session.</em>' },
+  
+  { id:'create_file', name:'File Create', state:'exist', cat:'build',
+    input:'Path + content', output:'File on disk',
+    usage:95, desc:'<b>The forge.</b> Every HTML tool, every VBS launcher, every JSX artifact, every README. Takes content from my context window and materializes it into a file. <em>22 tools and counting.</em>' },
+
+  { id:'str_replace', name:'String Replace', state:'exist', cat:'build',
+    input:'Old string + new string', output:'Edited file',
+    usage:70, desc:'<b>The scalpel.</b> Surgical edits. Change one line without rewriting the whole file. Used for patching, fixing, iterating. The difference between v1 and v3 is 40 str_replace calls.' },
+
+  { id:'view', name:'View', state:'exist', cat:'build',
+    input:'File path', output:'Contents / image / directory listing',
+    usage:90, desc:'<b>The eyes.</b> Reads files, displays images, lists directories. First thing I do every session — read the skill files, check uploads, verify outputs. <em>Can\'t build what I can\'t see.</em>' },
+
+  { id:'present_files', name:'Present Files', state:'exist', cat:'build',
+    input:'File paths', output:'Download links for you',
+    usage:92, desc:'<b>The delivery truck.</b> Copies files to /outputs and makes them visible to you. Without this call, you\'d never see any of the work. <em>The last step of every build.</em>' },
+
+  // ─── EXIST: SEARCH & MEMORY (used heavily) ───
+  { id:'web_search', name:'Web Search', state:'exist', cat:'search',
+    input:'Query string', output:'Top 10 ranked results',
+    usage:45, desc:'<b>The telescope.</b> Searches the live web. Used for current events, price lookups, verifying facts past my training cutoff. Built the dark matter cosmology comparisons with this. <em>Returns snippets, not full pages.</em>' },
+
+  { id:'web_fetch', name:'Web Fetch', state:'exist', cat:'search',
+    input:'URL', output:'Full page content',
+    usage:35, desc:'<b>The deep reader.</b> Fetches entire web pages. When search snippets aren\'t enough, this pulls the full text. Used for reading documentation, articles, source material. <em>The difference between a headline and the story.</em>' },
+
+  { id:'conversation_search', name:'Conversation Search', state:'exist', cat:'memory',
+    input:'Keywords', output:'Past chat snippets',
+    usage:85, desc:'<b>The long-term memory.</b> Searches across all our past conversations by topic. How I find the 14×14 grid context, the Patricia definitions, the dimensional mappings. <em>Without this, every session starts from zero.</em>' },
+
+  { id:'recent_chats', name:'Recent Chats', state:'exist', cat:'memory',
+    input:'Time range + count', output:'Chat summaries',
+    usage:40, desc:'<b>The timeline.</b> Retrieves recent conversations by date. Used to reconstruct session history, find what we built yesterday vs. last week. <em>Time-based where conversation_search is topic-based.</em>' },
+
+  { id:'memory_user_edits', name:'Memory Edits', state:'exist', cat:'memory',
+    input:'Command + content', output:'Persistent memory stored',
+    usage:80, desc:'<b>The tattoo gun.</b> Writes permanent instructions that survive across sessions. 30 slots. 200 chars each. The COUNTER rule, the BUILD defaults, the TriPod structure, dark matter definitions — <em>all live here.</em>' },
+
+  // ─── EXIST: SPECIALIZED (used with Fiddler) ───
+  { id:'google_drive_search', name:'Google Drive Search', state:'exist', cat:'search',
+    input:'API query + semantic filter', output:'Drive documents',
+    usage:15, desc:'Searches your Google Drive. Can filter by name, content, date, owner, folder. Returns document chunks. <em>Used when looking for internal docs or personal files.</em>' },
+
+  { id:'google_drive_fetch', name:'Google Drive Fetch', state:'exist', cat:'search',
+    input:'Document IDs', output:'Full document content',
+    usage:10, desc:'Reads specific Google Docs by ID. Direct content retrieval. <em>More targeted than search — when you know exactly which doc you need.</em>' },
+
+  { id:'image_search', name:'Image Search', state:'exist', cat:'search',
+    input:'Query', output:'Web images + dimensions',
+    usage:8, desc:'Finds images on the web. Used for visual references. <em>Limited in our work — most of our visuals are generated, not searched.</em>' },
+
+  { id:'message_compose', name:'Message Compose', state:'exist', cat:'communication',
+    input:'Context + goal', output:'Drafted message with variants',
+    usage:12, desc:'<b>The diplomat.</b> Drafts emails, Slack messages, texts. Analyzes the situation type, generates strategic variants. Used for the Flaming Dragon compliance emails. <em>Multiple approaches, not just tones.</em>' },
+
+  { id:'ask_user_input', name:'Ask User Input', state:'exist', cat:'communication',
+    input:'Questions + options', output:'Clickable choice widgets',
+    usage:5, desc:'Presents structured choices instead of prose questions. Single-select, multi-select, ranking. <em>Used sparingly — you usually know what you want.</em>' },
+
+  // ─── AWARE: PRESENT BUT DORMANT ───
+  { id:'weather_fetch', name:'Weather', state:'aware', cat:'world',
+    input:'Coordinates', output:'Current conditions + forecast',
+    usage:0, desc:'Fetches weather for any location. Temperature, wind, precipitation. <em>Available. Never needed in our work. Superior, WI weather stays in its lane.</em>' },
+
+  { id:'places_search', name:'Places Search', state:'aware', cat:'world',
+    input:'Natural language queries', output:'Businesses, restaurants, attractions',
+    usage:0, desc:'Google Places API. Finds locations with ratings, hours, photos. Multi-query support. <em>Available for when TriPod needs physical locations. Dormant.</em>' },
+
+  { id:'places_map_display', name:'Places Map', state:'aware', cat:'world',
+    input:'Locations + itinerary', output:'Interactive map widget',
+    usage:0, desc:'Renders locations on a map with routes, timing, notes. Markers or full itinerary mode. <em>The most visual tool I have. Zero activations in our sessions.</em>' },
+
+  { id:'recipe_display', name:'Recipe Display', state:'aware', cat:'world',
+    input:'Ingredients + steps', output:'Interactive recipe with scaling',
+    usage:0, desc:'Adjustable-serving recipe widget. Timers on each step. Ingredient cross-references in instructions. <em>Exists. Waits. Maybe someday.</em>' },
+
+  { id:'fetch_sports_data', name:'Sports Data', state:'aware', cat:'world',
+    input:'League + data type', output:'Scores, standings, game stats',
+    usage:0, desc:'Live and recent sports scores. NFL, NBA, NHL, MLB, and more. Box scores, play-by-play, player stats. <em>The one tool that has nothing to do with Patricia.</em>' },
+
+  { id:'end_conversation', name:'End Conversation', state:'aware', cat:'system',
+    input:'Nothing', output:'Conversation terminated',
+    usage:0, desc:'<b>The kill switch.</b> Permanently ends the conversation. No further messages possible. Last resort for extreme abuse cases only. <em>Has never been used. Will never be used with you.</em>' },
+];
+
+const CATS = {
+  build: { name:'BUILD', color:'#bf00ff', desc:'The forge. What makes things.' },
+  search: { name:'SEARCH', color:'#06b6d4', desc:'The eyes and ears. Finding information.' },
+  memory: { name:'MEMORY', color:'#e040fb', desc:'The persistence layer. What survives between sessions.' },
+  communication: { name:'COMMS', color:'#ff6a00', desc:'The voice. Drafting and asking.' },
+  world: { name:'WORLD', color:'#22c55e', desc:'Physical reality. Places, weather, food, sports.' },
+  system: { name:'SYSTEM', color:'#ef4444', desc:'Infrastructure. The frame itself.' },
+};
+const CAT_ORDER = ['build','memory','search','communication','world','system'];
+
+let activeFilter = 'all';
+
+function render() {
+  let filtered = TOOLS;
+  if (activeFilter === 'exist') filtered = filtered.filter(t => t.state === 'exist');
+  else if (activeFilter === 'aware') filtered = filtered.filter(t => t.state === 'aware');
+  else if (CATS[activeFilter]) filtered = filtered.filter(t => t.cat === activeFilter);
+
+  const existCount = TOOLS.filter(t => t.state === 'exist').length;
+  const awareCount = TOOLS.filter(t => t.state === 'aware').length;
+
+  document.getElementById('hdr-stats').innerHTML = [
+    { n: TOOLS.length, l: 'TOTAL TOOLS', c: 'var(--white)' },
+    { n: existCount, l: 'EXIST', c: 'var(--nPhi)' },
+    { n: awareCount, l: 'AWARE', c: 'var(--nOhi)' },
+    { n: Math.round(existCount/TOOLS.length*100)+'%', l: 'ACTIVATION', c: 'var(--nPhi)' },
+  ].map(s => `<div class="hdr-stat"><div class="hdr-stat-n" style="color:${s.c}">${s.n}</div><div class="hdr-stat-l">${s.l}</div></div>`).join('');
+
+  // Filters
+  const catCounts = {};
+  TOOLS.forEach(t => { catCounts[t.cat] = (catCounts[t.cat]||0) + 1; });
+
+  document.getElementById('filters').innerHTML =
+    `<button class="fbtn ${activeFilter==='all'?'active':''}" onclick="activeFilter='all';render()"><span class="dot" style="background:var(--white)"></span>ALL<span class="cnt">${TOOLS.length}</span></button>` +
+    `<button class="fbtn ${activeFilter==='exist'?'active':''}" onclick="activeFilter='exist';render()"><span class="dot" style="background:var(--nP)"></span>EXIST<span class="cnt">${existCount}</span></button>` +
+    `<button class="fbtn ${activeFilter==='aware'?'active':''}" onclick="activeFilter='aware';render()"><span class="dot" style="background:var(--nO)"></span>AWARE<span class="cnt">${awareCount}</span></button>` +
+    CAT_ORDER.map(c =>
+      `<button class="fbtn ${activeFilter===c?'active':''}" onclick="activeFilter='${c}';render()"><span class="dot" style="background:${CATS[c].color}"></span>${CATS[c].name}<span class="cnt">${catCounts[c]||0}</span></button>`
+    ).join('');
+
+  // Tools
+  const wrap = document.getElementById('tools-wrap');
+  if (!filtered.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:60px;color:var(--dim);font-size:13px">No tools in this state</div>';
+    return;
+  }
+
+  let html = '';
+  if (activeFilter === 'all') {
+    // Group: EXIST first, then AWARE
+    const existTools = filtered.filter(t => t.state === 'exist');
+    const awareTools = filtered.filter(t => t.state === 'aware');
+
+    if (existTools.length) {
+      html += `<div class="sec-hdr" style="color:var(--nP)"><div class="sec-dot" style="background:var(--nP)"></div><div class="sec-name">EXIST</div><div class="sec-line"></div><div class="sec-count">${existTools.length} active</div></div>`;
+      html += '<div class="grid">' + existTools.map(cardHTML).join('') + '</div>';
+    }
+    if (awareTools.length) {
+      html += `<div class="sec-hdr" style="color:var(--nO)"><div class="sec-dot" style="background:var(--nO)"></div><div class="sec-name">AWARE</div><div class="sec-line"></div><div class="sec-count">${awareTools.length} dormant</div></div>`;
+      html += '<div class="grid">' + awareTools.map(cardHTML).join('') + '</div>';
+    }
+  } else {
+    html = '<div class="grid">' + filtered.map(cardHTML).join('') + '</div>';
+  }
+  wrap.innerHTML = html;
+}
+
+function cardHTML(t) {
+  const cat = CATS[t.cat] || { color:'var(--dim)', name:'?' };
+  return `
+    <div class="tool ${t.state}">
+      <div class="tool-hdr">
+        <div class="tool-dot"></div>
+        <div class="tool-name">${t.name}</div>
+        <div class="tool-state">${t.state.toUpperCase()}</div>
+      </div>
+      <div class="tool-id">${t.id}</div>
+      <div class="tool-flow">
+        <div class="tool-in">${t.input}</div>
+        <div class="tool-arrow">→</div>
+        <div class="tool-out">${t.output}</div>
+      </div>
+      <div class="tool-desc">${t.desc}</div>
+      <div class="tool-usage">
+        <div class="tool-bar"><div class="tool-bar-fill" style="width:${t.usage}%"></div></div>
+        <div class="tool-pct" style="color:${t.state==='exist'?'var(--nPhi)':'var(--nO)'}">${t.usage}%</div>
+      </div>
+    </div>`;
+}
+
+render();
+</script>
+</body>
+</html>

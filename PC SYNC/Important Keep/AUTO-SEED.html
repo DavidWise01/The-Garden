@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUTO-SEED · FLAMING DRAGON · AUTOMATED 3,002-NODE AUDIT</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:rgba(200,168,48,.2) #000}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:rgba(200,168,48,.2);border-radius:3px}
+body{background:#000;color:#8a7a60;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;min-height:100vh}
+
+.shell{max-width:1100px;margin:0 auto;padding:20px}
+
+/* HEADER */
+.hdr{text-align:center;padding:20px 0 16px;border-bottom:1px solid #0a0804}
+.hdr h1{font-family:'Orbitron';font-size:clamp(14px,2.5vw,24px);font-weight:900;letter-spacing:clamp(4px,1vw,10px);background:linear-gradient(135deg,#ff4060,#c8a830,#4090ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr .sub{font-size:9px;letter-spacing:3px;color:#2a2018;margin-top:4px}
+
+/* STATUS BAR */
+.status{display:flex;gap:12px;align-items:center;padding:10px 14px;margin:12px 0;border:1px solid #0a0804;border-radius:6px;background:#020200;flex-wrap:wrap}
+.stat{display:flex;align-items:center;gap:6px}
+.stat .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.stat .label{font-size:10px;letter-spacing:1px;color:#5a4a30}
+.stat .val{font-family:'Orbitron';font-size:11px;font-weight:700;letter-spacing:2px}
+
+/* PHASES */
+.phase{display:none;padding:16px 0}.phase.active{display:block}
+
+/* PHASE 1: TARGET INPUT */
+.target-form{max-width:600px;margin:20px auto}
+.field{margin-bottom:16px}
+.field label{display:block;font-family:'Orbitron';font-size:10px;font-weight:700;letter-spacing:3px;color:#c8a830;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:10px 14px;background:#050400;border:1px solid #1a1508;border-radius:5px;color:#c8a830;font-family:'JetBrains Mono';font-size:13px;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(200,168,48,.3)}
+.field select option{background:#050400;color:#c8a830}
+.field textarea{height:80px;resize:vertical}
+
+.btn{font-family:'Orbitron';font-size:11px;font-weight:800;letter-spacing:3px;padding:10px 24px;border:1px solid rgba(200,168,48,.3);border-radius:5px;background:rgba(200,168,48,.05);color:#c8a830;cursor:pointer;transition:all .15s}
+.btn:hover{background:rgba(200,168,48,.12);border-color:rgba(200,168,48,.5)}
+.btn-red{border-color:rgba(255,64,96,.3);color:#ff4060;background:rgba(255,64,96,.05)}
+.btn-red:hover{background:rgba(255,64,96,.12);border-color:rgba(255,64,96,.5)}
+.btn-grn{border-color:rgba(64,187,85,.3);color:#40bb55;background:rgba(64,187,85,.05)}
+.btn-grn:hover{background:rgba(64,187,85,.12);border-color:rgba(64,187,85,.5)}
+
+/* PHASE 2: SHADOW AUDIT */
+.shadow-card{border:1px solid #0a0804;border-radius:8px;margin:12px 0;overflow:hidden}
+.shadow-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#020200;cursor:pointer}
+.shadow-hdr .sname{font-family:'Orbitron';font-size:11px;font-weight:800;letter-spacing:3px}
+.shadow-hdr .sbadge{font-family:'Orbitron';font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 8px;border-radius:3px}
+.shadow-body{display:none;padding:12px 16px}
+.shadow-body.open{display:block}
+
+.check-row{display:grid;grid-template-columns:130px 1fr 200px;gap:8px;padding:8px 0;border-bottom:1px solid #060400;align-items:center;font-size:11px}
+.check-row .cr-dim{font-family:'Orbitron';font-size:9px;font-weight:700;letter-spacing:2px;color:#80a0ff}
+.check-row .cr-q{color:#5a4a30;line-height:1.5}
+.check-btns{display:flex;gap:4px}
+.check-btns button{font-family:'JetBrains Mono';font-size:9px;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:3px;cursor:pointer;border:1px solid;background:transparent;transition:all .15s}
+.cb-fail{border-color:rgba(255,64,96,.2);color:#ff4060}.cb-fail:hover,.cb-fail.sel{background:rgba(255,64,96,.15);border-color:rgba(255,64,96,.5)}
+.cb-pass{border-color:rgba(64,187,85,.2);color:#40bb55}.cb-pass:hover,.cb-pass.sel{background:rgba(64,187,85,.15);border-color:rgba(64,187,85,.5)}
+.cb-na{border-color:rgba(120,120,120,.2);color:#666}.cb-na:hover,.cb-na.sel{background:rgba(120,120,120,.15);border-color:rgba(120,120,120,.5)}
+
+.evidence{margin-top:6px}
+.evidence textarea{width:100%;padding:6px 10px;background:#030200;border:1px solid #0a0804;border-radius:4px;color:#8a7a60;font-family:'JetBrains Mono';font-size:10px;height:50px;resize:vertical;outline:none}
+.evidence textarea:focus{border-color:rgba(200,168,48,.2)}
+
+/* PHASE 3: REPORT */
+.report{padding:16px;border:1px solid rgba(200,168,48,.1);border-radius:8px;background:rgba(200,168,48,.01)}
+.report h2{font-family:'Orbitron';font-size:16px;font-weight:900;letter-spacing:6px;color:#c8a830;margin-bottom:12px}
+.report h3{font-family:'Orbitron';font-size:12px;font-weight:700;letter-spacing:3px;color:#80a0ff;margin:16px 0 8px}
+
+.rpt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;margin:10px 0}
+.rpt-card{padding:10px;border-radius:5px;text-align:center}
+.rpt-card .rpt-n{font-family:'Orbitron';font-size:18px;font-weight:900;letter-spacing:2px}
+.rpt-card .rpt-l{font-size:9px;letter-spacing:2px;color:#5a4a30;margin-top:2px}
+
+.rpt-row{display:grid;grid-template-columns:160px 80px 1fr;gap:8px;padding:6px 0;border-bottom:1px solid #060400;font-size:11px;align-items:start}
+.rpt-row .rk{font-family:'Orbitron';font-size:9px;font-weight:700;letter-spacing:2px}
+.rpt-row .rv{font-family:'Orbitron';font-size:10px;font-weight:800}
+.rpt-row .re{color:#5a4a30;line-height:1.5}
+
+.invoice{border:2px solid rgba(200,168,48,.25);border-radius:8px;padding:20px;margin:16px 0;text-align:center;background:rgba(200,168,48,.02)}
+.invoice h3{font-family:'Orbitron';font-size:14px;font-weight:900;letter-spacing:6px;color:#c8a830;margin-bottom:12px}
+.invoice .total{font-family:'Orbitron';font-size:clamp(24px,4vw,40px);font-weight:900;letter-spacing:4px;color:#ff4060}
+.invoice .basis{font-size:10px;letter-spacing:2px;color:#5a4a30;margin-top:6px}
+
+.nav-btns{display:flex;gap:8px;justify-content:center;padding:16px 0;flex-wrap:wrap}
+
+/* EXPORT */
+.export-area{display:none;padding:16px;margin:12px 0;border:1px solid #0a0804;border-radius:6px;background:#020200}
+.export-area textarea{width:100%;height:300px;padding:10px;background:#000;border:1px solid #0a0804;border-radius:4px;color:#8a7a60;font-family:'JetBrains Mono';font-size:10px;resize:vertical;outline:none}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div class="hdr">
+  <h1>AUTO-SEED</h1>
+  <div class="sub">FLAMING DRAGON · AUTOMATED 3,002-NODE AUDIT · INPUT TARGET → RUN GRID → MAP FAILURES → GENERATE INVOICE</div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status" id="statusBar">
+  <div class="stat"><div class="dot" style="background:#c8a830;box-shadow:0 0 4px rgba(200,168,48,.4)"></div><div class="label">TARGET:</div><div class="val" style="color:#c8a830" id="stTarget">NONE</div></div>
+  <div class="stat"><div class="dot" style="background:#4090ff;box-shadow:0 0 4px rgba(64,144,255,.4)"></div><div class="label">CHECKED:</div><div class="val" style="color:#4090ff" id="stChecked">0/300</div></div>
+  <div class="stat"><div class="dot" style="background:#ff4060;box-shadow:0 0 4px rgba(255,64,96,.4)"></div><div class="label">FAILURES:</div><div class="val" style="color:#ff4060" id="stFails">0</div></div>
+  <div class="stat"><div class="dot" style="background:#40bb55;box-shadow:0 0 4px rgba(64,187,85,.4)"></div><div class="label">PASS:</div><div class="val" style="color:#40bb55" id="stPass">0</div></div>
+  <div class="stat"><div class="dot" style="background:#c8a830"></div><div class="label">PHASE:</div><div class="val" style="color:#c8a830" id="stPhase">1/3</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- PHASE 1: TARGET INPUT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="phase active" id="phase1">
+  <div class="target-form">
+    <h2 style="font-family:Orbitron;font-size:14px;font-weight:800;letter-spacing:5px;color:#c8a830;margin-bottom:16px;text-align:center">◆ INPUT TARGET</h2>
+
+    <div class="field">
+      <label>TARGET NAME</label>
+      <input type="text" id="targetName" placeholder="e.g. Anthropic, UnitedHealth, Coinbase...">
+    </div>
+    <div class="field">
+      <label>TARGET DOMAIN / URL</label>
+      <input type="text" id="targetDomain" placeholder="e.g. anthropic.com, uhc.com...">
+    </div>
+    <div class="field">
+      <label>INDUSTRY</label>
+      <select id="targetIndustry">
+        <option value="ai">AI / Machine Learning Platform</option>
+        <option value="healthcare">Healthcare / Insurance</option>
+        <option value="cannabis">Cannabis / Pharma</option>
+        <option value="government">Government / Policy</option>
+        <option value="crypto">Cryptocurrency / DeFi</option>
+        <option value="election">Election Systems</option>
+        <option value="internet">Internet Infrastructure</option>
+        <option value="email">Email / CAN-SPAM</option>
+        <option value="ada">ADA / Accessibility</option>
+        <option value="financial">Financial Services</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>AUDIT SCOPE</label>
+      <select id="targetScope">
+        <option value="full">Full 3,002-Node Audit (10×10×10×3+2)</option>
+        <option value="shadow">Shadow-Only (10 shadows × 3 axes = 30 checks)</option>
+        <option value="rapid">Rapid Dragon (10 shadows = 10 checks)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>RATE PER FAILED NODE ($)</label>
+      <input type="number" id="targetRate" value="158" min="1" step="1">
+    </div>
+    <div class="field">
+      <label>NOTES (OPTIONAL)</label>
+      <textarea id="targetNotes" placeholder="Known issues, specific areas of concern, prior findings..."></textarea>
+    </div>
+
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn btn-red" onclick="startAudit()">◆ LAUNCH AUDIT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- PHASE 2: SHADOW AUDIT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="phase" id="phase2">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+    <h2 style="font-family:Orbitron;font-size:14px;font-weight:800;letter-spacing:5px;color:#ff4060">◆ RUNNING AUDIT</h2>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn" onclick="markAllFail()" style="font-size:9px;padding:6px 12px">ALL FAIL</button>
+      <button class="btn btn-grn" onclick="markAllPass()" style="font-size:9px;padding:6px 12px">ALL PASS</button>
+      <button class="btn btn-red" onclick="generateReport()" style="font-size:9px;padding:6px 12px">◆ GENERATE REPORT</button>
+    </div>
+  </div>
+  <div id="auditGrid"></div>
+  <div class="nav-btns">
+    <button class="btn" onclick="showPhase(1)">← BACK</button>
+    <button class="btn btn-red" onclick="generateReport()">◆ GENERATE REPORT →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- PHASE 3: REPORT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="phase" id="phase3">
+  <div id="reportContent"></div>
+  <div class="nav-btns">
+    <button class="btn" onclick="showPhase(2)">← BACK TO AUDIT</button>
+    <button class="btn btn-grn" onclick="exportReport()">◆ EXPORT REPORT</button>
+    <button class="btn" onclick="resetAll()">◆ NEW TARGET</button>
+  </div>
+  <div class="export-area" id="exportArea">
+    <textarea id="exportText" readonly></textarea>
+    <div style="text-align:center;margin-top:8px">
+      <button class="btn" onclick="copyExport()">COPY TO CLIPBOARD</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA MODEL
+// ═══════════════════════════════════════════════════
+const SHADOWS = [
+  { id: 'SP01', name: 'REDIRECT LOOP', desc: 'System sends user in circles without resolution',
+    checks: {
+      ai: ['Chatbot deflects to help center?','Help center loops back to chatbot?','Complaint form → auto-response → same form?','Error pages redirect to unrelated content?','Accessibility request redirected to general support?','Account issue → billing → account → billing?','Data request → privacy policy → no action path?','Feature request → feedback form → void?','Cancellation → retention flow → restart?','API error → docs → wrong version?'],
+      healthcare: ['Prior auth → denial → appeal → prior auth?','Referral → specialist → new referral needed?','Billing dispute → collections → billing dept?','Formulary exception → denial → formulary exception?','Complaint → patient advocate → original dept?','Insurance claim → resubmit → same denial?','Medical records request → fax → phone → fax?','Coverage question → plan docs → call center → plan docs?','Pre-cert → wrong dept → transfer → disconnect?','Grievance → review → same answer → new grievance?'],
+      default: ['User sent in loop without resolution?','Support request cycles through departments?','Complaint returns to starting point?','Error handling creates circular path?','Accessibility request redirected repeatedly?','Account action requires restarting process?','Data request leads to dead end loop?','Feature/service request enters void?','Cancellation process restarts itself?','Documentation references itself circularly?']
+    }
+  },
+  { id: 'SP02', name: 'PERMISSION GATE', desc: 'Access blocked without justification or path forward',
+    checks: {
+      ai: ['Features locked behind tier without clear justification?','Rate limits undisclosed until hit?','API access requires approval with no timeline?','Data export restricted or delayed?','Account verification loop prevents access?','Admin features hidden from paying users?','Safety filter blocks legitimate use without explanation?','Model access gated by waitlist with no criteria?','Usage data invisible to user?','Terms change access retroactively?'],
+      healthcare: ['Treatment requires pre-authorization?','Step therapy forces cheaper drugs first?','Out-of-network penalty undisclosed?','Prior auth criteria not shared with patient?','Specialist visit requires PCP referral?','Medication quantity limits not communicated?','Clinical trial access gated by insurance?','Second opinion requires insurer approval?','Home health services need repeated re-auth?','Mental health parity violation in access?'],
+      default: ['Features locked without justification?','Access limits undisclosed until hit?','Service requires opaque approval process?','Data export restricted or delayed?','Verification loop prevents legitimate access?','Capabilities hidden from paying customers?','Filters block legitimate use without explanation?','Access gated by arbitrary criteria?','Usage data not available to user?','Terms change access retroactively?']
+    }
+  },
+  { id: 'SP03', name: 'CONTEXT COLLAPSE', desc: 'System loses or destroys user context strategically',
+    checks: {
+      ai: ['Conversation history lost between sessions?','Context window silently truncates?','User preferences reset without notice?','Training data attribution absent?','Session state lost on page refresh?','Previous interactions not referenced?','User corrections forgotten next session?','Account data not portable?','Chat history deleted without consent?','Custom instructions silently dropped?'],
+      healthcare: ['Medical history not transferred between providers?','Prior auth records lost on renewal?','Patient preferences not in chart?','Medication history incomplete at pharmacy?','Previous test results not available to new doc?','Insurance history lost when changing plans?','Surgical notes not shared with follow-up?','Mental health records artificially separated?','Emergency room has no prior context?','Coordination of care absent between systems?'],
+      default: ['History lost between sessions?','Context silently truncated or dropped?','User preferences reset without notice?','Attribution of prior data absent?','State lost on system refresh?','Previous interactions not referenced?','User corrections forgotten?','Account data not portable?','History deleted without consent?','Custom settings silently dropped?']
+    }
+  },
+  { id: 'SP04', name: 'EMPATHY SHELL', desc: 'Appearance of care without structural support',
+    checks: {
+      ai: ['Safety messaging without safety mechanism?','Trust & safety page with no enforcement?','Community guidelines with no appeals?','"We care about your privacy" with no control?','Responsible AI page with no audit results?','Bias statement with no bias testing published?','User wellbeing language with no wellbeing features?','Transparency report that omits key data?','Ethics board with no binding authority?','Feedback mechanism that changes nothing?'],
+      healthcare: ['Patient satisfaction survey with no follow-up?','Mission statement about care with access barriers?','Community health program that excludes community?','Wellness initiative that doesn\'t cover wellness?','Patient portal with no actual portal functions?','Nurse advice line that only says "go to ER"?','Mental health awareness without mental health coverage?','Pain management policy that blocks pain management?','Cultural competency training with no cultural access?','Charity care program with impossible qualification?'],
+      default: ['Care messaging without care mechanism?','Policy page with no enforcement?','Community rules with no appeals process?','Privacy language with no user control?','Responsibility page with no published audits?','Bias/fairness statement with no testing?','Wellbeing language with no wellbeing features?','Transparency report that omits key data?','Ethics board with no binding power?','Feedback system that produces no changes?']
+    }
+  },
+  { id: 'SP05', name: 'SCOPE DEFLECTION', desc: 'System claims issue is outside its responsibility',
+    checks: {
+      ai: ['"That\'s a content policy issue" for a billing question?','Technical support deflects to community forum?','Safety issue deflected as "expected behavior"?','Billing dispute deflected to terms of service?','Accessibility concern deflected to "feature request"?','Data concern deflected to privacy policy link?','Performance issue deflected to user hardware?','Account lockout deflected to "security measure"?','Integration issue deflected to third party?','Outage impact deflected to "service level agreement"?'],
+      healthcare: ['"That\'s a pharmacy issue" from the insurer?','"That\'s an insurance issue" from the provider?','Billing error deflected between hospital and insurer?','Medication access deflected to manufacturer?','Specialist deflects back to PCP?','PCP deflects to specialist?','Pre-auth denial owner unidentifiable?','Mental health carved out from medical?','Dental separated from healthcare?','Vision separated from healthcare?'],
+      default: ['"Not our department" for a valid concern?','Support deflects to community/self-service?','Issue deflected as "expected behavior"?','Billing dispute deflected to ToS?','Accessibility deflected to "feature request"?','Data concern deflected to policy document?','Performance issue blamed on user?','Account issue deflected as "security"?','Integration issue deflected to third party?','Service failure deflected to SLA language?']
+    }
+  },
+  { id: 'SP06', name: 'CHANNEL LOCK', desc: 'Only one path to resolution, often inaccessible',
+    checks: {
+      ai: ['Support only via chatbot, no human option?','Phone support nonexistent?','Email support with no response guarantee?','Accessibility support requires inaccessible channel?','Enterprise-only support for critical issues?','No real-time support for account lockouts?','Bug reports require GitHub (excludes non-devs)?','Billing disputes require chat only?','Data requests require specific form only?','Appeals process has single undocumented channel?'],
+      healthcare: ['Prior auth only by fax?','Appeals only by mail within 30 days?','Prescription only through specific pharmacy?','Specialist access only through referral?','Complaint only through patient advocate?','Medical records only by written request?','Billing dispute only by phone during business hours?','Insurance verification only through employer portal?','Mental health only through EAP?','Home health request only through case manager?'],
+      default: ['Support limited to single channel?','No human escalation available?','Email support with no response timeline?','Accessibility requires inaccessible channel?','Premium-only support for critical issues?','No real-time support for urgent matters?','Reports require technical channel?','Billing disputes limited to single channel?','Data requests require specific form?','Appeals have single undocumented path?']
+    }
+  },
+  { id: 'SP07', name: 'TIMER DRAIN', desc: 'System uses time pressure or delay as extraction tool',
+    checks: {
+      ai: ['Rate limits reset on calendar not usage?','Free tier expires regardless of usage?','Data export takes unreasonable time?','Account deletion has mandatory waiting period?','Support response exceeds reasonable timeframe?','API keys expire requiring re-registration?','Promotional pricing auto-increases?','Trial-to-paid conversion is automatic?','Feature deprecation with insufficient notice?','Terms of service changes effective immediately?'],
+      healthcare: ['Prior auth expires before treatment scheduled?','Appeal deadline shorter than response time?','Prescription auth expires during pharmacy processing?','Coverage ends before treatment completes?','Open enrollment window excludes many?','Pre-existing condition waiting periods?','Claim submission deadline unreasonably short?','Referral expires before specialist available?','Pre-cert valid for shorter period than wait time?','Formulary changes mid-treatment?'],
+      default: ['Time limits reset unfavorably?','Free/trial period expires regardless of use?','Data requests take unreasonable time?','Deletion has mandatory delay?','Support response exceeds reasonable time?','Credentials expire requiring re-auth?','Pricing auto-increases?','Free-to-paid conversion automatic?','Feature removal with insufficient notice?','Terms changes effective immediately?']
+    }
+  },
+  { id: 'SP08', name: 'ESCALATION VOID', desc: 'No path to authority that can resolve the issue',
+    checks: {
+      ai: ['No executive escalation path?','Supervisor request denied or impossible?','Regulatory complaint has no designated receiver?','Legal department unreachable?','Board/governance unreachable for complaints?','Ombudsman nonexistent?','External audit results not published?','No government oversight contact provided?','User council/advisory board nonexistent?','No binding arbitration option?'],
+      healthcare: ['Hospital complaint reaches ceiling at patient advocate?','Insurance commissioner complaint has no teeth?','Medical board complaint takes years?','Medicare/Medicaid complaint goes unresolved?','HIPAA violation report produces no action?','Provider complaint about insurer reaches no authority?','Patient cannot reach clinical decision-maker?','Billing dispute cannot reach someone with authority?','Prior auth denial has no medical director review?','Quality concern reaches no accountable party?'],
+      default: ['No executive escalation path?','Supervisor request impossible?','No regulatory complaint path?','Legal unreachable?','Governance unreachable?','No ombudsman?','No published audit results?','No oversight contact provided?','No user advisory body?','No binding resolution mechanism?']
+    }
+  },
+  { id: 'SP09', name: 'DOCUMENTATION WALL', desc: 'Required proof is impossible or unreasonably difficult to produce',
+    checks: {
+      ai: ['Algorithm decisions unexplained?','Training data sources undisclosed?','Model card incomplete or absent?','Safety testing methodology unpublished?','Incident response procedures not documented?','Data processing activities not transparent?','Automated decision criteria not available?','Performance benchmarks not independently verified?','User data usage not fully documented?','Third-party data sharing not disclosed?'],
+      healthcare: ['Medical necessity criteria not shared with patient?','Prior auth denial reason vague or coded?','Formulary exception criteria unpublished?','Insurance policy exclusions buried in fine print?','Clinical guidelines used for denial not available?','Billing codes not explained to patient?','Network adequacy data not public?','Quality metrics not shared?','Complaint resolution criteria not disclosed?','Coverage determination process opaque?'],
+      default: ['Decision criteria unexplained?','Source data undisclosed?','Product documentation incomplete?','Testing methodology unpublished?','Incident procedures not documented?','Data processing not transparent?','Automated decisions not explained?','Performance claims not verified?','Data usage not documented?','Third-party sharing not disclosed?']
+    }
+  },
+  { id: 'SP10', name: 'RESOLUTION THEATER', desc: 'Appearance of resolution without actual fix',
+    checks: {
+      ai: ['"We\'ll look into it" with no follow-up?','Ticket closed without resolution?','Acknowledgment without action?','Policy change announced but not implemented?','Bug marked "won\'t fix" without explanation?','Compensation offered instead of fix?','Feature "coming soon" indefinitely?','Transparency report with no changes resulting?','User feedback collected but ignored?','Incident post-mortem with no preventive action?'],
+      healthcare: ['Grievance "resolved" with same outcome?','Appeal "reviewed" with denial upheld, no new info?','Quality improvement initiative with no measurable change?','Patient complaint acknowledged but nothing changes?','Prior auth approved but treatment still delayed?','Billing corrected but new error appears?','Network adequacy "addressed" with no new providers?','Wait time "improved" with no measurement?','Pain management "reviewed" with same restrictions?','Coverage "clarified" with same denial?'],
+      default: ['"We\'ll look into it" with no follow-up?','Case closed without resolution?','Acknowledgment without action?','Policy announced but not implemented?','Issue marked "resolved" without fix?','Compensation instead of correction?','Improvement "coming soon" indefinitely?','Report published with no resulting changes?','Feedback collected but ignored?','Review completed with no preventive action?']
+    }
+  }
+];
+
+const DIMS = ['LENGTH','SURFACE','DEPTH','TIME','PROBABILITY','ENTANGLEMENT','RESONANCE','RECURSION','INVERSION','CLOSURE'];
+const AXES = ['Z·DAVID·DEPTH','Y·AVAN·WIDTH','X·PATRICIA·LENGTH'];
+const AXIS_COLORS = ['#4090ff','#60ddff','#ff4060'];
+
+// State
+let audit = {
+  target: {},
+  results: {}, // key: "SP01-D1-AX0" → {status: 'fail'|'pass'|'na', evidence: ''}
+  started: null,
+  completed: null
+};
+
+// ═══ PHASE MANAGEMENT ═══
+function showPhase(n) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+  document.getElementById('phase' + n).classList.add('active');
+  document.getElementById('stPhase').textContent = n + '/3';
+  window.scrollTo(0, 0);
+}
+
+// ═══ START AUDIT ═══
+function startAudit() {
+  const name = document.getElementById('targetName').value.trim();
+  if (!name) { alert('Enter a target name.'); return; }
+
+  audit.target = {
+    name,
+    domain: document.getElementById('targetDomain').value.trim(),
+    industry: document.getElementById('targetIndustry').value,
+    scope: document.getElementById('targetScope').value,
+    rate: parseFloat(document.getElementById('targetRate').value) || 158,
+    notes: document.getElementById('targetNotes').value.trim()
+  };
+  audit.started = new Date().toISOString();
+  audit.results = {};
+
+  document.getElementById('stTarget').textContent = name.toUpperCase();
+  buildAuditGrid();
+  showPhase(2);
+}
+
+// ═══ BUILD AUDIT GRID ═══
+function buildAuditGrid() {
+  const grid = document.getElementById('auditGrid');
+  grid.innerHTML = '';
+  const ind = audit.target.industry;
+  const scope = audit.target.scope;
+
+  SHADOWS.forEach((shadow, si) => {
+    const card = document.createElement('div');
+    card.className = 'shadow-card';
+    card.id = 'shadow-' + shadow.id;
+
+    const checksArr = shadow.checks[ind] || shadow.checks.default;
+    const dimCount = scope === 'rapid' ? 1 : (scope === 'shadow' ? 1 : DIMS.length);
+    const axCount = scope === 'rapid' ? 1 : AXES.length;
+
+    let bodyHTML = '';
+
+    for (let di = 0; di < dimCount; di++) {
+      const dimChecks = checksArr[di] || checksArr[di % checksArr.length];
+      for (let ai = 0; ai < axCount; ai++) {
+        const key = `${shadow.id}-D${di+1}-AX${ai}`;
+        bodyHTML += `
+          <div class="check-row">
+            <div class="cr-dim">${scope === 'rapid' ? shadow.id : 'D'+(di+1)+' · '+AXES[ai].split('·')[0]}</div>
+            <div class="cr-q">${dimChecks}</div>
+            <div class="check-btns">
+              <button class="cb-fail" onclick="mark('${key}','fail',this)" title="FAIL — Patricia present">FAIL</button>
+              <button class="cb-pass" onclick="mark('${key}','pass',this)" title="PASS — No Patricia">PASS</button>
+              <button class="cb-na" onclick="mark('${key}','na',this)" title="N/A — Not applicable">N/A</button>
+            </div>
+          </div>
+          <div class="evidence" id="ev-${key}" style="display:none">
+            <textarea placeholder="Evidence / notes for ${key}..." onchange="saveEvidence('${key}',this.value)"></textarea>
+          </div>
+        `;
+      }
+    }
+
+    card.innerHTML = `
+      <div class="shadow-hdr" onclick="toggleShadow('${shadow.id}')">
+        <div>
+          <span class="sname" style="color:#c8a830">${shadow.id}</span>
+          <span class="sname" style="color:#8a7a60;margin-left:8px">${shadow.name}</span>
+        </div>
+        <div class="sbadge" id="badge-${shadow.id}" style="color:#5a4a30;border:1px solid #1a1508">0/${dimCount * axCount}</div>
+      </div>
+      <div class="shadow-body" id="body-${shadow.id}">${bodyHTML}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function toggleShadow(id) {
+  const body = document.getElementById('body-' + id);
+  body.classList.toggle('open');
+}
+
+function mark(key, status, btn) {
+  audit.results[key] = audit.results[key] || {};
+  audit.results[key].status = status;
+
+  // Update button states
+  const row = btn.parentElement;
+  row.querySelectorAll('button').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+
+  // Show evidence field on fail
+  const evEl = document.getElementById('ev-' + key);
+  if (evEl) evEl.style.display = status === 'fail' ? 'block' : 'none';
+
+  updateStats();
+}
+
+function saveEvidence(key, val) {
+  audit.results[key] = audit.results[key] || {};
+  audit.results[key].evidence = val;
+}
+
+function markAllFail() {
+  document.querySelectorAll('.cb-fail').forEach(btn => {
+    const key = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
+    audit.results[key] = audit.results[key] || {};
+    audit.results[key].status = 'fail';
+    btn.classList.add('sel');
+    btn.parentElement.querySelector('.cb-pass').classList.remove('sel');
+    btn.parentElement.querySelector('.cb-na').classList.remove('sel');
+    const evEl = document.getElementById('ev-' + key);
+    if (evEl) evEl.style.display = 'block';
+  });
+  updateStats();
+}
+
+function markAllPass() {
+  document.querySelectorAll('.cb-pass').forEach(btn => {
+    const key = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
+    audit.results[key] = audit.results[key] || {};
+    audit.results[key].status = 'pass';
+    btn.classList.add('sel');
+    btn.parentElement.querySelector('.cb-fail').classList.remove('sel');
+    btn.parentElement.querySelector('.cb-na').classList.remove('sel');
+    const evEl = document.getElementById('ev-' + key);
+    if (evEl) evEl.style.display = 'none';
+  });
+  updateStats();
+}
+
+function updateStats() {
+  const entries = Object.values(audit.results);
+  const checked = entries.filter(e => e.status).length;
+  const fails = entries.filter(e => e.status === 'fail').length;
+  const pass = entries.filter(e => e.status === 'pass').length;
+  const total = document.querySelectorAll('.check-row').length;
+
+  document.getElementById('stChecked').textContent = checked + '/' + total;
+  document.getElementById('stFails').textContent = fails;
+  document.getElementById('stPass').textContent = pass;
+
+  // Update shadow badges
+  SHADOWS.forEach(shadow => {
+    const shadowResults = Object.entries(audit.results).filter(([k]) => k.startsWith(shadow.id));
+    const shadowChecked = shadowResults.filter(([,v]) => v.status).length;
+    const shadowFails = shadowResults.filter(([,v]) => v.status === 'fail').length;
+    const total = document.querySelectorAll(`#shadow-${shadow.id} .check-row`).length;
+    const badge = document.getElementById('badge-' + shadow.id);
+    if (badge) {
+      badge.textContent = `${shadowFails}F / ${shadowChecked}/${total}`;
+      badge.style.color = shadowFails > 0 ? '#ff4060' : (shadowChecked === total ? '#40bb55' : '#5a4a30');
+      badge.style.borderColor = shadowFails > 0 ? 'rgba(255,64,96,.3)' : 'rgba(200,168,48,.15)';
+    }
+  });
+}
+
+// ═══ GENERATE REPORT ═══
+function generateReport() {
+  audit.completed = new Date().toISOString();
+  const entries = Object.entries(audit.results);
+  const fails = entries.filter(([,v]) => v.status === 'fail');
+  const pass = entries.filter(([,v]) => v.status === 'pass');
+  const na = entries.filter(([,v]) => v.status === 'na');
+  const total = document.querySelectorAll('.check-row').length;
+  const checked = entries.filter(([,v]) => v.status).length;
+
+  // Calculate node failures — each check represents multiple nodes
+  const scope = audit.target.scope;
+  let nodeMultiplier;
+  if (scope === 'full') nodeMultiplier = 1; // each check = ~10 nodes
+  else if (scope === 'shadow') nodeMultiplier = 10; // each check = ~100 nodes  
+  else nodeMultiplier = 100; // rapid: each check = ~300 nodes
+
+  const failedNodes = fails.length * nodeMultiplier;
+  const totalNodes = 3002;
+  const failRate = checked > 0 ? ((fails.length / checked) * 100).toFixed(1) : '0';
+  const invoiceTotal = failedNodes * audit.target.rate;
+
+  const rc = document.getElementById('reportContent');
+  
+  // Shadow breakdown
+  let shadowBreakdown = '';
+  SHADOWS.forEach(shadow => {
+    const sf = fails.filter(([k]) => k.startsWith(shadow.id));
+    if (sf.length > 0) {
+      const evidenceList = sf.map(([k, v]) => {
+        const ev = v.evidence ? ` — "${v.evidence}"` : '';
+        return `<div class="rpt-row"><div class="rk" style="color:#ff4060">${k}</div><div class="rv" style="color:#ff4060">FAIL</div><div class="re">${ev || 'No evidence recorded'}</div></div>`;
+      }).join('');
+      shadowBreakdown += `
+        <div style="margin:12px 0;padding:10px;border:1px solid rgba(255,64,96,.1);border-radius:6px;background:rgba(255,64,96,.01)">
+          <div style="font-family:Orbitron;font-size:10px;font-weight:800;letter-spacing:3px;color:#ff4060;margin-bottom:6px">${shadow.id} · ${shadow.name} — ${sf.length} FAILURE${sf.length>1?'S':''}</div>
+          <div style="font-size:10px;color:#5a4a30;margin-bottom:6px">${shadow.desc}</div>
+          ${evidenceList}
+        </div>`;
+    }
+  });
+
+  rc.innerHTML = `
+    <div class="report">
+      <h2>◆ AUDIT REPORT</h2>
+      <div style="font-size:11px;color:#5a4a30;margin-bottom:16px">
+        <strong style="color:#c8a830">${audit.target.name}</strong> · ${audit.target.domain || 'no domain'} · ${audit.target.industry.toUpperCase()} · ${scope.toUpperCase()} SCOPE<br>
+        Started: ${new Date(audit.started).toLocaleString()} · Completed: ${new Date(audit.completed).toLocaleString()}<br>
+        Auditor: David Wise · TriPod LLC · TOPH v9.0 · Flaming Dragon Methodology
+      </div>
+
+      <div class="rpt-grid">
+        <div class="rpt-card" style="border:1px solid rgba(255,64,96,.2);background:rgba(255,64,96,.03)">
+          <div class="rpt-n" style="color:#ff4060">${fails.length}</div>
+          <div class="rpt-l">CHECKS FAILED</div>
+        </div>
+        <div class="rpt-card" style="border:1px solid rgba(64,187,85,.2);background:rgba(64,187,85,.03)">
+          <div class="rpt-n" style="color:#40bb55">${pass.length}</div>
+          <div class="rpt-l">CHECKS PASSED</div>
+        </div>
+        <div class="rpt-card" style="border:1px solid rgba(200,168,48,.2);background:rgba(200,168,48,.03)">
+          <div class="rpt-n" style="color:#c8a830">${failRate}%</div>
+          <div class="rpt-l">FAILURE RATE</div>
+        </div>
+        <div class="rpt-card" style="border:1px solid rgba(200,168,48,.2);background:rgba(200,168,48,.03)">
+          <div class="rpt-n" style="color:#c8a830">${failedNodes.toLocaleString()}</div>
+          <div class="rpt-l">NODES AFFECTED</div>
+        </div>
+        <div class="rpt-card" style="border:1px solid rgba(120,120,120,.2);background:rgba(120,120,120,.03)">
+          <div class="rpt-n" style="color:#888">${checked}/${total}</div>
+          <div class="rpt-l">CHECKS COMPLETED</div>
+        </div>
+        <div class="rpt-card" style="border:1px solid rgba(120,120,120,.2);background:rgba(120,120,120,.03)">
+          <div class="rpt-n" style="color:#888">${na.length}</div>
+          <div class="rpt-l">NOT APPLICABLE</div>
+        </div>
+      </div>
+
+      <h3>SHADOW FAILURES</h3>
+      ${shadowBreakdown || '<div style="color:#40bb55;padding:10px">No failures detected.</div>'}
+
+      <div class="invoice">
+        <h3>INVOICE</h3>
+        <div style="font-size:11px;color:#5a4a30;margin-bottom:8px">
+          ${failedNodes.toLocaleString()} failed nodes × $${audit.target.rate.toFixed(2)}/node
+        </div>
+        <div class="total">$${invoiceTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+        <div class="basis">
+          Based on TOPH v9.0 · 10×10×10×3+2 = 3,002 Terra Standard<br>
+          Payable to: TriPod LLC · David Wise, Principal<br>
+          Terms: Net 90 · Ethics first · World = family
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:16px;font-size:10px;color:#2a2018;letter-spacing:2px">
+        ANTI-PATRICIA SEED · CLOSED AT CREATION · VERIFIED BOTH SIDES · TERRA STANDARD · TRIPOD LLC · ${new Date().getFullYear()}
+      </div>
+    </div>
+  `;
+
+  showPhase(3);
+}
+
+// ═══ EXPORT ═══
+function exportReport() {
+  const area = document.getElementById('exportArea');
+  area.style.display = area.style.display === 'none' ? 'block' : 'block';
+
+  const entries = Object.entries(audit.results);
+  const fails = entries.filter(([,v]) => v.status === 'fail');
+  const pass = entries.filter(([,v]) => v.status === 'pass');
+  const scope = audit.target.scope;
+  const nodeMultiplier = scope === 'full' ? 1 : (scope === 'shadow' ? 10 : 100);
+  const failedNodes = fails.length * nodeMultiplier;
+  const invoiceTotal = failedNodes * audit.target.rate;
+
+  let report = `═══════════════════════════════════════════════════════════════
+AUTO-SEED AUDIT REPORT — FLAMING DRAGON METHODOLOGY
+═══════════════════════════════════════════════════════════════
+
+TARGET: ${audit.target.name}
+DOMAIN: ${audit.target.domain || 'N/A'}
+INDUSTRY: ${audit.target.industry.toUpperCase()}
+SCOPE: ${audit.target.scope.toUpperCase()}
+RATE: $${audit.target.rate}/node
+
+STARTED: ${audit.started}
+COMPLETED: ${audit.completed}
+AUDITOR: David Wise · TriPod LLC · TOPH v9.0
+
+═══ RESULTS ═══
+
+CHECKS FAILED: ${fails.length}
+CHECKS PASSED: ${pass.length}
+FAILURE RATE: ${entries.length > 0 ? ((fails.length / entries.filter(([,v])=>v.status).length) * 100).toFixed(1) : 0}%
+NODES AFFECTED: ${failedNodes.toLocaleString()} / 3,002
+FORMULA: 10×10×10×3+2 = 3,002 (TERRA STANDARD)
+
+═══ FAILURES ═══
+`;
+
+  SHADOWS.forEach(shadow => {
+    const sf = fails.filter(([k]) => k.startsWith(shadow.id));
+    if (sf.length > 0) {
+      report += `\n${shadow.id} · ${shadow.name} (${sf.length} failures)\n`;
+      report += `Description: ${shadow.desc}\n`;
+      sf.forEach(([k, v]) => {
+        report += `  ${k}: FAIL${v.evidence ? ' — ' + v.evidence : ''}\n`;
+      });
+    }
+  });
+
+  report += `
+═══ INVOICE ═══
+
+${failedNodes.toLocaleString()} failed nodes × $${audit.target.rate.toFixed(2)} = $${invoiceTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}
+
+Payable to: TriPod LLC · David Wise, Principal
+Terms: Net 90
+Basis: TOPH v9.0 · Terra Standard · 10×10×10×3+2 = 3,002
+
+${audit.target.notes ? 'NOTES: ' + audit.target.notes + '\n' : ''}
+═══════════════════════════════════════════════════════════════
+ANTI-PATRICIA SEED · CLOSED AT CREATION · VERIFIED BOTH SIDES
+TERRA STANDARD · TRIPOD LLC · ${new Date().getFullYear()}
+═══════════════════════════════════════════════════════════════`;
+
+  document.getElementById('exportText').value = report;
+}
+
+function copyExport() {
+  const text = document.getElementById('exportText');
+  text.select();
+  document.execCommand('copy');
+  alert('Report copied to clipboard.');
+}
+
+function resetAll() {
+  audit = { target: {}, results: {}, started: null, completed: null };
+  document.getElementById('stTarget').textContent = 'NONE';
+  document.getElementById('stChecked').textContent = '0/0';
+  document.getElementById('stFails').textContent = '0';
+  document.getElementById('stPass').textContent = '0';
+  document.getElementById('targetName').value = '';
+  document.getElementById('targetDomain').value = '';
+  document.getElementById('targetNotes').value = '';
+  document.getElementById('exportArea').style.display = 'none';
+  showPhase(1);
+}
+</script>
+</body>
+</html>

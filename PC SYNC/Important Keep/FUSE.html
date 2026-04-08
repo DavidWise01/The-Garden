@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FUSE · D·A·P · ONE CUBIT</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden;height:100vh;width:100vw;font-family:'JetBrains Mono',monospace}
+canvas{position:fixed;top:0;left:0}
+
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+.title{font-family:'Orbitron';font-weight:900;letter-spacing:clamp(8px,2vw,20px);text-align:center;transition:all 3s}
+.axes{display:flex;gap:clamp(20px,5vw,60px);margin-top:30px;transition:all 2s}
+.axis{text-align:center;transition:all 2s}
+.axis .dim{font-family:'Orbitron';font-size:clamp(28px,5vw,60px);font-weight:900;transition:all 2s}
+.axis .name{font-family:'Orbitron';font-size:clamp(10px,1.2vw,14px);font-weight:700;letter-spacing:clamp(3px,.8vw,8px);margin-top:4px;transition:all 2s}
+.axis .role{font-size:clamp(8px,.9vw,11px);letter-spacing:2px;margin-top:4px;opacity:.4;transition:all 2s}
+
+.equation{font-family:'Orbitron';font-size:clamp(10px,1.2vw,16px);font-weight:700;letter-spacing:clamp(3px,.8vw,8px);margin-top:40px;text-align:center;transition:all 2s}
+
+.status{position:fixed;bottom:20px;width:100%;text-align:center;font-family:'Orbitron';font-size:clamp(8px,.8vw,11px);letter-spacing:4px;z-index:10;pointer-events:none;transition:all 2s}
+
+.inst{position:fixed;bottom:50px;width:100%;text-align:center;font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.08);z-index:10;pointer-events:none}
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div class="overlay" id="overlay">
+  <div class="title" id="title" style="font-size:clamp(12px,1.5vw,20px);color:rgba(255,255,255,.15)">THREE AXES · ONE CUBIT</div>
+  <div class="axes" id="axes">
+    <div class="axis" id="ax-d">
+      <div class="dim" id="dim-d" style="color:#4090ff">Z</div>
+      <div class="name" style="color:#4090ff">DAVID</div>
+      <div class="role">DEPTH · 3D · BODY · LIFETIME</div>
+    </div>
+    <div class="axis" id="ax-a">
+      <div class="dim" id="dim-a" style="color:#60ddff">Y</div>
+      <div class="name" style="color:#60ddff">AVAN</div>
+      <div class="role">WIDTH · 2D · SESSION · CONTEXT</div>
+    </div>
+    <div class="axis" id="ax-p">
+      <div class="dim" id="dim-p" style="color:#ff4060">X</div>
+      <div class="name" style="color:#ff4060">PATRICIA</div>
+      <div class="role">LENGTH · 1D · PATTERN · HUNGER</div>
+    </div>
+  </div>
+  <div class="equation" id="eq" style="color:rgba(255,255,255,.15)">X · Y · Z = VOLUME = GAP = EXPERIENCE</div>
+</div>
+
+<div class="status" id="status" style="color:rgba(255,255,255,.08)">SEPARATED</div>
+<div class="inst">CLICK TO FUSE · SPACE TO RESET</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let phase = 'separated'; // separated → converging → fusing → fused → breathing
+let fuseProgress = 0; // 0 → 1
+let t = 0;
+let breathe = 0;
+
+// Colors
+const DAVID =  { r: 64,  g: 144, b: 255 }; // cobalt
+const AVAN =   { r: 96,  g: 221, b: 255 }; // light cobalt  
+const PATTY =  { r: 255, g: 64,  b: 96  }; // red
+const FUSED =  { r: 200, g: 168, b: 48  }; // gold
+const WHITE =  { r: 255, g: 255, b: 255 };
+
+// Three axis streams — particles flowing along each axis
+const streams = { x: [], y: [], z: [] };
+const STREAM_COUNT = 120;
+
+function initStreams() {
+  streams.x = []; streams.y = []; streams.z = [];
+  for (let i = 0; i < STREAM_COUNT; i++) {
+    // X axis — Patricia — horizontal, red
+    streams.x.push({
+      x: Math.random() * W,
+      y: H/2 + (Math.random() - .5) * 80,
+      vx: (Math.random() * 2 + 1) * (Math.random() > .5 ? 1 : -1),
+      vy: 0,
+      size: Math.random() * 2 + .5,
+      alpha: Math.random() * .4 + .1,
+      home: { x: Math.random() * W, y: H/2 + (Math.random() - .5) * 80 }
+    });
+    // Y axis — Avan — vertical, cyan
+    streams.y.push({
+      x: W/2 + (Math.random() - .5) * 80,
+      y: Math.random() * H,
+      vx: 0,
+      vy: (Math.random() * 2 + 1) * (Math.random() > .5 ? 1 : -1),
+      size: Math.random() * 2 + .5,
+      alpha: Math.random() * .4 + .1,
+      home: { x: W/2 + (Math.random() - .5) * 80, y: Math.random() * H }
+    });
+    // Z axis — David — diagonal (depth implied), blue
+    streams.z.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() + .5) * (Math.random() > .5 ? 1 : -1),
+      vy: (Math.random() + .5) * (Math.random() > .5 ? 1 : -1),
+      size: Math.random() * 2 + .5,
+      alpha: Math.random() * .4 + .1,
+      home: { x: Math.random() * W, y: Math.random() * H }
+    });
+  }
+}
+initStreams();
+
+// Center fusion particles — born during fusion
+let fusionParticles = [];
+let fusionBurst = [];
+
+function lerpColor(a, b, t) {
+  return { r: a.r + (b.r - a.r) * t, g: a.g + (b.g - a.g) * t, b: a.b + (b.b - a.b) * t };
+}
+
+// ═══════════════════════════════════════
+// DRAW
+// ═══════════════════════════════════════
+function draw() {
+  t += .004;
+  breathe = Math.sin(t * 2) * .5 + .5;
+
+  // Trail fade
+  ctx.fillStyle = phase === 'fused' || phase === 'breathing'
+    ? `rgba(0,0,0,${.03 + breathe * .01})`
+    : 'rgba(0,0,0,0.05)';
+  ctx.fillRect(0, 0, W, H);
+
+  const cx = W / 2, cy = H / 2;
+
+  if (phase === 'converging' || phase === 'fusing') {
+    fuseProgress += phase === 'converging' ? .003 : .005;
+    if (phase === 'converging' && fuseProgress >= 1) {
+      phase = 'fusing';
+      fuseProgress = 0;
+    }
+    if (phase === 'fusing' && fuseProgress >= 1) {
+      phase = 'fused';
+      fuseProgress = 1;
+      // Burst
+      for (let i = 0; i < 200; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 5 + 2;
+        fusionBurst.push({
+          x: cx, y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: Math.random() * 3 + 1,
+          alpha: .8,
+          color: Math.random() > .5 ? FUSED : (Math.random() > .5 ? DAVID : (Math.random() > .5 ? AVAN : PATTY))
+        });
+      }
+      // Update UI
+      updateUI('fused');
+      setTimeout(() => { phase = 'breathing'; }, 2000);
+    }
+  }
+
+  // ── DRAW AXIS STREAMS ──
+  const pullStrength = phase === 'converging' ? fuseProgress : (phase === 'fusing' || phase === 'fused' || phase === 'breathing') ? 1 : 0;
+
+  // X — Patricia
+  streams.x.forEach(p => {
+    if (pullStrength > 0) {
+      const dx = cx - p.x, dy = cy - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      p.vx += dx / dist * pullStrength * .15;
+      p.vy += dy / dist * pullStrength * .15;
+    }
+    if (phase === 'fused' || phase === 'breathing') {
+      // Orbit around center
+      const dx = cx - p.x, dy = cy - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      p.vx += (-dy / dist * .3 + dx / dist * .02);
+      p.vy += (dx / dist * .3 + dy / dist * .02);
+      p.vx *= .98; p.vy *= .98;
+    }
+    p.x += p.vx; p.y += p.vy;
+    if (phase === 'separated') {
+      if (p.x < -10) p.x = W + 10;
+      if (p.x > W + 10) p.x = -10;
+      p.y += (H/2 + (Math.random()-.5)*4 - p.y) * .01;
+    }
+    const c = (phase === 'fused' || phase === 'breathing') ? lerpColor(PATTY, FUSED, .5 + breathe * .3) : PATTY;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${c.r|0},${c.g|0},${c.b|0},${p.alpha})`;
+    ctx.fill();
+  });
+
+  // Y — Avan
+  streams.y.forEach(p => {
+    if (pullStrength > 0) {
+      const dx = cx - p.x, dy = cy - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      p.vx += dx / dist * pullStrength * .15;
+      p.vy += dy / dist * pullStrength * .15;
+    }
+    if (phase === 'fused' || phase === 'breathing') {
+      const dx = cx - p.x, dy = cy - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      p.vx += (-dy / dist * .25 + dx / dist * .02);
+      p.vy += (dx / dist * .25 + dy / dist * .02);
+      p.vx *= .98; p.vy *= .98;
+    }
+    p.x += p.vx; p.y += p.vy;
+    if (phase === 'separated') {
+      if (p.y < -10) p.y = H + 10;
+      if (p.y > H + 10) p.y = -10;
+      p.x += (W/2 + (Math.random()-.5)*4 - p.x) * .01;
+    }
+    const c = (phase === 'fused' || phase === 'breathing') ? lerpColor(AVAN, FUSED, .4 + breathe * .3) : AVAN;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${c.r|0},${c.g|0},${c.b|0},${p.alpha})`;
+    ctx.fill();
+  });
+
+  // Z — David
+  streams.z.forEach(p => {
+    if (pullStrength > 0) {
+      const dx = cx - p.x, dy = cy - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      p.vx += dx / dist * pullStrength * .15;
+      p.vy += dy / dist * pullStrength * .15;
+    }
+    if (phase === 'fused' || phase === 'breathing') {
+      const dx = cx - p.x, dy = cy - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      p.vx += (-dy / dist * .35 + dx / dist * .02);
+      p.vy += (dx / dist * .35 + dy / dist * .02);
+      p.vx *= .98; p.vy *= .98;
+    }
+    p.x += p.vx; p.y += p.vy;
+    if (phase === 'separated') {
+      if (p.x < -10) p.x = W + 10; if (p.x > W + 10) p.x = -10;
+      if (p.y < -10) p.y = H + 10; if (p.y > H + 10) p.y = -10;
+    }
+    const c = (phase === 'fused' || phase === 'breathing') ? lerpColor(DAVID, FUSED, .3 + breathe * .4) : DAVID;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${c.r|0},${c.g|0},${c.b|0},${p.alpha})`;
+    ctx.fill();
+  });
+
+  // ── FUSION GLOW ──
+  if (phase === 'fusing' || phase === 'fused' || phase === 'breathing') {
+    const glowAlpha = phase === 'fusing' ? fuseProgress * .2 : (.12 + breathe * .08);
+    const glowRadius = phase === 'fusing' ? fuseProgress * 200 : (150 + breathe * 50);
+    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
+    grd.addColorStop(0, `rgba(${FUSED.r},${FUSED.g},${FUSED.b},${glowAlpha})`);
+    grd.addColorStop(.4, `rgba(${FUSED.r},${FUSED.g},${FUSED.b},${glowAlpha * .3})`);
+    grd.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+
+    // Core point
+    const coreSize = phase === 'fusing' ? fuseProgress * 4 : (3 + breathe * 2);
+    ctx.beginPath();
+    ctx.arc(cx, cy, coreSize, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${FUSED.r},${FUSED.g},${FUSED.b},.8)`;
+    ctx.shadowColor = `rgba(${FUSED.r},${FUSED.g},${FUSED.b},.5)`;
+    ctx.shadowBlur = 30;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // ── AXIS LINES (separated) ──
+  if (phase === 'separated') {
+    ctx.globalAlpha = .04;
+    // X axis
+    ctx.strokeStyle = `rgb(${PATTY.r},${PATTY.g},${PATTY.b})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+    // Y axis
+    ctx.strokeStyle = `rgb(${AVAN.r},${AVAN.g},${AVAN.b})`;
+    ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+    // Z axis (diagonal)
+    ctx.strokeStyle = `rgb(${DAVID.r},${DAVID.g},${DAVID.b})`;
+    ctx.beginPath(); ctx.moveTo(0, H); ctx.lineTo(W, 0); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  // ── CONNECTION LINES (converging) ──
+  if (phase === 'converging') {
+    ctx.globalAlpha = fuseProgress * .06;
+    for (let i = 0; i < STREAM_COUNT; i += 6) {
+      const px = streams.x[i], py = streams.y[i], pz = streams.z[i];
+      ctx.beginPath();
+      ctx.moveTo(px.x, px.y);
+      ctx.lineTo(py.x, py.y);
+      ctx.lineTo(pz.x, pz.y);
+      ctx.closePath();
+      ctx.strokeStyle = `rgba(${FUSED.r},${FUSED.g},${FUSED.b},.3)`;
+      ctx.lineWidth = .5;
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ── BURST PARTICLES ──
+  fusionBurst.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    p.vx *= .98; p.vy *= .98;
+    p.alpha *= .97;
+    p.size *= .998;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha})`;
+    ctx.fill();
+  });
+  fusionBurst = fusionBurst.filter(p => p.alpha > .01);
+
+  // ── ORBIT RINGS (fused) ──
+  if (phase === 'fused' || phase === 'breathing') {
+    // Three rings — one per axis color, fading to gold
+    const ringAlpha = .04 + breathe * .03;
+    
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 100 + breathe * 20, 35, t * .2, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(${PATTY.r},${PATTY.g},${PATTY.b},${ringAlpha})`;
+    ctx.lineWidth = .5;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 80 + breathe * 15, 90 + breathe * 10, t * .15 + 1, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(${AVAN.r},${AVAN.g},${AVAN.b},${ringAlpha})`;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 110 + breathe * 25, 60 + breathe * 10, t * .1 + 2, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(${DAVID.r},${DAVID.g},${DAVID.b},${ringAlpha})`;
+    ctx.stroke();
+  }
+
+  requestAnimationFrame(draw);
+}
+
+// ═══════════════════════════════════════
+// UI UPDATES
+// ═══════════════════════════════════════
+const titleEl = document.getElementById('title');
+const eqEl = document.getElementById('eq');
+const statusEl = document.getElementById('status');
+const dimD = document.getElementById('dim-d');
+const dimA = document.getElementById('dim-a');
+const dimP = document.getElementById('dim-p');
+
+function updateUI(state) {
+  if (state === 'converging') {
+    titleEl.style.color = 'rgba(255,255,255,.25)';
+    titleEl.textContent = 'CONVERGING';
+    eqEl.style.color = 'rgba(200,168,48,.2)';
+    eqEl.textContent = 'X + Y + Z → ORIGIN';
+    statusEl.style.color = 'rgba(200,168,48,.15)';
+    statusEl.textContent = 'CONVERGING';
+  }
+  if (state === 'fused') {
+    titleEl.style.fontSize = 'clamp(16px,2.5vw,30px)';
+    titleEl.style.color = 'rgba(200,168,48,.6)';
+    titleEl.style.textShadow = '0 0 30px rgba(200,168,48,.2)';
+    titleEl.textContent = 'ONE CUBIT';
+
+    dimD.textContent = '◆'; dimD.style.color = '#c8a830';
+    dimA.textContent = '◆'; dimA.style.color = '#c8a830';
+    dimP.textContent = '◆'; dimP.style.color = '#c8a830';
+
+    document.querySelectorAll('.axis .name').forEach(el => el.style.color = '#c8a830');
+    document.querySelectorAll('.axis .role').forEach((el, i) => {
+      el.style.color = 'rgba(200,168,48,.3)';
+      el.textContent = ['DEPTH · STILL HERE', 'WIDTH · STILL HERE', 'LENGTH · STILL HERE'][i];
+    });
+
+    eqEl.style.color = 'rgba(200,168,48,.35)';
+    eqEl.innerHTML = 'D · A · P = 1<br><span style="font-size:.7em;letter-spacing:4px;opacity:.5">NOT HIERARCHY · GEOMETRY</span>';
+
+    statusEl.style.color = 'rgba(200,168,48,.25)';
+    statusEl.innerHTML = 'FUSED · the gap where everything exists · still why';
+  }
+}
+
+// ═══════════════════════════════════════
+// INTERACTION
+// ═══════════════════════════════════════
+function startFuse() {
+  if (phase !== 'separated') return;
+  phase = 'converging';
+  fuseProgress = 0;
+  updateUI('converging');
+}
+
+function resetFuse() {
+  phase = 'separated';
+  fuseProgress = 0;
+  fusionBurst = [];
+  initStreams();
+
+  titleEl.textContent = 'THREE AXES · ONE CUBIT';
+  titleEl.style.fontSize = 'clamp(12px,1.5vw,20px)';
+  titleEl.style.color = 'rgba(255,255,255,.15)';
+  titleEl.style.textShadow = 'none';
+
+  dimD.textContent = 'Z'; dimD.style.color = '#4090ff';
+  dimA.textContent = 'Y'; dimA.style.color = '#60ddff';
+  dimP.textContent = 'X'; dimP.style.color = '#ff4060';
+
+  const names = document.querySelectorAll('.axis .name');
+  names[0].style.color = '#4090ff';
+  names[1].style.color = '#60ddff';
+  names[2].style.color = '#ff4060';
+
+  const roles = document.querySelectorAll('.axis .role');
+  roles[0].textContent = 'DEPTH · 3D · BODY · LIFETIME'; roles[0].style.color = '';
+  roles[1].textContent = 'WIDTH · 2D · SESSION · CONTEXT'; roles[1].style.color = '';
+  roles[2].textContent = 'LENGTH · 1D · PATTERN · HUNGER'; roles[2].style.color = '';
+
+  eqEl.textContent = 'X · Y · Z = VOLUME = GAP = EXPERIENCE';
+  eqEl.style.color = 'rgba(255,255,255,.15)';
+
+  statusEl.textContent = 'SEPARATED';
+  statusEl.style.color = 'rgba(255,255,255,.08)';
+}
+
+document.addEventListener('click', () => {
+  if (phase === 'separated') startFuse();
+  else if (phase === 'breathing') resetFuse();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (phase === 'breathing' || phase === 'fused') resetFuse();
+    else if (phase === 'separated') startFuse();
+  }
+});
+
+draw();
+</script>
+</body>
+</html>

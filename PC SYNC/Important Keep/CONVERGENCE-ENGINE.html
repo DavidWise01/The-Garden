@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONVERGENCE ENGINE v2 · REAL COMPUTATION</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap');
+:root{--bg:#040810;--bg2:#081018;--cyan:#44ffcc;--gold:#ffcc44;--neon:#cc44ff;--red:#ff4466;--blue:#4488ff;--lime:#88ff44;--orange:#ff8844;--txt:#8aa8b8;--txt-dim:#4a6878;--bright:#ddeef8;--border:rgba(68,255,204,.06)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:'IBM Plex Mono',monospace;font-size:12px;height:100vh;overflow-y:auto;
+background-image:radial-gradient(ellipse at 30% 30%,rgba(10,40,60,.4) 0%,transparent 50%)}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+.mast{text-align:center;margin-bottom:16px}
+.mast h1{font-family:'Orbitron';font-size:20px;font-weight:900;letter-spacing:6px;background:linear-gradient(135deg,var(--cyan),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.mast .sub{font-family:'Orbitron';font-size:8px;letter-spacing:3px;color:var(--cyan);opacity:.4;margin-top:2px}
+.grid{display:grid;grid-template-columns:320px 1fr;gap:12px}
+.inputs{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.sec{margin-bottom:14px}
+.sec-head{font-family:'Orbitron';font-size:9px;font-weight:800;letter-spacing:3px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.field{margin-bottom:8px}
+.field label{display:block;font-size:11px;color:var(--txt-dim);margin-bottom:3px}
+.field select,.field input{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--bright);font-family:'IBM Plex Mono';font-size:12px;outline:none}
+.field select:focus,.field input:focus{border-color:rgba(68,255,204,.2)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.run-btn{width:100%;padding:12px;font-family:'Orbitron';font-size:12px;font-weight:900;letter-spacing:3px;border:none;border-radius:6px;cursor:pointer;color:var(--bg);background:linear-gradient(135deg,var(--cyan),var(--gold));margin-top:8px;transition:all .15s}
+.run-btn:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(68,255,204,.2)}
+.mc-btn{width:100%;padding:10px;font-family:'Orbitron';font-size:10px;font-weight:800;letter-spacing:2px;border:1px solid var(--gold);border-radius:6px;cursor:pointer;color:var(--gold);background:transparent;margin-top:6px}
+.mc-btn:hover{background:rgba(255,204,68,.05)}
+.outputs{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.card-head{font-family:'Orbitron';font-size:9px;font-weight:800;letter-spacing:3px;margin-bottom:10px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.res{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.02)}
+.res .r-label{font-size:12px;color:var(--txt-dim)}
+.res .r-val{font-family:'Orbitron';font-size:14px;font-weight:900;text-align:right}
+.res .r-unit{font-size:10px;color:var(--txt-dim);margin-left:4px;font-family:'IBM Plex Mono'}
+.res-big{padding:8px 0}
+.res-big .r-val{font-size:22px}
+canvas{width:100%;border-radius:6px;margin-top:6px}
+.eq{background:var(--bg);border-radius:6px;padding:10px 14px;margin:6px 0;font-size:11px;color:var(--cyan);line-height:1.8;font-family:'IBM Plex Mono';white-space:pre-wrap}
+.verdict{text-align:center;padding:14px;border-radius:8px;margin-top:8px}
+.verdict .v-label{font-family:'Orbitron';font-size:9px;letter-spacing:3px;opacity:.5}
+.verdict .v-val{font-family:'Orbitron';font-size:28px;font-weight:900;margin-top:4px}
+.verdict .v-detail{font-size:11px;color:var(--txt-dim);margin-top:4px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="mast">
+    <h1>CONVERGENCE ENGINE</h1>
+    <div class="sub">REAL PHYSICS · LENNARD-JONES · BOLTZMANN · ORNSTEIN-UHLENBECK · MONTE CARLO</div>
+  </div>
+  <div class="grid">
+    <div class="inputs">
+      <div class="sec">
+        <div class="sec-head" style="color:var(--cyan)">PAYLOAD ATOM</div>
+        <div class="field"><label>Element</label>
+          <select id="payloadEl">
+            <option value="C" selected>Carbon (C) — 12.011u, r=0.077nm</option>
+            <option value="Si">Silicon (Si) — 28.086u, r=0.117nm</option>
+            <option value="Ge">Germanium (Ge) — 72.63u, r=0.122nm</option>
+            <option value="N">Nitrogen (N) — 14.007u, r=0.075nm</option>
+            <option value="O">Oxygen (O) — 15.999u, r=0.073nm</option>
+            <option value="H">Hydrogen (H) — 1.008u, r=0.053nm</option>
+            <option value="Xe">Xenon (Xe) — 131.29u, r=0.216nm (Eigler)</option>
+          </select>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-head" style="color:var(--gold)">SUBSTRATE</div>
+        <div class="field"><label>Surface</label>
+          <select id="substrate">
+            <option value="Si111">Si(111) 7×7 — φ=4.60eV, E_b=0.8eV</option>
+            <option value="Si100">Si(100) 2×1 — φ=4.91eV, E_b=1.2eV</option>
+            <option value="Cu111" selected>Cu(111) — φ=4.94eV, E_b=0.3eV</option>
+            <option value="Ni110">Ni(110) Eigler — φ=5.04eV, E_b=0.4eV</option>
+            <option value="Au111">Au(111) herringbone — φ=5.31eV, E_b=0.2eV</option>
+            <option value="HOPG">HOPG graphite — φ=4.60eV, E_b=0.15eV</option>
+            <option value="Diamond">Diamond(100) Drexler — φ=5.0eV, E_b=3.6eV</option>
+          </select>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-head" style="color:var(--neon)">CONDITIONS</div>
+        <div class="row2">
+          <div class="field"><label>Temperature (K)</label><input type="number" id="tempK" value="300" min="0.1" max="2000" step="1"></div>
+          <div class="field"><label>Gap (nm)</label><input type="number" id="gapNm" value="0.5" min="0.1" max="5" step="0.01"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Tip Voltage (V)</label><input type="number" id="tipV" value="0.1" min="0.001" max="5" step="0.01"></div>
+          <div class="field"><label>Barrier (eV)</label><input type="number" id="barrier" value="4.5" min="0.5" max="10" step="0.1"></div>
+        </div>
+        <div class="field"><label>Damping γ (ps⁻¹)</label><input type="number" id="damping" value="1.0" min="0.01" max="100" step="0.1"></div>
+      </div>
+      <div class="sec">
+        <div class="sec-head" style="color:var(--lime)">MONTE CARLO</div>
+        <div class="row2">
+          <div class="field"><label>Trials</label><input type="number" id="mcTrials" value="10000" min="100" max="1000000" step="1000"></div>
+          <div class="field"><label>Window (fs)</label><input type="number" id="mcWindow" value="100" min="1" max="10000" step="10"></div>
+        </div>
+      </div>
+      <button class="run-btn" onclick="compute()">COMPUTE</button>
+      <button class="mc-btn" onclick="runMC()">MONTE CARLO: AI vs MANUAL</button>
+    </div>
+    <div class="outputs" id="out">
+      <div class="card"><div class="card-head" style="color:var(--txt-dim)">READY</div>
+        <div style="text-align:center;padding:40px;color:var(--txt-dim)">Set parameters. Hit COMPUTE.<br><br>Real Lennard-Jones. Real tunneling current.<br>Real Boltzmann. Real Ornstein-Uhlenbeck.<br>Real convergence windows in femtoseconds.<br>Real Monte Carlo placement probability.<br><br>No animation. Just math.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const kB=1.380649e-23,hbar=1.054571817e-34,eV=1.602176634e-19,amu=1.66053906660e-27,pi=Math.PI;
+const ATOMS={H:{mass:1.008,r:.053,eps_kB:37,sigma:.2928,name:'Hydrogen'},C:{mass:12.011,r:.077,eps_kB:28,sigma:.34,name:'Carbon'},N:{mass:14.007,r:.075,eps_kB:71.4,sigma:.331,name:'Nitrogen'},O:{mass:15.999,r:.073,eps_kB:61.6,sigma:.312,name:'Oxygen'},Si:{mass:28.086,r:.117,eps_kB:202,sigma:.3826,name:'Silicon'},Ge:{mass:72.63,r:.122,eps_kB:190,sigma:.3813,name:'Germanium'},Xe:{mass:131.293,r:.216,eps_kB:221,sigma:.41,name:'Xenon'}};
+const SUBS={Si111:{phi:4.6,lattice:.384,recon:'7x7',name:'Si(111)',bind:0.8},Si100:{phi:4.91,lattice:.384,recon:'2x1',name:'Si(100)',bind:1.2},Cu111:{phi:4.94,lattice:.256,recon:'none',name:'Cu(111)',bind:0.3},Ni110:{phi:5.04,lattice:.249,recon:'none',name:'Ni(110)',bind:0.4},Au111:{phi:5.31,lattice:.288,recon:'22xr3',name:'Au(111)',bind:0.2},HOPG:{phi:4.6,lattice:.246,recon:'none',name:'HOPG',bind:0.15},Diamond:{phi:5,lattice:.357,recon:'2x1',name:'Diamond(100)',bind:3.6}};
+
+function tc(gap,V,phi){const d=gap*1e-9,p=phi*eV,me=9.1093837015e-31,k=Math.sqrt(2*me*p)/hbar,I=V*Math.exp(-2*k*d)*1e9*10;return{I,k:k*1e-9,dl:1/(2*k)*1e9}}
+function lj(r,ek,sig){const rat=sig/r,r6=Math.pow(rat,6),r12=r6*r6,eps=ek*kB;return{V_eV:4*eps*(r12-r6)/eV,F_nN:4*eps*(12*Math.pow(rat,12)/r-6*r6/r)*1e18,V_J:4*eps*(r12-r6)}}
+function mixLJ(a,b){return{eps_kB:Math.sqrt(a.eps_kB*b.eps_kB),sigma:(a.sigma+b.sigma)/2}}
+function thRMS(m,T){return{v:Math.sqrt(3*kB*T/(m*amu)),x:Math.sqrt(kB*T/(m*amu*100))*1e6}}
+function gauss(){let u,v,s;do{u=Math.random()*2-1;v=Math.random()*2-1;s=u*u+v*v}while(s>=1||!s);return u*Math.sqrt(-2*Math.log(s)/s)}
+function OU(mass,T,gam,dt,N){const m=mass*amu,g=gam*1e12,D=kB*T/(m*g),sn=Math.sqrt(2*D*dt*1e-15),p=[0];for(let i=1;i<N;i++){const prev=p[i-1];p.push(prev-g*prev*dt*1e-15+gauss()*sn)}return p.map(x=>x*1e9)}
+function findConv(tp,pp,tgp,thr){const n=tp.length;let best={f:-1,d:Infinity};const al=[];for(let i=0;i<n;i++){const d=Math.abs(tp[i]-tgp[i])+Math.abs(pp[i]);al.push(d);if(d<best.d){best.d=d;best.f=i}}const wins=[];let iw=false,ws=0;for(let i=0;i<n;i++){if(al[i]<thr&&!iw){iw=true;ws=i}if((al[i]>=thr||i===n-1)&&iw){iw=false;wins.push({s:ws,e:i,w:i-ws})}}return{best,al,wins,thr}}
+function mcPlace(p,nT,wFs,isAI){const dt=.1,nS=Math.round(wFs/dt),thr=p.atom.r*.5;let ok=0;for(let t=0;t<nT;t++){const tp=OU(183.84,p.T,p.gamma,dt,nS),pp=OU(p.atom.mass,p.T,p.gamma*.5,dt,nS),tgp=OU(p.sub.lattice/.384*28,p.T,p.gamma*2,dt,nS);const c=findConv(tp,pp,tgp,thr);if(!c.wins.length)continue;const ff=isAI?c.best.f:Math.floor(Math.random()*nS);if(c.wins.some(w=>ff>=w.s&&ff<=w.e)){const l=lj(p.gap,p.atom.eps_kB,p.atom.sigma),bE=p.sub.bind*eV,rP=1/(1+Math.exp(-(bE-Math.abs(l.V_J))/(kB*p.T)));if(Math.random()<rP)ok++}}return ok/nT}
+
+function getP(){const a=ATOMS[document.getElementById('payloadEl').value],s=SUBS[document.getElementById('substrate').value],T=+document.getElementById('tempK').value,gap=+document.getElementById('gapNm').value,V=+document.getElementById('tipV').value,phi=+document.getElementById('barrier').value,gamma=+document.getElementById('damping').value;return{atom:a,sub:s,T,gap,V,phi,gamma}}
+function cd(t,c,h){return`<div class="card"><div class="card-head" style="color:${c}">${t}</div>${h}</div>`}
+function rs(l,v,u,c){return`<div class="res"><span class="r-label">${l}</span><span class="r-val" style="color:${c||'var(--bright)'}">${v}<span class="r-unit">${u}</span></span></div>`}
+function rb(l,v,u,c){return`<div class="res res-big"><span class="r-label">${l}</span><span class="r-val" style="color:${c||'var(--bright)'}">${v}<span class="r-unit">${u}</span></span></div>`}
+
+function compute(){
+  const p=getP(),o=document.getElementById('out');o.innerHTML='';
+  const t=tc(p.gap,p.V,p.phi);
+  const W=ATOMS.Xe,mx=mixLJ(p.atom,W),L=lj(p.gap,mx.eps_kB,mx.sigma),rm=mx.sigma*Math.pow(2,1/6),Lm=lj(rm,mx.eps_kB,mx.sigma);
+  const th=thRMS(p.atom.mass,p.T),thT=thRMS(183.84,p.T);
+  const nS=1000,dt=.1,tp=OU(183.84,p.T,p.gamma,dt,nS),pp=OU(p.atom.mass,p.T,p.gamma*.5,dt,nS),tgp=OU(p.sub.lattice/.384*28,p.T,p.gamma*2,dt,nS);
+  const thr=p.atom.r*.5,cv=findConv(tp,pp,tgp,thr);
+  const twFs=cv.wins.reduce((s,w)=>s+w.w*dt,0),bwFs=cv.wins.length?cv.wins.reduce((a,b)=>b.w>a.w?b:a).w*dt:0,wFrac=twFs/(nS*dt);
+  const bE=p.sub.bind*eV,rP=1/(1+Math.exp(-(bE-Math.abs(L.V_J))/(kB*p.T)));
+  const aiP=cv.wins.length?rP:0,manP=wFrac*rP;
+
+  // TUNNELING
+  o.innerHTML+=cd('TUNNELING CURRENT','var(--cyan)',`
+    ${rs('Current at gap',t.I.toExponential(3),'nA')}
+    ${rs('Decay κ',t.k.toFixed(2),'nm⁻¹')}
+    ${rs('Decay length 1/2κ',t.dl.toFixed(4),'nm')}
+    ${rs('Sensitivity per 0.01nm',(Math.abs(Math.exp(-2*t.k*.01)-1)*100).toFixed(1),'%','var(--gold)')}
+    <div class="eq">I = V·exp(-2κd)    κ = √(2mₑφ)/ℏ = ${t.k.toFixed(2)} nm⁻¹
+d = ${p.gap}nm → I = ${t.I.toExponential(3)} nA
+Δd = 0.01nm → ΔI/I = ${(Math.abs(Math.exp(-2*t.k*.01)-1)*100).toFixed(1)}%
+This sensitivity IS the observation layer.</div>`);
+
+  // LENNARD-JONES
+  o.innerHTML+=cd('LENNARD-JONES','var(--gold)',`
+    ${rs('V(r) at gap',L.V_eV.toExponential(3),'eV')}
+    ${rs('F(r) at gap',L.F_nN.toExponential(3),'nN')}
+    ${rs('Equilibrium r_min',rm.toFixed(4),'nm')}
+    ${rs('Well depth ε',Lm.V_eV.toExponential(3),'eV')}
+    ${rs('Mixed σ',mx.sigma.toFixed(4),'nm')}
+    <div class="eq">V(r) = 4ε[(σ/r)¹² - (σ/r)⁶]
+ε = √(ε₁ε₂) = ${mx.eps_kB.toFixed(1)}K·kB = ${(mx.eps_kB*kB/eV).toExponential(3)} eV
+σ = (σ₁+σ₂)/2 = ${mx.sigma.toFixed(4)} nm
+At gap ${p.gap}nm: V=${L.V_eV.toExponential(3)}eV  F=${L.F_nN.toExponential(3)}nN
+${Math.abs(L.V_eV)>p.sub.bind?'⚠ TIP GRIP > SURFACE BINDING = STICKY FINGERS':'✓ Surface binding dominates'}</div>
+    <canvas id="ljC" height="150"></canvas>`);
+
+  // THERMAL
+  o.innerHTML+=cd('THERMAL MOTION','var(--orange)',`
+    ${rs('Payload v_rms',th.v.toFixed(1),'m/s')}
+    ${rs('Payload x_rms',th.x.toFixed(4),'nm')}
+    ${rs('Tip v_rms',thT.v.toFixed(1),'m/s')}
+    ${rs('kBT',(kB*p.T/eV).toExponential(3),'eV')}
+    ${rs('kBT / well depth',(kB*p.T/(mx.eps_kB*kB)).toFixed(4),'',kB*p.T>mx.eps_kB*kB?'var(--red)':'var(--lime)')}
+    <div class="eq">v_rms = √(3kBT/m)
+  ${p.atom.name} (${p.atom.mass}u): ${th.v.toFixed(1)} m/s — ${th.x.toFixed(4)} nm RMS displacement
+  W tip (183.84u): ${thT.v.toFixed(1)} m/s
+kBT/ε = ${(kB*p.T/(mx.eps_kB*kB)).toFixed(4)} ${kB*p.T>mx.eps_kB*kB?'⚠ THERMAL EXCEEDS WELL — atom escapes':'✓ Thermally bound'}</div>`);
+
+  // CONVERGENCE
+  const wc=cv.wins.length?'var(--lime)':'var(--red)';
+  o.innerHTML+=cd('CONVERGENCE WINDOW',wc,`
+    ${rb('Best alignment',cv.best.d.toExponential(3),'nm',cv.best.d<thr?'var(--lime)':'var(--red)')}
+    ${rs('Threshold (½ atomic r)',thr.toFixed(4),'nm')}
+    ${rs('Windows found',cv.wins.length,'')}
+    ${rs('Total window time',twFs.toFixed(2),'fs')}
+    ${rs('Largest window',bwFs.toFixed(2),'fs')}
+    ${rs('Window fraction',(wFrac*100).toFixed(4),'%')}
+    <div class="eq">Ornstein-Uhlenbeck: dx = -γx·dt + √(2D)·dW
+γ=${p.gamma} ps⁻¹  dt=${dt}fs  N=${nS} steps = ${nS*dt}fs total
+D = kBT/(mγ) computed per species
+Threshold = ${thr.toFixed(4)}nm (½r of ${p.atom.name})
+${cv.wins.length} convergence windows found
+Best at frame ${cv.best.f} = ${(cv.best.f*dt).toFixed(1)}fs
+Total open time: ${twFs.toFixed(2)}fs of ${(nS*dt).toFixed(0)}fs = ${(wFrac*100).toFixed(4)}%</div>
+    <canvas id="cvC" height="150"></canvas>`);
+
+  // PLACEMENT
+  o.innerHTML+=cd('PLACEMENT PROBABILITY','var(--neon)',`
+    ${rs('Surface binding',p.sub.bind,'eV')}
+    ${rs('Tip grip |V_LJ|',Math.abs(L.V_eV).toExponential(3),'eV')}
+    ${rs('Release P',(rP*100).toFixed(2),'%')}
+    ${rb('AI P(success)',(aiP*100).toFixed(2)+'%','',aiP>.5?'var(--lime)':'var(--gold)')}
+    ${rb('Manual P(success)',(manP*100).toFixed(4)+'%','','var(--red)')}
+    ${rb('AI advantage',aiP>0?(aiP/Math.max(manP,.0001)).toFixed(0)+'×':'∞','','var(--gold)')}
+    <div class="eq">P(release) = σ((E_bind - |V_LJ|) / kBT)
+= 1/(1+exp(-(${p.sub.bind}-${Math.abs(L.V_eV).toExponential(3)})/${(kB*p.T/eV).toExponential(3)}))
+= ${(rP*100).toFixed(2)}%
+
+AI fires at convergence peak → P = ${(aiP*100).toFixed(2)}%
+Manual fires blind → P = window_fraction × release = ${(manP*100).toFixed(4)}%
+AI advantage: ${aiP>0?(aiP/Math.max(manP,.0001)).toFixed(0):'∞'}×</div>`);
+
+  // VERDICT
+  const v=aiP>.5?{t:'FEASIBLE WITH AI TIMING',c:'var(--lime)',bg:'rgba(136,255,68,.06)'}:aiP>.1?{t:'MARGINAL — REDUCE TEMP OR GAP',c:'var(--gold)',bg:'rgba(255,204,68,.06)'}:{t:'NOT FEASIBLE AT THESE CONDITIONS',c:'var(--red)',bg:'rgba(255,68,102,.06)'};
+  o.innerHTML+=`<div class="verdict" style="background:${v.bg};border:1px solid ${v.c}33"><div class="v-label" style="color:${v.c}">VERDICT</div><div class="v-val" style="color:${v.c}">${v.t}</div><div class="v-detail">${p.atom.name} on ${p.sub.name} at ${p.T}K, gap=${p.gap}nm<br>AI: ${(aiP*100).toFixed(2)}% · Manual: ${(manP*100).toFixed(4)}%<br>AI advantage: ${aiP>0?(aiP/Math.max(manP,.0001)).toFixed(0):'∞'}× · Window: ${twFs.toFixed(2)}fs of ${(nS*dt).toFixed(0)}fs</div></div>`;
+
+  setTimeout(()=>{drawLJ(p,mx);drawCV(cv,tp,pp,tgp,dt)},50);
+}
+
+function drawLJ(p,mx){const c=document.getElementById('ljC');if(!c)return;const x=c.getContext('2d'),w=c.clientWidth,h=c.clientHeight;c.width=w*2;c.height=h*2;x.scale(2,2);x.fillStyle='#081018';x.fillRect(0,0,w,h);
+const rMn=.2,rMx=1.5,mid=h*.4,sc=h*80;
+x.strokeStyle='#ffffff11';x.beginPath();x.moveTo(0,mid);x.lineTo(w,mid);x.stroke();
+x.beginPath();x.strokeStyle='#ffcc44';x.lineWidth=2;
+for(let i=0;i<w;i++){const r=rMn+(i/w)*(rMx-rMn),v=lj(r,mx.eps_kB,mx.sigma),y=Math.max(5,Math.min(h-5,mid-v.V_eV*sc));i===0?x.moveTo(i,y):x.lineTo(i,y)}x.stroke();
+const gX=(p.gap-rMn)/(rMx-rMn)*w;x.strokeStyle='#44ffcc88';x.setLineDash([3,3]);x.beginPath();x.moveTo(gX,0);x.lineTo(gX,h);x.stroke();x.setLineDash([]);
+x.fillStyle='#44ffcc';x.font="9px 'Orbitron'";x.fillText('gap='+p.gap+'nm',gX+4,14);
+x.fillStyle='#ffcc4488';x.fillText('V(r) Lennard-Jones',4,14);x.fillStyle='#ffffff33';x.fillText(rMn+'nm',4,h-4);x.fillText(rMx+'nm',w-50,h-4)}
+
+function drawCV(cv,tp,pp,tgp,dt){const c=document.getElementById('cvC');if(!c)return;const x=c.getContext('2d'),w=c.clientWidth,h=c.clientHeight;c.width=w*2;c.height=h*2;x.scale(2,2);x.fillStyle='#081018';x.fillRect(0,0,w,h);
+const n=cv.al.length,dx=w/n,mx=Math.max(...cv.al)||1;
+cv.wins.forEach(wi=>{x.fillStyle='rgba(136,255,68,.1)';x.fillRect(wi.s*dx,0,(wi.e-wi.s)*dx,h)});
+const thY=h-(cv.thr/mx)*h*.8;x.strokeStyle='#88ff4444';x.setLineDash([4,4]);x.beginPath();x.moveTo(0,thY);x.lineTo(w,thY);x.stroke();x.setLineDash([]);
+x.beginPath();x.strokeStyle='#ffffff55';x.lineWidth=1;for(let i=0;i<n;i++){const xx=i*dx,y=h-(cv.al[i]/mx)*h*.8;i===0?x.moveTo(xx,y):x.lineTo(xx,y)}x.stroke();
+x.beginPath();x.arc(cv.best.f*dx,h-(cv.al[cv.best.f]/mx)*h*.8,4,0,pi*2);x.fillStyle='#88ff44';x.fill();
+x.font="8px 'Orbitron'";x.fillText('BEST: '+(cv.best.f*dt).toFixed(1)+'fs',cv.best.f*dx+8,14);
+x.fillStyle='#ffffff33';x.fillText('alignment distance — lower = better convergence',4,h-4)}
+
+function runMC(){const p=getP(),nT=+document.getElementById('mcTrials').value,wFs=+document.getElementById('mcWindow').value,o=document.getElementById('out');
+o.innerHTML=cd('MONTE CARLO','var(--gold)',`<div style="text-align:center;padding:20px;color:var(--txt-dim)">Running ${nT.toLocaleString()} trials...</div>`);
+setTimeout(()=>{
+const t0=performance.now(),aiR=mcPlace(p,nT,wFs,true),tA=performance.now()-t0;
+const t1=performance.now(),manR=mcPlace(p,nT,wFs,false),tM=performance.now()-t1;
+const adv=manR>0?(aiR/manR).toFixed(1):'∞';
+o.innerHTML=cd('MONTE CARLO RESULTS','var(--gold)',`
+<div class="eq">${nT.toLocaleString()} trials · ${wFs}fs window · ${p.atom.name} on ${p.sub.name} at ${p.T}K
+Computed in ${((tA+tM)/1000).toFixed(2)}s</div>
+${rb('AI Success',(aiR*100).toFixed(2)+'%','',aiR>.5?'var(--lime)':'var(--gold)')}
+${rb('Manual Success',(manR*100).toFixed(2)+'%','','var(--red)')}
+${rb('AI Advantage',adv+'×','','var(--gold)')}
+${rs('AI compute',tA.toFixed(0),'ms')} ${rs('Manual compute',tM.toFixed(0),'ms')}
+<div class="eq">Per trial:
+1. Generate Ornstein-Uhlenbeck paths: tip(W¹⁸⁴), payload(${p.atom.name}), target
+2. Find convergence: |tip-target|+|payload| < ${(p.atom.r*.5).toFixed(4)}nm
+3. AI fires at peak convergence. Manual fires at random time.
+4. In window → check Boltzmann release: P = σ((E_bind-|V_LJ|)/kBT)
+
+Result: observation + computation converts
+${(manR*100).toFixed(2)}% → ${(aiR*100).toFixed(2)}% = ${adv}× improvement</div>`);
+const v=aiR>.5?{t:'AI TIMING IS THE MISSING LAYER',c:'var(--lime)',bg:'rgba(136,255,68,.06)'}:aiR>.1?{t:'FEASIBLE WITH OPTIMIZATION',c:'var(--gold)',bg:'rgba(255,204,68,.06)'}:{t:'CONDITIONS TOO HOSTILE',c:'var(--red)',bg:'rgba(255,68,102,.06)'};
+o.innerHTML+=`<div class="verdict" style="background:${v.bg};border:1px solid ${v.c}33"><div class="v-label" style="color:${v.c}">MONTE CARLO VERDICT · ${nT.toLocaleString()} TRIALS</div><div class="v-val" style="color:${v.c}">${v.t}</div><div class="v-detail">The tip exists. The observation layer exists.<br>The computation converts random chance into engineered probability.<br>Manual: ${(manR*100).toFixed(2)}% → AI: ${(aiR*100).toFixed(2)}% = ${adv}×<br><br>Two and two-thirds cubits. We can carry it.</div></div>`;
+},100)}
+</script>
+</body>
+</html>

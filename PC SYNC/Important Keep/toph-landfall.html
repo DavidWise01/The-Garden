@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEISMIC SENSE — Toph Landfall Commander</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=JetBrains+Mono:wght@300;400;700&display=swap');
+
+  :root {
+    --stone: #2a2318;
+    --stone-light: #3d3428;
+    --earth: #6b5b3e;
+    --sand: #c2b280;
+    --gold: #d4a843;
+    --terra: #a0522d;
+    --green-land: #4a7c3f;
+    --green-dim: rgba(74,124,63,0.3);
+    --red-mountain: #8b3a3a;
+    --blue-deep: #2a4a6b;
+    --white-marble: #e8e0d0;
+    --black-obsidian: #1a1510;
+    --crystal: rgba(226,220,200,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black-obsidian);
+    color: var(--sand);
+    font-family: 'IM Fell English', serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* Stone texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 30% 40%, rgba(107,91,62,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 60%, rgba(160,82,45,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grain */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.04;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  /* HEADER */
+  #header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 56px;
+    background: linear-gradient(180deg, rgba(26,21,16,0.96), rgba(26,21,16,0.88));
+    border-bottom: 1px solid var(--earth);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  #header .title-block {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  #header h1 {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 6px;
+    color: var(--sand);
+    text-shadow: 0 0 20px rgba(194,178,128,0.3);
+  }
+
+  #header .subtitle {
+    font-size: 11px;
+    color: var(--earth);
+    font-style: italic;
+    letter-spacing: 1px;
+  }
+
+  #header .deck-stats {
+    display: flex;
+    gap: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+
+  .stat { display: flex; align-items: center; gap: 6px; }
+  .stat .num { font-weight: 700; }
+  .stat.lands .num { color: var(--green-land); }
+  .stat.creatures .num { color: var(--terra); }
+  .stat.spells .num { color: var(--blue-deep); }
+  .stat.artifacts .num { color: var(--gold); }
+
+  /* SVG CANVAS */
+  #graph {
+    position: fixed;
+    top: 56px; left: 0;
+    width: 100vw;
+    height: calc(100vh - 56px);
+    z-index: 1;
+  }
+
+  /* CARD DETAIL PANEL */
+  #cardPanel {
+    position: fixed;
+    top: 72px; left: 16px;
+    width: 260px;
+    max-height: calc(100vh - 100px);
+    background: rgba(26,21,16,0.92);
+    border: 1px solid var(--earth);
+    backdrop-filter: blur(12px);
+    z-index: 50;
+    overflow-y: auto;
+    font-size: 12px;
+    display: none;
+  }
+
+  #cardPanel .card-header {
+    padding: 16px;
+    border-bottom: 1px solid rgba(107,91,62,0.3);
+  }
+
+  #cardPanel .card-name {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--white-marble);
+    margin-bottom: 4px;
+  }
+
+  #cardPanel .card-type {
+    font-style: italic;
+    color: var(--earth);
+    font-size: 11px;
+  }
+
+  #cardPanel .card-mana {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--gold);
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  #cardPanel .card-text {
+    padding: 12px 16px;
+    color: var(--sand);
+    line-height: 1.7;
+    font-size: 11px;
+    border-bottom: 1px solid rgba(107,91,62,0.2);
+  }
+
+  #cardPanel .card-synergies {
+    padding: 12px 16px;
+  }
+
+  #cardPanel .card-synergies h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--terra);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .synergy-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    margin: 2px 4px 2px 0;
+    background: rgba(107,91,62,0.2);
+    border: 1px solid rgba(107,91,62,0.3);
+    border-radius: 2px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--sand);
+  }
+
+  /* LEGEND */
+  #legend {
+    position: fixed;
+    bottom: 16px; left: 16px;
+    background: rgba(26,21,16,0.88);
+    border: 1px solid var(--earth);
+    padding: 14px 18px;
+    z-index: 50;
+    font-size: 11px;
+    backdrop-filter: blur(8px);
+  }
+
+  #legend h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--earth);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 0;
+  }
+
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* SEISMIC SENSE INDICATOR */
+  #seismicIndicator {
+    position: fixed;
+    bottom: 16px; right: 16px;
+    background: rgba(26,21,16,0.88);
+    border: 1px solid var(--earth);
+    padding: 14px 18px;
+    z-index: 50;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    backdrop-filter: blur(8px);
+    text-align: right;
+  }
+
+  #seismicIndicator h4 {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--terra);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  #seismicReadout {
+    color: var(--sand);
+    line-height: 1.6;
+  }
+
+  /* FILTER BAR */
+  #filterBar {
+    position: fixed;
+    top: 72px; right: 16px;
+    display: flex;
+    gap: 6px;
+    z-index: 50;
+  }
+
+  .filter-btn {
+    background: rgba(26,21,16,0.88);
+    border: 1px solid var(--earth);
+    color: var(--sand);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 6px 12px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    backdrop-filter: blur(8px);
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: rgba(107,91,62,0.3);
+    border-color: var(--sand);
+    color: var(--white-marble);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--earth); border-radius: 2px; }
+
+  /* SVG styles */
+  .node-circle {
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+
+  .node-label {
+    font-family: 'JetBrains Mono', monospace;
+    pointer-events: none;
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+
+  .link-line {
+    transition: stroke 0.3s, stroke-width 0.3s, stroke-opacity 0.3s;
+  }
+
+  /* Seismic pulse animation */
+  @keyframes seismicPulse {
+    0% { r: 0; opacity: 0.6; }
+    100% { r: 60; opacity: 0; }
+  }
+
+  .seismic-ring {
+    fill: none;
+    stroke: var(--sand);
+    stroke-width: 1.5;
+    animation: seismicPulse 1.2s ease-out forwards;
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="title-block">
+    <h1>SEISMIC SENSE</h1>
+    <span class="subtitle">Toph Landfall Commander &mdash; Synergy Map</span>
+  </div>
+  <div class="deck-stats">
+    <span class="stat lands"><span class="num" id="landCount">0</span> Lands</span>
+    <span class="stat creatures"><span class="num" id="creatureCount">0</span> Creatures</span>
+    <span class="stat spells"><span class="num" id="spellCount">0</span> Spells</span>
+    <span class="stat artifacts"><span class="num" id="artifactCount">0</span> Artifacts</span>
+  </div>
+</div>
+
+<svg id="graph"></svg>
+
+<div id="cardPanel">
+  <div class="card-header">
+    <div class="card-name"></div>
+    <div class="card-type"></div>
+    <div class="card-mana"></div>
+  </div>
+  <div class="card-text"></div>
+  <div class="card-synergies">
+    <h4>Synergies</h4>
+    <div class="synergy-list"></div>
+  </div>
+</div>
+
+<div id="filterBar">
+  <button class="filter-btn active" data-filter="all">ALL</button>
+  <button class="filter-btn" data-filter="land">LANDS</button>
+  <button class="filter-btn" data-filter="creature">CREATURES</button>
+  <button class="filter-btn" data-filter="enchantment">ENCHANT</button>
+  <button class="filter-btn" data-filter="artifact">ARTIFACTS</button>
+  <button class="filter-btn" data-filter="spell">SPELLS</button>
+</div>
+
+<div id="legend">
+  <h4>Card Types</h4>
+  <div class="legend-row"><div class="legend-dot" style="background:#4a7c3f"></div>Land</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#a0522d"></div>Creature</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#2a4a6b"></div>Enchantment</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#d4a843"></div>Artifact</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#8b3a3a"></div>Instant/Sorcery</div>
+  <div class="legend-row" style="margin-top:8px;"><div class="legend-dot" style="background:var(--sand);border-radius:50%;width:14px;height:14px;"></div>Commander</div>
+</div>
+
+<div id="seismicIndicator">
+  <h4>Seismic Sense</h4>
+  <div id="seismicReadout">Hover a card to feel<br>the vibrations...</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// TOPH LANDFALL COMMANDER DECK DATA
+// Gruul (R/G) Landfall with Omnath, Locus of Rage
+// ═══════════════════════════════════════════
+
+const CARDS = [
+  // === COMMANDER ===
+  { id: "omnath",       name: "Omnath, Locus of Rage",     type: "creature",    subtype: "Legendary Creature — Elemental", mana: "{5}{R}{G}", cmc: 7, tags: ["commander","landfall","token","elemental","payoff"], text: "Landfall — Create a 5/5 red and green Elemental creature token. When an Elemental you control dies, it deals 3 damage to any target.", isCommander: true },
+
+  // === LANDS (38) ===
+  { id: "evolving",     name: "Evolving Wilds",            type: "land",        subtype: "Land", mana: "", cmc: 0, tags: ["fetch","landfall-trigger","basic-search"], text: "Sacrifice: Search for a basic land card, put it onto the battlefield tapped." },
+  { id: "terramorphic", name: "Terramorphic Expanse",      type: "land",        subtype: "Land", mana: "", cmc: 0, tags: ["fetch","landfall-trigger","basic-search"], text: "Sacrifice: Search for a basic land card, put it onto the battlefield tapped." },
+  { id: "fabled",       name: "Fabled Passage",            type: "land",        subtype: "Land", mana: "", cmc: 0, tags: ["fetch","landfall-trigger","basic-search"], text: "Sacrifice: Search for a basic. Untapped if you control 4+ lands." },
+  { id: "prismatic",    name: "Prismatic Vista",           type: "land",        subtype: "Land", mana: "", cmc: 0, tags: ["fetch","landfall-trigger","basic-search"], text: "Pay 1 life, sacrifice: Search for a basic land, put it onto the battlefield untapped." },
+  { id: "wooded",       name: "Wooded Foothills",          type: "land",        subtype: "Land", mana: "", cmc: 0, tags: ["fetch","landfall-trigger","mountain","forest"], text: "Pay 1 life, sacrifice: Search for a Mountain or Forest card." },
+  { id: "stomping",     name: "Stomping Ground",           type: "land",        subtype: "Land — Mountain Forest", mana: "", cmc: 0, tags: ["dual","mountain","forest","fetchable"], text: "Enters tapped unless you pay 2 life." },
+  { id: "cinder",       name: "Cinder Glade",              type: "land",        subtype: "Land — Mountain Forest", mana: "", cmc: 0, tags: ["dual","mountain","forest","fetchable"], text: "Enters tapped unless you control 2+ basics." },
+  { id: "gruul_turf",   name: "Gruul Turf",                type: "land",        subtype: "Land", mana: "", cmc: 0, tags: ["bounce","landfall-trigger","ramp"], text: "Enters tapped. When enters, return a land to your hand. Tap: Add {R}{G}." },
+  { id: "valakut",      name: "Valakut, the Molten Pinnacle", type: "land",     subtype: "Land", mana: "", cmc: 0, tags: ["payoff","mountain","damage"], text: "When a Mountain enters under your control, if you control 5+ Mountains, deal 3 damage to any target." },
+  { id: "field_dead",   name: "Field of the Dead",         type: "land",        subtype: "Land", mana: "", cmc: 0, tags: ["payoff","token","landfall-trigger"], text: "When a land enters under your control, if you control 7+ lands with different names, create a 2/2 Zombie." },
+  { id: "castle_garenbrig", name: "Castle Garenbrig",      type: "land",        subtype: "Land", mana: "", cmc: 0, tags: ["ramp","forest"], text: "Enters tapped unless you control a Forest. Tap, pay 2: Add 6 {G} for creatures." },
+  { id: "mosswort",     name: "Mosswort Bridge",           type: "land",        subtype: "Land", mana: "", cmc: 0, tags: ["hideaway","payoff"], text: "Hideaway 4. Tap, pay {G}: Play the exiled card if creatures you control have total power 10+." },
+  { id: "kessig",       name: "Kessig Wolf Run",           type: "land",        subtype: "Land", mana: "", cmc: 0, tags: ["pump","trample"], text: "Tap: Add {C}. {X}{R}{G}, Tap: Target creature gets +X/+0 and trample." },
+  { id: "mountain1",    name: "Mountain",                  type: "land",        subtype: "Basic Land — Mountain", mana: "", cmc: 0, tags: ["basic","mountain"], text: "Basic land." },
+  { id: "mountain2",    name: "Mountain (2)",              type: "land",        subtype: "Basic Land — Mountain", mana: "", cmc: 0, tags: ["basic","mountain"], text: "Basic land." },
+  { id: "mountain3",    name: "Mountain (3)",              type: "land",        subtype: "Basic Land — Mountain", mana: "", cmc: 0, tags: ["basic","mountain"], text: "Basic land." },
+  { id: "forest1",      name: "Forest",                    type: "land",        subtype: "Basic Land — Forest", mana: "", cmc: 0, tags: ["basic","forest"], text: "Basic land." },
+  { id: "forest2",      name: "Forest (2)",                type: "land",        subtype: "Basic Land — Forest", mana: "", cmc: 0, tags: ["basic","forest"], text: "Basic land." },
+  { id: "forest3",      name: "Forest (3)",                type: "land",        subtype: "Basic Land — Forest", mana: "", cmc: 0, tags: ["basic","forest"], text: "Basic land." },
+
+  // === CREATURES (18) ===
+  { id: "avenger",      name: "Avenger of Zendikar",       type: "creature",    subtype: "Creature — Elemental", mana: "{5}{G}{G}", cmc: 7, tags: ["landfall","token","payoff","elemental","plant"], text: "ETB: Create a 0/1 Plant for each land you control. Landfall — Put a +1/+1 counter on each Plant you control." },
+  { id: "rampaging",    name: "Rampaging Baloths",         type: "creature",    subtype: "Creature — Beast", mana: "{4}{G}{G}", cmc: 6, tags: ["landfall","token","payoff"], text: "Trample. Landfall — Create a 4/4 green Beast creature token." },
+  { id: "lotus_cobra",  name: "Lotus Cobra",               type: "creature",    subtype: "Creature — Snake", mana: "{1}{G}", cmc: 2, tags: ["landfall","ramp","mana"], text: "Landfall — Add one mana of any color." },
+  { id: "tireless",     name: "Tireless Provisioner",      type: "creature",    subtype: "Creature — Elf Scout", mana: "{2}{G}", cmc: 3, tags: ["landfall","ramp","mana","treasure","food"], text: "Landfall — Create a Treasure or Food token." },
+  { id: "scute",        name: "Scute Swarm",               type: "creature",    subtype: "Creature — Insect", mana: "{2}{G}", cmc: 3, tags: ["landfall","token","payoff","exponential"], text: "Landfall — Create a 1/1 Insect. If you control 6+ lands, create a copy of Scute Swarm instead." },
+  { id: "oracle_mul",   name: "Oracle of Mul Daya",        type: "creature",    subtype: "Creature — Elf Shaman", mana: "{3}{G}", cmc: 4, tags: ["extra-land","ramp","topdeck"], text: "Play with top card revealed. You may play an additional land each turn." },
+  { id: "azusa",        name: "Azusa, Lost but Seeking",   type: "creature",    subtype: "Legendary Creature — Human Monk", mana: "{2}{G}", cmc: 3, tags: ["extra-land","ramp"], text: "You may play two additional lands on each of your turns." },
+  { id: "dryad",        name: "Dryad of the Ilysian Grove", type: "creature",   subtype: "Creature — Nymph Dryad", mana: "{2}{G}", cmc: 3, tags: ["extra-land","fixing","mountain"], text: "You may play an additional land each turn. Lands you control are every basic type." },
+  { id: "titania",      name: "Titania, Protector of Argoth", type: "creature", subtype: "Legendary Creature — Elemental", mana: "{3}{G}{G}", cmc: 5, tags: ["landfall","token","sacrifice","elemental","payoff"], text: "ETB: Return land from graveyard. When a land is put into your graveyard, create a 5/3 Elemental." },
+  { id: "ob_nixilis",   name: "Ob Nixilis, the Fallen",    type: "creature",    subtype: "Legendary Creature — Demon", mana: "{3}{B}{B}", cmc: 5, tags: ["landfall","damage","drain","payoff"], text: "Landfall — You may have target player lose 3 life. If you do, put three +1/+1 counters on Ob Nixilis." },
+  { id: "angry_omnath",  name: "Omnath, Locus of Creation", type: "creature",   subtype: "Legendary Creature — Elemental", mana: "{R}{G}{W}{U}", cmc: 4, tags: ["landfall","lifegain","ramp","damage","elemental"], text: "ETB: Draw a card. Landfall (1st): Gain 4 life. (2nd): Add {R}{G}{W}{U}. (3rd): Deal 4 damage to each opponent." },
+  { id: "terror",       name: "Terror of the Peaks",       type: "creature",    subtype: "Creature — Dragon", mana: "{3}{R}{R}", cmc: 5, tags: ["token-synergy","damage","payoff"], text: "When another creature ETB under your control, deal damage equal to that creature's power to any target." },
+  { id: "ancient_green", name: "Ancient Greenwarden",      type: "creature",    subtype: "Creature — Elemental", mana: "{4}{G}{G}", cmc: 6, tags: ["landfall","double","graveyard","elemental"], text: "You may play lands from your graveyard. If a land entering causes a triggered ability, that ability triggers an additional time." },
+  { id: "wood_elves",   name: "Wood Elves",                type: "creature",    subtype: "Creature — Elf Scout", mana: "{2}{G}", cmc: 3, tags: ["ramp","forest","fetch","landfall-trigger"], text: "ETB: Search for a Forest card, put it onto the battlefield." },
+  { id: "sakura",       name: "Sakura-Tribe Elder",        type: "creature",    subtype: "Creature — Snake Shaman", mana: "{1}{G}", cmc: 2, tags: ["ramp","fetch","sacrifice","landfall-trigger","basic-search"], text: "Sacrifice: Search for a basic land card, put it onto the battlefield tapped." },
+  { id: "ramunap",      name: "Ramunap Excavator",         type: "creature",    subtype: "Creature — Naga Cleric", mana: "{2}{G}", cmc: 3, tags: ["graveyard","recursion","extra-land"], text: "You may play lands from your graveyard." },
+  { id: "bane_progress", name: "Bane of Progress",         type: "creature",    subtype: "Creature — Elemental", mana: "{4}{G}{G}", cmc: 6, tags: ["removal","elemental"], text: "ETB: Destroy all artifacts and enchantments. Put a +1/+1 counter on Bane for each permanent destroyed." },
+
+  // === ENCHANTMENTS (6) ===
+  { id: "zendikar_resurgent", name: "Zendikar Resurgent",  type: "enchantment", subtype: "Enchantment", mana: "{5}{G}{G}", cmc: 7, tags: ["ramp","draw","mana-doubler"], text: "When you tap a land for mana, add one additional mana. When a creature enters under your control, draw a card." },
+  { id: "warstorm",     name: "Warstorm Surge",            type: "enchantment", subtype: "Enchantment", mana: "{5}{R}", cmc: 6, tags: ["token-synergy","damage","payoff"], text: "When a creature ETB under your control, it deals damage equal to its power to any target." },
+  { id: "burgeoning",   name: "Burgeoning",                type: "enchantment", subtype: "Enchantment", mana: "{G}", cmc: 1, tags: ["extra-land","ramp"], text: "Whenever an opponent plays a land, you may put a land from your hand onto the battlefield." },
+  { id: "retreat_kazandu", name: "Retreat to Kazandu",      type: "enchantment", subtype: "Enchantment", mana: "{2}{G}", cmc: 3, tags: ["landfall","pump","lifegain"], text: "Landfall — Choose one: Put a +1/+1 counter on target creature; or you gain 2 life." },
+  { id: "retreat_valakut", name: "Retreat to Valakut",      type: "enchantment", subtype: "Enchantment", mana: "{2}{R}", cmc: 3, tags: ["landfall","damage","pump"], text: "Landfall — Choose one: Target creature gets +2/+0; or deal 1 damage to target creature." },
+  { id: "where_ancients", name: "Where Ancients Tread",    type: "enchantment", subtype: "Enchantment", mana: "{3}{R}{R}", cmc: 5, tags: ["token-synergy","damage","payoff"], text: "When a creature with power 5+ ETB under your control, deal 5 damage to any target." },
+
+  // === ARTIFACTS (5) ===
+  { id: "sol_ring",     name: "Sol Ring",                  type: "artifact",    subtype: "Artifact", mana: "{1}", cmc: 1, tags: ["ramp","mana"], text: "Tap: Add {C}{C}." },
+  { id: "horn_greed",   name: "Horn of Greed",             type: "artifact",    subtype: "Artifact", mana: "{3}", cmc: 3, tags: ["landfall","draw"], text: "Whenever a player plays a land, that player draws a card." },
+  { id: "crucible",     name: "Crucible of Worlds",        type: "artifact",    subtype: "Artifact", mana: "{3}", cmc: 3, tags: ["graveyard","recursion","extra-land"], text: "You may play lands from your graveyard." },
+  { id: "zuran_orb",    name: "Zuran Orb",                 type: "artifact",    subtype: "Artifact", mana: "{0}", cmc: 0, tags: ["sacrifice","lifegain","landfall-trigger"], text: "Sacrifice a land: You gain 2 life." },
+  { id: "lightning_greaves", name: "Lightning Greaves",    type: "artifact",    subtype: "Artifact — Equipment", mana: "{2}", cmc: 2, tags: ["protection","haste"], text: "Equipped creature has shroud and haste. Equip {0}." },
+
+  // === INSTANTS/SORCERIES (8) ===
+  { id: "cultivate",    name: "Cultivate",                 type: "spell",       subtype: "Sorcery", mana: "{2}{G}", cmc: 3, tags: ["ramp","basic-search","landfall-trigger"], text: "Search for two basic lands. Put one onto the battlefield tapped, the other into your hand." },
+  { id: "kodamas",      name: "Kodama's Reach",            type: "spell",       subtype: "Sorcery — Arcane", mana: "{2}{G}", cmc: 3, tags: ["ramp","basic-search","landfall-trigger"], text: "Search for two basic lands. Put one onto the battlefield tapped, the other into your hand." },
+  { id: "scapeshift",   name: "Scapeshift",                type: "spell",       subtype: "Sorcery", mana: "{2}{G}{G}", cmc: 4, tags: ["landfall-trigger","sacrifice","fetch","combo"], text: "Sacrifice any number of lands. Search for that many lands, put them onto the battlefield." },
+  { id: "splendid_rec",  name: "Splendid Reclamation",     type: "spell",       subtype: "Sorcery", mana: "{3}{G}", cmc: 4, tags: ["graveyard","landfall-trigger","mass-recursion"], text: "Return all land cards from your graveyard to the battlefield tapped." },
+  { id: "boundless",    name: "Boundless Realms",          type: "spell",       subtype: "Sorcery", mana: "{6}{G}", cmc: 7, tags: ["ramp","basic-search","landfall-trigger","mass"], text: "Search for up to X basic lands where X is the number of lands you control. Put them onto the battlefield tapped." },
+  { id: "beast_within",  name: "Beast Within",             type: "spell",       subtype: "Instant", mana: "{2}{G}", cmc: 3, tags: ["removal"], text: "Destroy target permanent. Its controller creates a 3/3 Beast." },
+  { id: "chord",        name: "Chord of Calling",          type: "spell",       subtype: "Instant", mana: "{X}{G}{G}{G}", cmc: 3, tags: ["tutor","creature-search","convoke"], text: "Convoke. Search for a creature with CMC X or less, put it onto the battlefield." },
+  { id: "heroic_int",   name: "Heroic Intervention",       type: "spell",       subtype: "Instant", mana: "{1}{G}", cmc: 2, tags: ["protection"], text: "Until end of turn, permanents you control gain hexproof and indestructible." },
+];
+
+// ═══════════════════════════════════════════
+// SYNERGY LINKS — computed from shared tags
+// ═══════════════════════════════════════════
+
+const SYNERGY_TAGS = [
+  "landfall", "landfall-trigger", "extra-land", "ramp", "token",
+  "token-synergy", "payoff", "damage", "sacrifice", "graveyard",
+  "recursion", "elemental", "fetch", "basic-search", "mountain"
+];
+
+const links = [];
+const linkSet = new Set();
+
+for (let i = 0; i < CARDS.length; i++) {
+  for (let j = i + 1; j < CARDS.length; j++) {
+    const a = CARDS[i], b = CARDS[j];
+    const shared = a.tags.filter(t => b.tags.includes(t) && SYNERGY_TAGS.includes(t));
+
+    // Special synergy rules
+    let strength = shared.length;
+
+    // Landfall triggers + landfall payoffs
+    if ((a.tags.includes('landfall-trigger') && b.tags.includes('landfall')) ||
+        (b.tags.includes('landfall-trigger') && a.tags.includes('landfall'))) {
+      strength += 2;
+    }
+
+    // Token makers + token damage
+    if ((a.tags.includes('token') && b.tags.includes('token-synergy')) ||
+        (b.tags.includes('token') && a.tags.includes('token-synergy'))) {
+      strength += 2;
+    }
+
+    // Extra land plays + landfall
+    if ((a.tags.includes('extra-land') && b.tags.includes('landfall')) ||
+        (b.tags.includes('extra-land') && a.tags.includes('landfall'))) {
+      strength += 1;
+    }
+
+    if (strength >= 2) {
+      const key = `${a.id}-${b.id}`;
+      if (!linkSet.has(key)) {
+        linkSet.add(key);
+        links.push({ source: a.id, target: b.id, strength, sharedTags: shared });
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// D3 FORCE-DIRECTED GRAPH
+// ═══════════════════════════════════════════
+
+const svg = d3.select('#graph');
+const width = window.innerWidth;
+const height = window.innerHeight - 56;
+svg.attr('viewBox', `0 0 ${width} ${height}`);
+
+// Color map
+const typeColors = {
+  land: '#4a7c3f',
+  creature: '#a0522d',
+  enchantment: '#2a4a6b',
+  artifact: '#d4a843',
+  spell: '#8b3a3a'
+};
+
+// Node sizes
+function nodeRadius(d) {
+  if (d.isCommander) return 24;
+  if (d.type === 'land') return 8;
+  if (d.tags.includes('payoff')) return 16;
+  if (d.cmc >= 5) return 14;
+  return 11;
+}
+
+// Defs
+const defs = svg.append('defs');
+defs.append('filter').attr('id', 'earthGlow')
+  .append('feGaussianBlur').attr('stdDeviation', 6).attr('in', 'SourceGraphic');
+
+// Radial gradient for commander
+const cmdGrad = defs.append('radialGradient').attr('id', 'commanderGlow');
+cmdGrad.append('stop').attr('offset', '0%').attr('stop-color', '#c2b280').attr('stop-opacity', 0.4);
+cmdGrad.append('stop').attr('offset', '100%').attr('stop-color', '#c2b280').attr('stop-opacity', 0);
+
+// Groups
+const gLinks = svg.append('g').attr('class', 'links-layer');
+const gPulse = svg.append('g').attr('class', 'pulse-layer');
+const gNodes = svg.append('g').attr('class', 'nodes-layer');
+const gLabels = svg.append('g').attr('class', 'labels-layer');
+
+// Force simulation
+const simulation = d3.forceSimulation(CARDS)
+  .force("charge", d3.forceManyBody().strength(d => d.isCommander ? -200 : -120))
+  .force("link", d3.forceLink(links).id(d => d.id).distance(d => 100 - d.strength * 8).strength(d => d.strength * 0.02))
+  .force("center", d3.forceCenter(width / 2, height / 2))
+  .force("gravity", d3.forceRadial(d => {
+    if (d.isCommander) return 0;
+    if (d.type === 'land') return 300;
+    if (d.type === 'creature') return 180;
+    return 220;
+  }, width / 2, height / 2).strength(d => {
+    if (d.isCommander) return 0.3;
+    if (d.type === 'land') return 0.08;
+    return 0.04;
+  }))
+  .force("collide", d3.forceCollide(d => nodeRadius(d) + 6));
+
+// Draw links
+const linkElements = gLinks.selectAll('line')
+  .data(links)
+  .enter().append('line')
+  .attr('class', 'link-line')
+  .attr('stroke', '#333')
+  .attr('stroke-width', d => Math.min(d.strength * 0.5, 3))
+  .attr('stroke-opacity', 0.15)
+  .attr('stroke-dasharray', d => d.strength >= 4 ? 'none' : '3 4');
+
+// Draw nodes
+const nodeElements = gNodes.selectAll('g')
+  .data(CARDS)
+  .enter().append('g')
+  .attr('class', 'node-group')
+  .call(d3.drag()
+    .on("start", dragStarted)
+    .on("drag", dragged)
+    .on("end", dragEnded));
+
+// Commander glow
+nodeElements.filter(d => d.isCommander)
+  .append('circle')
+  .attr('r', 40)
+  .attr('fill', 'url(#commanderGlow)');
+
+// Node circles
+nodeElements.append('circle')
+  .attr('class', 'node-circle')
+  .attr('r', d => nodeRadius(d))
+  .attr('fill', d => {
+    const c = typeColors[d.type];
+    return d.isCommander ? '#c2b280' : c;
+  })
+  .attr('fill-opacity', d => d.isCommander ? 0.9 : 0.7)
+  .attr('stroke', d => d.isCommander ? '#c2b280' : typeColors[d.type])
+  .attr('stroke-width', d => d.isCommander ? 3 : 1.5)
+  .attr('stroke-opacity', 0.8);
+
+// Commander inner symbol
+nodeElements.filter(d => d.isCommander)
+  .append('text')
+  .attr('text-anchor', 'middle')
+  .attr('dy', 1)
+  .attr('fill', '#1a1510')
+  .attr('font-family', 'Cinzel, serif')
+  .attr('font-weight', '900')
+  .attr('font-size', '14px')
+  .text('T');
+
+// Labels for important cards
+const labelElements = gLabels.selectAll('text')
+  .data(CARDS.filter(d => d.isCommander || d.tags.includes('payoff') || d.cmc >= 5 || d.type === 'enchantment'))
+  .enter().append('text')
+  .attr('class', 'node-label')
+  .attr('dy', d => nodeRadius(d) + 12)
+  .attr('fill', d => d.isCommander ? '#c2b280' : typeColors[d.type])
+  .attr('fill-opacity', 0.8)
+  .attr('font-size', d => d.isCommander ? '10px' : '8px')
+  .attr('font-weight', d => d.isCommander ? '700' : '400')
+  .text(d => d.name.length > 20 ? d.name.substring(0, 18) + '…' : d.name);
+
+// ═══════════════════════════════════════════
+// SEISMIC SENSE — Hover Interaction
+// ═══════════════════════════════════════════
+
+let activeNode = null;
+
+nodeElements.on("mouseenter", function(event, d) {
+  activeNode = d;
+
+  // Seismic pulse
+  gPulse.selectAll('.seismic-ring').remove();
+  for (let i = 0; i < 3; i++) {
+    gPulse.append('circle')
+      .attr('class', 'seismic-ring')
+      .attr('cx', d.x)
+      .attr('cy', d.y)
+      .attr('r', 0)
+      .attr('stroke', typeColors[d.type] || '#c2b280')
+      .attr('stroke-opacity', 0.5)
+      .style('animation-delay', `${i * 0.25}s`);
+  }
+
+  // Get connected nodes
+  const connected = new Set();
+  links.forEach(l => {
+    const srcId = typeof l.source === 'object' ? l.source.id : l.source;
+    const tgtId = typeof l.target === 'object' ? l.target.id : l.target;
+    if (srcId === d.id) connected.add(tgtId);
+    if (tgtId === d.id) connected.add(srcId);
+  });
+
+  // Highlight links
+  linkElements
+    .attr('stroke', l => {
+      const srcId = typeof l.source === 'object' ? l.source.id : l.source;
+      const tgtId = typeof l.target === 'object' ? l.target.id : l.target;
+      return (srcId === d.id || tgtId === d.id) ? '#c2b280' : '#222';
+    })
+    .attr('stroke-width', l => {
+      const srcId = typeof l.source === 'object' ? l.source.id : l.source;
+      const tgtId = typeof l.target === 'object' ? l.target.id : l.target;
+      return (srcId === d.id || tgtId === d.id) ? Math.min(l.strength, 5) : 0.5;
+    })
+    .attr('stroke-opacity', l => {
+      const srcId = typeof l.source === 'object' ? l.source.id : l.source;
+      const tgtId = typeof l.target === 'object' ? l.target.id : l.target;
+      return (srcId === d.id || tgtId === d.id) ? 0.8 : 0.04;
+    });
+
+  // Dim non-connected nodes
+  nodeElements.select('.node-circle')
+    .attr('fill-opacity', n => (n.id === d.id || connected.has(n.id)) ? 0.9 : 0.1)
+    .attr('stroke-opacity', n => (n.id === d.id || connected.has(n.id)) ? 1 : 0.1);
+
+  // Update seismic readout
+  const readout = document.getElementById('seismicReadout');
+  readout.innerHTML = `
+    <div style="color:${typeColors[d.type] || '#c2b280'}; font-weight:700; margin-bottom:4px;">${d.name}</div>
+    <div style="color:var(--earth)">Connections: ${connected.size}</div>
+    <div style="color:var(--earth)">Tags: ${d.tags.slice(0, 4).join(', ')}</div>
+  `;
+
+  // Show card panel
+  showCardPanel(d, connected);
+});
+
+nodeElements.on("mouseleave", function() {
+  activeNode = null;
+  gPulse.selectAll('.seismic-ring').remove();
+
+  linkElements
+    .attr('stroke', '#333')
+    .attr('stroke-width', d => Math.min(d.strength * 0.5, 3))
+    .attr('stroke-opacity', 0.15);
+
+  nodeElements.select('.node-circle')
+    .attr('fill-opacity', d => d.isCommander ? 0.9 : 0.7)
+    .attr('stroke-opacity', 0.8);
+
+  document.getElementById('seismicReadout').innerHTML = 'Hover a card to feel<br>the vibrations...';
+  document.getElementById('cardPanel').style.display = 'none';
+});
+
+// Card panel
+function showCardPanel(d, connected) {
+  const panel = document.getElementById('cardPanel');
+  panel.style.display = 'block';
+  panel.querySelector('.card-name').textContent = d.name;
+  panel.querySelector('.card-name').style.color = d.isCommander ? '#c2b280' : typeColors[d.type];
+  panel.querySelector('.card-type').textContent = d.subtype;
+  panel.querySelector('.card-mana').textContent = d.mana || '—';
+  panel.querySelector('.card-text').textContent = d.text;
+
+  const synList = panel.querySelector('.synergy-list');
+  synList.innerHTML = '';
+  d.tags.forEach(tag => {
+    const el = document.createElement('span');
+    el.className = 'synergy-tag';
+    el.textContent = tag;
+    synList.appendChild(el);
+  });
+}
+
+// ═══════════════════════════════════════════
+// FILTER BUTTONS
+// ═══════════════════════════════════════════
+
+let currentFilter = 'all';
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+
+    nodeElements.style('opacity', d => {
+      if (currentFilter === 'all') return 1;
+      return d.type === currentFilter ? 1 : 0.08;
+    });
+
+    linkElements.style('opacity', l => {
+      if (currentFilter === 'all') return 1;
+      const srcType = (typeof l.source === 'object' ? l.source : CARDS.find(c => c.id === l.source)).type;
+      const tgtType = (typeof l.target === 'object' ? l.target : CARDS.find(c => c.id === l.target)).type;
+      return (srcType === currentFilter || tgtType === currentFilter) ? 0.6 : 0.02;
+    });
+
+    gLabels.selectAll('text').style('opacity', d => {
+      if (currentFilter === 'all') return 1;
+      return d.type === currentFilter ? 1 : 0.05;
+    });
+  });
+});
+
+// ═══════════════════════════════════════════
+// SIMULATION TICK
+// ═══════════════════════════════════════════
+
+simulation.on("tick", () => {
+  linkElements
+    .attr('x1', d => d.source.x)
+    .attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x)
+    .attr('y2', d => d.target.y);
+
+  nodeElements.attr('transform', d => `translate(${d.x},${d.y})`);
+
+  labelElements
+    .attr('x', d => d.x)
+    .attr('y', d => d.y);
+
+  // Update seismic pulses
+  if (activeNode) {
+    gPulse.selectAll('.seismic-ring')
+      .attr('cx', activeNode.x)
+      .attr('cy', activeNode.y);
+  }
+});
+
+// Drag handlers
+function dragStarted(event, d) {
+  if (!event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+
+function dragged(event, d) {
+  d.fx = event.x;
+  d.fy = event.y;
+}
+
+function dragEnded(event, d) {
+  if (!event.active) simulation.alphaTarget(0);
+  d.fx = null;
+  d.fy = null;
+}
+
+// ═══════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════
+
+document.getElementById('landCount').textContent = CARDS.filter(c => c.type === 'land').length;
+document.getElementById('creatureCount').textContent = CARDS.filter(c => c.type === 'creature').length;
+document.getElementById('spellCount').textContent = CARDS.filter(c => c.type === 'spell' || c.type === 'enchantment').length;
+document.getElementById('artifactCount').textContent = CARDS.filter(c => c.type === 'artifact').length;
+
+// ═══════════════════════════════════════════
+// AMBIENT: Slow earth rotation on background
+// ═══════════════════════════════════════════
+
+const bgRing = svg.insert('circle', ':first-child')
+  .attr('cx', width / 2)
+  .attr('cy', height / 2)
+  .attr('r', 320)
+  .attr('fill', 'none')
+  .attr('stroke', 'rgba(107,91,62,0.06)')
+  .attr('stroke-width', 1)
+  .attr('stroke-dasharray', '4 8');
+
+const bgRing2 = svg.insert('circle', ':first-child')
+  .attr('cx', width / 2)
+  .attr('cy', height / 2)
+  .attr('r', 200)
+  .attr('fill', 'none')
+  .attr('stroke', 'rgba(74,124,63,0.04)')
+  .attr('stroke-width', 1)
+  .attr('stroke-dasharray', '2 10');
+
+// Slow rotation
+let angle = 0;
+function rotateRings() {
+  angle += 0.05;
+  bgRing.attr('stroke-dashoffset', angle);
+  bgRing2.attr('stroke-dashoffset', -angle * 1.5);
+  requestAnimationFrame(rotateRings);
+}
+rotateRings();
+
+</script>
+</body>
+</html>

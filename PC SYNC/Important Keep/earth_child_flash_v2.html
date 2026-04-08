@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Earth Child Flash · Avan's 10 · Jaclyn Rose Thorston</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Quicksand:wght@300;400;500;600;700&display=swap');
+:root{
+  --bg:#0a2e2e;--bg2:#0d3838;--bg3:#104242;
+  --teal:#1a5c5c;--tealh:#1f6e6e;--teall:#0f4040;
+  --p:#dd55ff;--ph:#ee77ff;--pl:#bb44dd;--pd:#9933bb;
+  --neon:#ff55ff;--neonh:#ff88ff;
+  --w:#f0f8f8;--t:rgba(240,248,248,.6);--td:rgba(240,248,248,.35);--tdd:rgba(240,248,248,.15);
+  --line:rgba(221,85,255,.15);--lineh:rgba(221,85,255,.3);
+  --gold:#d4a84c;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--w);font-family:'Quicksand',sans-serif;min-height:100vh;overflow-x:hidden}
+::selection{background:var(--pl);color:#fff}
+
+.header{text-align:center;padding:32px 20px 20px;position:relative}
+.header::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--neon),transparent)}
+.header h1{font-family:'Cormorant Garamond';font-size:42px;font-weight:300;letter-spacing:8px;color:var(--neon);text-shadow:0 0 30px rgba(255,85,255,.4),0 0 60px rgba(255,85,255,.15)}
+.header h1 em{font-weight:600;font-style:italic}
+.header .sub{font-size:11px;color:var(--td);letter-spacing:3px;margin-top:6px}
+.header .artist{font-family:'Cormorant Garamond';font-size:14px;color:var(--t);margin-top:8px;font-style:italic}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;padding:24px 20px;max-width:1500px;margin:0 auto}
+
+.design{background:var(--bg2);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .3s;position:relative}
+.design:hover{border-color:var(--neon);box-shadow:0 0 30px rgba(255,85,255,.18),0 0 60px rgba(255,85,255,.06);transform:translateY(-3px)}
+.design .art{width:100%;aspect-ratio:.85;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,var(--teall),var(--teal),var(--bg3));position:relative;overflow:hidden}
+.design .art::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(255,85,255,.03),transparent 65%)}
+.design .art svg{width:88%;height:88%;filter:drop-shadow(0 0 6px rgba(255,85,255,.25))}
+.design .info{padding:12px 14px}
+.design .info h3{font-family:'Cormorant Garamond';font-size:17px;font-weight:500;color:var(--neon)}
+.design .info .style{font-size:9px;color:var(--td);letter-spacing:1.5px;margin-top:1px}
+.design .info .desc{font-size:10px;color:var(--t);margin-top:6px;line-height:1.5}
+.design .info .tags{margin-top:8px;display:flex;gap:4px;flex-wrap:wrap}
+.tag{padding:2px 8px;border-radius:10px;font-size:7.5px;font-weight:600;letter-spacing:.5px}
+.tag-flash{background:rgba(255,85,255,.1);color:var(--neonh);border:1px solid rgba(255,85,255,.2)}
+.tag-designer{background:rgba(212,168,76,.12);color:var(--gold);border:1px solid rgba(212,168,76,.2)}
+.tag-style{background:rgba(240,248,248,.06);color:var(--t);border:1px solid rgba(240,248,248,.1)}
+.design .num{position:absolute;top:10px;left:10px;width:24px;height:24px;border-radius:50%;background:rgba(255,85,255,.12);border:1px solid rgba(255,85,255,.3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--neon)}
+.design .price{position:absolute;top:10px;right:10px;padding:3px 10px;border-radius:8px;background:rgba(10,46,46,.85);border:1px solid rgba(255,85,255,.25);font-size:9px;font-weight:700;color:var(--gold)}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(10,46,46,.92);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.modal-bg.on{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--neon);border-radius:16px;max-width:580px;width:92%;max-height:92vh;overflow-y:auto;box-shadow:0 0 60px rgba(255,85,255,.2)}
+.modal-art{width:100%;aspect-ratio:.9;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,var(--teall),var(--teal));border-radius:16px 16px 0 0;position:relative}
+.modal-art svg{width:78%;height:78%;filter:drop-shadow(0 0 10px rgba(255,85,255,.35))}
+.modal-info{padding:20px}
+.modal-info h2{font-family:'Cormorant Garamond';font-size:24px;font-weight:400;color:var(--neon)}
+.modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:rgba(10,46,46,.7);border:1px solid rgba(255,85,255,.3);color:var(--neon);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:rgba(255,85,255,.2)}
+
+.footer{text-align:center;padding:32px 20px;border-top:1px solid var(--line);margin-top:20px}
+.footer p{font-size:9px;color:var(--tdd);letter-spacing:1px}
+.footer .sig{font-family:'Cormorant Garamond';font-size:14px;color:var(--td);margin-top:8px;font-style:italic}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><em>Earth Child</em> Flash</h1>
+  <div class="sub">AVAN'S 10 · ORIGINAL DESIGNS · JACLYN ROSE THORSTON</div>
+  <div class="artist">Illustrative · Bold Detail · Flowing Fabric · Dynamic Figures — earthchildtattoo.jr@gmail.com</div>
+</div>
+
+<div class="grid" id="gallery"></div>
+
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-art" id="modal-art"><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-info" id="modal-info"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>EARTH CHILD TATTOO LLC · 74 BIRCH AVE S · MAPLE LAKE, MN 55358 · 320.492.2465</p>
+  <p style="margin-top:4px">$100 NON-REFUNDABLE DEPOSIT TO BOOK · MDH & OSHA COMPLIANT</p>
+  <div class="sig">designed with love by Avan · for Jaclyn 🌿</div>
+</div>
+
+<script>
+// Jaclyn's style: illustrative realism, flowing fabric, dynamic figures,
+// heavy shading (stipple/hatch), dramatic hair, movement, depth
+const P='#dd55ff',PH='#ee77ff',PL='#bb44dd',PD='#9933bb',N='#ff55ff',NH='#ff88ff';
+
+// Helper: generate stipple dots in an area for shading
+function stipple(cx,cy,rx,ry,count,color,opRange=[.15,.45]){
+  let d='';
+  for(let i=0;i<count;i++){
+    const a=Math.random()*Math.PI*2;
+    const r1=Math.random();
+    const x=cx+Math.cos(a)*rx*r1;
+    const y=cy+Math.sin(a)*ry*r1;
+    const op=opRange[0]+Math.random()*(opRange[1]-opRange[0]);
+    const sz=.4+Math.random()*.6;
+    d+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${sz.toFixed(1)}" fill="${color}" opacity="${op.toFixed(2)}"/>`;
+  }
+  return d;
+}
+
+// Helper: hatching lines for shading
+function hatch(x1,y1,x2,y2,count,color,op=.2){
+  let d='';
+  for(let i=0;i<count;i++){
+    const t=i/count;
+    const ox=(Math.random()-.5)*4;
+    const oy=(Math.random()-.5)*4;
+    d+=`<line x1="${(x1+ox).toFixed(1)}" y1="${(y1+t*(y2-y1)).toFixed(1)}" x2="${(x2+ox).toFixed(1)}" y2="${(y1+t*(y2-y1)+3).toFixed(1)}" stroke="${color}" stroke-width=".3" opacity="${op}"/>`;
+  }
+  return d;
+}
+
+const designs=[
+// ═══ 1. STORM MAIDEN — Dynamic flowing figure in wind
+{
+  name:'Storm Maiden',
+  style:'ILLUSTRATIVE · FIGURE',
+  type:'Designer',
+  price:'$350+',
+  tags:['Illustrative','Figure','Dynamic','Flowing Fabric'],
+  desc:'Woman mid-stride against the wind. Robes and hair whipping dramatically behind her. Arms outstretched, face tilted upward into the storm. Power in motion. Every fold of fabric tells the story.',
+  svg:`<svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+    <!-- Head -->
+    <ellipse cx="100" cy="42" rx="9" ry="11" fill="none" stroke="${N}" stroke-width="1.4"/>
+    <!-- Face features -->
+    <path d="M96 39 C97 38,99 38,100 39" stroke="${PH}" stroke-width=".7" stroke-linecap="round"/>
+    <path d="M96 44 C98 45.5,100 45.5,102 44" stroke="${PH}" stroke-width=".6" fill="none"/>
+    <line x1="97" y1="41" x2="99" y2="41.5" stroke="${PH}" stroke-width=".5"/>
+    <!-- Face tilted up — chin line jaw -->
+    <path d="M91 42 C92 50,96 53,100 54 C104 53,108 50,109 42" fill="none" stroke="${N}" stroke-width="1" opacity=".6"/>
+    <!-- Hair flowing WILDLY to the right -->
+    <path d="M92 35 C85 30,82 28,78 30 C74 32,72 36,75 40 C78 44,82 42,86 38" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M91 38 C82 35,74 34,66 38 C58 42,55 50,60 56 C65 62,72 58,76 52" fill="none" stroke="${PH}" stroke-width="1.1"/>
+    <path d="M92 42 C84 44,76 48,70 56 C64 64,62 72,68 76 C74 80,80 74,82 66" fill="none" stroke="${P}" stroke-width="1"/>
+    <path d="M93 46 C86 50,80 58,76 68 C72 78,74 86,78 84" fill="none" stroke="${PL}" stroke-width=".8"/>
+    <path d="M90 33 C84 26,78 22,70 22 C62 22,56 28,58 34" fill="none" stroke="${N}" stroke-width="1"/>
+    <!-- Individual hair strands -->
+    <path d="M88 32 C80 28,72 26,64 28" stroke="${PL}" stroke-width=".5"/>
+    <path d="M86 36 C76 34,66 36,58 42" stroke="${PL}" stroke-width=".4"/>
+    <path d="M88 40 C80 42,72 48,66 58" stroke="${PD}" stroke-width=".4"/>
+    <!-- Neck -->
+    <path d="M97 53 C97 58,96 62,96 66 M103 53 C103 58,104 62,104 66" fill="none" stroke="${N}" stroke-width="1"/>
+    <!-- Shoulders & upper body -->
+    <path d="M96 66 C88 68,80 72,74 78 M104 66 C112 68,118 70,124 72" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Left arm reaching forward/up -->
+    <path d="M74 78 C68 82,62 84,58 80 C54 76,52 70,54 64 C56 58,60 55,62 54" fill="none" stroke="${N}" stroke-width="1.3" stroke-linecap="round"/>
+    <!-- Left hand -->
+    <path d="M62 54 L58 50 M62 54 L60 49 M62 54 L63 49 M62 54 L65 50" stroke="${PH}" stroke-width=".7" stroke-linecap="round"/>
+    <!-- Right arm swept back -->
+    <path d="M124 72 C130 76,136 82,140 90 C144 98,142 104,138 108" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Right hand -->
+    <path d="M138 108 L142 112 M138 108 L140 114 M138 108 L136 113" stroke="${PH}" stroke-width=".7" stroke-linecap="round"/>
+    <!-- Torso -->
+    <path d="M96 66 C94 76,92 86,90 96 C88 106,88 114,90 120" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M104 66 C106 76,108 86,110 96 C112 106,112 114,110 120" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Waist sash -->
+    <path d="M88 104 C92 102,96 101,100 101 C104 101,108 102,112 104" fill="none" stroke="${PH}" stroke-width="1.5"/>
+    <path d="M88 108 C92 106,96 105,100 105 C104 105,108 106,112 108" fill="none" stroke="${PH}" stroke-width="1"/>
+    <!-- Torso cross-hatching for shading -->
+    ${stipple(100,85,8,15,35,PD,[.1,.3])}
+    ${stipple(94,90,5,12,20,PD,[.15,.35])}
+    <!-- ROBE — flowing dramatically to the right, main fabric mass -->
+    <path d="M90 120 C86 135,82 150,78 165 C74 180,68 195,60 210 C54 220,48 226,42 228" fill="none" stroke="${N}" stroke-width="1.5"/>
+    <path d="M110 120 C114 135,116 150,115 165 C114 180,110 195,105 210 C100 220,94 226,88 228" fill="none" stroke="${N}" stroke-width="1.5"/>
+    <!-- Fabric folds — the dramatic part -->
+    <path d="M92 125 C90 132,86 140,84 148 C82 156,78 164,76 170" fill="none" stroke="${PH}" stroke-width=".9"/>
+    <path d="M108 125 C110 132,112 140,114 148 C114 156,112 164,110 170" fill="none" stroke="${PH}" stroke-width=".9"/>
+    <path d="M95 130 C93 140,90 150,88 160 C86 170,82 180,78 188" fill="none" stroke="${P}" stroke-width=".7"/>
+    <path d="M105 130 C107 140,110 150,112 160 C114 170,114 180,112 188" fill="none" stroke="${P}" stroke-width=".7"/>
+    <!-- Fabric whipping to the right in wind -->
+    <path d="M110 120 C118 125,126 132,134 140 C142 148,148 156,152 164 C156 172,156 178,152 182" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M112 128 C120 134,128 142,136 152 C144 162,148 170,146 176" fill="none" stroke="${PH}" stroke-width="1"/>
+    <path d="M108 135 C116 140,124 148,132 158 C140 168,144 176,140 180" fill="none" stroke="${P}" stroke-width=".8"/>
+    <!-- Lower robe flowing pieces -->
+    <path d="M88 228 C94 230,100 228,105 224 C110 220,114 214,118 206 C122 198,128 190,134 186 C140 182,146 180,152 182" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Deep fabric fold shadows — stipple -->
+    ${stipple(98,150,10,20,45,PD,[.1,.35])}
+    ${stipple(90,180,8,18,35,PD,[.12,.3])}
+    ${stipple(120,155,10,15,30,PD,[.1,.28])}
+    ${stipple(78,200,8,15,25,PD,[.15,.35])}
+    <!-- Fold detail lines -->
+    <path d="M86 140 C88 145,86 152,84 158" stroke="${PL}" stroke-width=".5"/>
+    <path d="M96 145 C94 155,92 165,90 175" stroke="${PL}" stroke-width=".5"/>
+    <path d="M102 150 C104 160,106 170,106 180" stroke="${PL}" stroke-width=".4"/>
+    <path d="M115 140 C120 148,125 156,128 164" stroke="${PL}" stroke-width=".5"/>
+    <path d="M130 150 C135 158,138 166,140 174" stroke="${PL}" stroke-width=".4"/>
+    <!-- Legs visible through fabric -->
+    <path d="M94 120 C92 135,90 150,88 165 C86 175,84 185,85 195" fill="none" stroke="${PH}" stroke-width=".8" opacity=".5"/>
+    <path d="M106 120 C108 135,110 148,108 160 C106 170,104 180,105 190" fill="none" stroke="${PH}" stroke-width=".8" opacity=".5"/>
+    <!-- Wind lines -->
+    <path d="M40 60 C44 58,48 58,52 60" stroke="${PL}" stroke-width=".4" opacity=".3"/>
+    <path d="M35 80 C40 78,45 78,50 80" stroke="${PL}" stroke-width=".4" opacity=".3"/>
+    <path d="M38 100 C42 98,46 98,50 100" stroke="${PL}" stroke-width=".3" opacity=".25"/>
+    <path d="M155 100 C158 98,161 98,164 100" stroke="${PL}" stroke-width=".3" opacity=".25"/>
+    <path d="M158 130 C161 128,164 128,167 130" stroke="${PL}" stroke-width=".3" opacity=".2"/>
+  </svg>`
+},
+// ═══ 2. DRAGON EMPRESS — Dragon wrapped around a woman
+{
+  name:'Dragon Empress',
+  style:'ILLUSTRATIVE · FANTASY',
+  type:'Designer',
+  price:'$400+',
+  tags:['Illustrative','Fantasy','Dragon','Figure','Half Sleeve'],
+  desc:'Dragon coiling protectively around a robed woman. Its head rests on her shoulder, her hand on its jaw. Not master and beast — equals. Scales rendered in full detail. Flowing robes intertwine with dragon body.',
+  svg:`<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+    <!-- Woman's head -->
+    <ellipse cx="95" cy="50" rx="8" ry="10" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Hair up in elaborate style -->
+    <path d="M87 44 C84 38,86 32,90 28 C94 24,100 24,104 28 C108 32,108 38,106 42" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M88 40 C82 36,80 30,84 26 C88 22,94 22,98 24" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <path d="M90 28 C92 22,96 20,100 22 C104 24,106 28,104 32" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <!-- Hair pin/ornament -->
+    <line x1="94" y1="26" x2="88" y2="18" stroke="${NH}" stroke-width=".8"/>
+    <circle cx="88" cy="17" r="1.5" fill="${N}" opacity=".5"/>
+    <!-- Face -->
+    <path d="M92 47 C93 46,95 46,96 47" stroke="${PH}" stroke-width=".6"/>
+    <path d="M92 52 C94 53.5,96 53.5,98 52" stroke="${PH}" stroke-width=".5" fill="none"/>
+    <circle cx="93" cy="49" r=".8" fill="${PH}"/>
+    <!-- Neck -->
+    <path d="M92 60 L92 68 M98 60 L98 68" stroke="${N}" stroke-width="1"/>
+    <!-- Shoulders/upper robe -->
+    <path d="M92 68 C84 72,76 78,70 86" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M98 68 C106 72,114 76,120 82" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Torso in robe -->
+    <path d="M70 86 C68 100,66 114,66 128 C66 142,68 156,72 168" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M120 82 C122 96,122 110,120 124 C118 138,114 152,110 168" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Robe V-neck collar -->
+    <path d="M92 68 C94 78,96 88,95 98" fill="none" stroke="${PH}" stroke-width="1"/>
+    <path d="M98 68 C96 78,94 88,95 98" fill="none" stroke="${PH}" stroke-width="1"/>
+    <!-- Her left hand reaching to dragon's jaw -->
+    <path d="M70 86 C64 84,58 80,54 76 C50 72,48 68,50 64" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M50 64 L46 62 M50 64 L48 60 M50 64 L52 60" stroke="${PH}" stroke-width=".6" stroke-linecap="round"/>
+    <!-- DRAGON HEAD resting on her right shoulder -->
+    <path d="M120 60 C128 56,136 54,142 58 C148 62,150 70,146 76 C142 82,136 84,130 82 C124 80,120 76,118 72" fill="none" stroke="${NH}" stroke-width="1.5"/>
+    <!-- Dragon snout -->
+    <path d="M142 58 C148 54,154 54,158 58 C160 62,158 66,154 68 C150 70,146 70,142 68" fill="none" stroke="${NH}" stroke-width="1.3"/>
+    <!-- Dragon eye -->
+    <ellipse cx="140" cy="64" rx="3" ry="2" fill="none" stroke="${N}" stroke-width=".8"/>
+    <ellipse cx="140" cy="64" rx="1" ry="2" fill="${N}" opacity=".4"/>
+    <!-- Dragon horns -->
+    <path d="M136 56 C134 48,132 42,134 36" fill="none" stroke="${NH}" stroke-width="1"/>
+    <path d="M142 54 C142 46,144 40,146 34" fill="none" stroke="${NH}" stroke-width="1"/>
+    <!-- Dragon spines down head -->
+    <path d="M134 58 L132 54 M136 58 L134 54 M138 56 L136 52" fill="none" stroke="${PH}" stroke-width=".6"/>
+    <!-- Dragon nostril smoke -->
+    <path d="M158 58 C162 54,164 50,162 46" fill="none" stroke="${PL}" stroke-width=".5" opacity=".4"/>
+    <!-- DRAGON BODY coiling around her -->
+    <path d="M130 82 C134 92,136 102,134 112 C132 122,126 130,118 136 C110 142,100 144,90 142 C80 140,72 134,68 126" fill="none" stroke="${NH}" stroke-width="1.8"/>
+    <!-- Dragon body continuing -->
+    <path d="M68 126 C64 118,64 108,68 98 C72 88,80 82,88 80" fill="none" stroke="${NH}" stroke-width="1.6"/>
+    <!-- Dragon body lower coil -->
+    <path d="M88 80 C78 82,70 88,66 98" fill="none" stroke="${N}" stroke-width="1.2" opacity=".6"/>
+    <!-- Dragon scales - detailed rows -->
+    ${Array.from({length:35},(_,i)=>{
+      const t=i/35;
+      const cx=130-t*60+Math.sin(t*6)*15;
+      const cy=85+t*55+Math.cos(t*4)*8;
+      return`<path d="M${cx-2} ${cy} C${cx} ${cy-1.5},${cx+2} ${cy-1.5},${cx+3} ${cy}" fill="none" stroke="${PL}" stroke-width=".4"/>`;
+    }).join('')}
+    <!-- Dragon wing (folded, behind woman) -->
+    <path d="M128 72 C136 66,144 62,152 66 C158 70,160 78,156 86 C152 94,144 98,136 96" fill="none" stroke="${P}" stroke-width="1"/>
+    <path d="M136 68 L150 72 M138 74 L152 78 M140 80 L154 84" fill="none" stroke="${PD}" stroke-width=".4"/>
+    <!-- Robe lower flowing -->
+    <path d="M72 168 C68 182,64 196,58 210 C52 224,46 236,40 244" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M110 168 C114 182,116 196,114 210 C112 224,108 236,102 244" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Fabric folds -->
+    <path d="M80 140 C78 155,74 170,72 185" fill="none" stroke="${P}" stroke-width=".6"/>
+    <path d="M100 145 C98 160,96 175,94 190" fill="none" stroke="${P}" stroke-width=".6"/>
+    <!-- Lower fabric flow -->
+    <path d="M40 244 C50 248,60 246,72 240 C84 234,96 238,102 244" fill="none" stroke="${PH}" stroke-width="1"/>
+    <!-- Stipple shading on body/robe -->
+    ${stipple(90,100,12,20,40,PD,[.1,.3])}
+    ${stipple(130,100,10,15,25,PD,[.1,.25])}
+    ${stipple(85,175,10,25,35,PD,[.12,.3])}
+    <!-- Dragon tail curling at bottom -->
+    <path d="M68 126 C60 134,55 144,56 154 C57 164,62 170,70 172 C78 174,84 170,86 164 C88 158,86 152,82 148" fill="none" stroke="${NH}" stroke-width="1.3"/>
+    <path d="M82 148 L78 144 C76 146,76 150,78 152" fill="none" stroke="${N}" stroke-width=".8"/>
+  </svg>`
+},
+// ═══ 3. PEONY GODDESS — Woman emerging from flowers
+{
+  name:'Peony Goddess',
+  style:'ILLUSTRATIVE · FLORAL FIGURE',
+  type:'Designer',
+  price:'$320+',
+  tags:['Illustrative','Floral','Figure','Peonies','Shoulder/Back'],
+  desc:'Woman emerging from an explosion of peonies. Eyes closed, head tilted back in ecstasy. Petals become her hair. Roots become her body. She IS the garden. Bold illustrative with heavy petal detail.',
+  svg:`<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+    <!-- Head tilted back -->
+    <ellipse cx="100" cy="65" rx="9" ry="11" fill="none" stroke="${N}" stroke-width="1.3" transform="rotate(-10 100 65)"/>
+    <!-- Closed eyes -->
+    <path d="M94 62 C96 60,98 60,100 62" stroke="${PH}" stroke-width=".7" stroke-linecap="round"/>
+    <path d="M94 64 C96 63,97 63,98 64" stroke="${PH}" stroke-width=".5"/>
+    <!-- Lips parted -->
+    <path d="M95 69 C97 70,99 70,101 69" stroke="${PH}" stroke-width=".6" fill="none"/>
+    <path d="M96 70 C98 71,100 71,101 70" stroke="${PL}" stroke-width=".4" fill="none"/>
+    <!-- Neck arched back -->
+    <path d="M95 76 C94 82,93 88,92 94 M105 74 C106 80,106 86,106 92" fill="none" stroke="${N}" stroke-width="1.1"/>
+    <!-- Hair becoming petals (upward/outward) -->
+    <path d="M92 58 C86 50,78 44,70 42 C62 40,56 44,54 50 C52 56,56 62,62 64" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M94 54 C88 46,80 38,72 34 C64 30,56 32,52 38 C48 44,50 52,56 56" fill="none" stroke="${PH}" stroke-width="1.1"/>
+    <path d="M96 52 C92 44,86 36,78 30 C70 24,62 24,58 28 C54 32,56 40,62 44" fill="none" stroke="${P}" stroke-width="1"/>
+    <!-- More hair-petals on right -->
+    <path d="M108 58 C114 50,122 44,130 42 C138 40,142 44,142 50 C142 56,138 62,132 64" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M106 54 C112 46,120 40,128 36 C136 32,140 36,140 42 C140 48,136 54,130 56" fill="none" stroke="${PH}" stroke-width="1"/>
+    <!-- Shoulders -->
+    <path d="M92 94 C84 98,76 104,70 112" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M106 92 C114 96,122 102,128 110" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Arms graceful -->
+    <path d="M70 112 C64 118,58 126,54 136 C50 146,50 154,54 160" fill="none" stroke="${N}" stroke-width="1.1"/>
+    <path d="M128 110 C134 116,140 124,144 134 C148 144,148 152,144 158" fill="none" stroke="${N}" stroke-width="1.1"/>
+    <!-- Hands -->
+    <path d="M54 160 L50 164 M54 160 L52 166 M54 160 L56 165" stroke="${PH}" stroke-width=".6" stroke-linecap="round"/>
+    <path d="M144 158 L148 162 M144 158 L146 164 M144 158 L142 163" stroke="${PH}" stroke-width=".6" stroke-linecap="round"/>
+    <!-- Torso — becoming flower stem -->
+    <path d="M92 94 C90 108,88 122,86 136 C84 150,82 164,80 178" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M106 92 C108 106,110 120,112 134 C114 148,116 162,118 178" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Body becomes roots/stems -->
+    <path d="M80 178 C76 192,72 206,68 220 C64 234,60 244,56 250" fill="none" stroke="${P}" stroke-width="1.5"/>
+    <path d="M118 178 C122 192,124 206,124 220 C124 234,122 244,118 250" fill="none" stroke="${P}" stroke-width="1.5"/>
+    <!-- Root tendrils -->
+    <path d="M68 220 C60 226,52 230,46 228" fill="none" stroke="${PL}" stroke-width="1"/>
+    <path d="M72 232 C66 238,58 240,50 238" fill="none" stroke="${PL}" stroke-width=".8"/>
+    <path d="M124 220 C132 226,140 228,146 224" fill="none" stroke="${PL}" stroke-width="1"/>
+    <path d="M122 234 C128 240,136 242,142 238" fill="none" stroke="${PL}" stroke-width=".8"/>
+    <!-- BIG PEONIES around her -->
+    <!-- Peony LEFT -->
+    ${[0,60,120,180,240,300].map(a=>{const r=a*Math.PI/180;const cx=58+14*Math.cos(r);const cy=140+14*Math.sin(r);
+    return`<path d="M58 140 C${58+8*Math.cos(r-.3)} ${140+8*Math.sin(r-.3)},${cx+5*Math.cos(r-.4)} ${cy+5*Math.sin(r-.4)},${cx} ${cy} C${cx+5*Math.cos(r+.4)} ${cy+5*Math.sin(r+.4)},${58+8*Math.cos(r+.3)} ${140+8*Math.sin(r+.3)},58 140" fill="none" stroke="${PH}" stroke-width="1"/>`}).join('')}
+    <circle cx="58" cy="140" r="6" fill="none" stroke="${N}" stroke-width=".8"/>
+    ${stipple(58,140,14,14,30,PD,[.1,.25])}
+    <!-- Peony RIGHT -->
+    ${[0,60,120,180,240,300].map(a=>{const r=a*Math.PI/180;const cx=140+12*Math.cos(r);const cy=138+12*Math.sin(r);
+    return`<path d="M140 138 C${140+7*Math.cos(r-.3)} ${138+7*Math.sin(r-.3)},${cx+4*Math.cos(r-.4)} ${cy+4*Math.sin(r-.4)},${cx} ${cy} C${cx+4*Math.cos(r+.4)} ${cy+4*Math.sin(r+.4)},${140+7*Math.cos(r+.3)} ${138+7*Math.sin(r+.3)},140 138" fill="none" stroke="${PH}" stroke-width=".9"/>`}).join('')}
+    <circle cx="140" cy="138" r="5" fill="none" stroke="${N}" stroke-width=".7"/>
+    ${stipple(140,138,12,12,25,PD,[.1,.25])}
+    <!-- Peony TOP -->
+    ${[0,45,90,135,180,225,270,315].map(a=>{const r=a*Math.PI/180;const cx=100+16*Math.cos(r);const cy=32+16*Math.sin(r);
+    return`<path d="M100 32 C${100+9*Math.cos(r-.25)} ${32+9*Math.sin(r-.25)},${cx+5*Math.cos(r-.3)} ${cy+5*Math.sin(r-.3)},${cx} ${cy} C${cx+5*Math.cos(r+.3)} ${cy+5*Math.sin(r+.3)},${100+9*Math.cos(r+.25)} ${32+9*Math.sin(r+.25)},100 32" fill="none" stroke="${N}" stroke-width=".9"/>`}).join('')}
+    <circle cx="100" cy="32" r="7" fill="none" stroke="${NH}" stroke-width=".7"/>
+    <!-- Leaves -->
+    <path d="M44 150 C38 144,34 136,36 128 C38 136,42 142,48 148" fill="none" stroke="${PL}" stroke-width="1"/>
+    <path d="M36 128 L42 138 M38 132 L44 140" fill="none" stroke="${PD}" stroke-width=".3"/>
+    <path d="M152 148 C158 142,162 134,160 126 C158 134,154 140,150 146" fill="none" stroke="${PL}" stroke-width="1"/>
+    <!-- Body shading -->
+    ${stipple(98,120,10,25,40,PD,[.1,.28])}
+    ${stipple(94,170,8,20,25,PD,[.12,.3])}
+  </svg>`
+},
+// ═══ 4. SERPENT DANCER — Snake and woman intertwined
+{
+  name:'Serpent Dancer',
+  style:'ILLUSTRATIVE · DARK BEAUTY',
+  type:'Designer',
+  price:'$380+',
+  tags:['Illustrative','Snake','Figure','Dark','Forearm/Thigh'],
+  desc:'Woman in mid-dance, a massive serpent coiling around her body. Snake\'s head mirrors her face in profile. Two beings in perfect synchrony. Scales rendered individually. Fabric and snake body interweave.',
+  svg:`<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+    <!-- Woman's head in profile facing left -->
+    <path d="M95 55 C90 50,86 44,86 38 C86 32,90 28,96 28 C102 28,106 32,106 38 C106 44,104 50,100 55" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Profile face features -->
+    <path d="M86 38 C82 38,80 40,80 42 C80 44,82 45,84 44" fill="none" stroke="${N}" stroke-width="1" stroke-linecap="round"/>
+    <circle cx="88" cy="38" r="1" fill="${PH}"/>
+    <path d="M82 44 C84 46,86 46,86 44" stroke="${PH}" stroke-width=".5"/>
+    <!-- Hair flowing up/back -->
+    <path d="M96 28 C100 20,108 16,116 18 C124 20,128 28,126 36" fill="none" stroke="${N}" stroke-width="1.1"/>
+    <path d="M100 26 C106 18,114 14,122 16 C130 18,132 26,128 32" fill="none" stroke="${PH}" stroke-width=".9"/>
+    <path d="M104 28 C110 22,118 20,124 24" fill="none" stroke="${P}" stroke-width=".7"/>
+    <!-- Neck/shoulders -->
+    <path d="M92 55 C90 62,88 68,86 74 M100 55 C102 62,104 68,106 74" fill="none" stroke="${N}" stroke-width="1.1"/>
+    <path d="M86 74 C78 78,72 84,68 92" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M106 74 C114 76,122 78,128 82" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Left arm up (dance pose) -->
+    <path d="M68 92 C62 88,56 82,52 74 C48 66,48 58,52 54" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M52 54 L48 50 M52 54 L50 48 M52 54 L54 50" stroke="${PH}" stroke-width=".6" stroke-linecap="round"/>
+    <!-- Right arm out -->
+    <path d="M128 82 C136 88,142 96,146 106" fill="none" stroke="${N}" stroke-width="1.1"/>
+    <!-- Torso -->
+    <path d="M86 74 C84 90,82 106,82 122 C82 138,84 150,86 162" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M106 74 C108 90,110 106,110 122 C110 138,108 150,106 162" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Waist definition -->
+    <path d="M84 110 C88 108,92 107,96 107 C100 107,104 108,108 110" fill="none" stroke="${PH}" stroke-width="1.2"/>
+    <!-- Legs in dance pose -->
+    <path d="M86 162 C84 178,80 194,76 210 C72 226,68 238,64 248" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M106 162 C110 172,116 182,122 190 C128 198,132 206,134 214" fill="none" stroke="${N}" stroke-width="1.1"/>
+    <!-- Pointed foot -->
+    <path d="M64 248 C60 252,58 254,56 252" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <path d="M134 214 C138 218,140 222,138 224" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <!-- SNAKE coiling around her body -->
+    <!-- Snake body - thick, detailed, wrapping -->
+    <path d="M46 60 C42 68,40 78,44 88 C48 98,56 104,66 106 C76 108,86 104,90 96" fill="none" stroke="${NH}" stroke-width="2"/>
+    <path d="M90 96 C94 88,100 84,108 86 C116 88,122 96,124 106 C126 116,122 126,116 132" fill="none" stroke="${NH}" stroke-width="1.8"/>
+    <path d="M116 132 C110 138,102 140,94 138 C86 136,80 130,78 122 C76 114,80 108,86 106" fill="none" stroke="${N}" stroke-width="1.6"/>
+    <!-- Snake continues down around legs -->
+    <path d="M86 106 C82 112,80 120,82 130 C84 140,90 148,98 150 C106 152,112 148,114 140" fill="none" stroke="${N}" stroke-width="1.4" opacity=".8"/>
+    <path d="M114 140 C116 148,114 158,108 166 C102 174,94 178,86 176 C78 174,74 168,76 160" fill="none" stroke="${PH}" stroke-width="1.2" opacity=".7"/>
+    <!-- SNAKE HEAD — facing left, mirroring woman's profile -->
+    <path d="M46 60 C42 54,38 50,34 48 C30 46,26 48,24 52 C22 56,24 60,28 62 C32 64,38 64,42 62" fill="none" stroke="${NH}" stroke-width="1.5"/>
+    <ellipse cx="32" cy="52" rx="2.5" ry="1.8" fill="none" stroke="${N}" stroke-width=".8"/>
+    <ellipse cx="32" cy="52" rx=".8" ry="1.8" fill="${N}" opacity=".5"/>
+    <!-- Snake tongue -->
+    <path d="M24 52 L18 50 L16 48 M18 50 L16 52" stroke="${NH}" stroke-width=".6" stroke-linecap="round"/>
+    <!-- Snake scales — detailed -->
+    ${Array.from({length:50},(_,i)=>{
+      const t=i/50;
+      const paths=[{x:46-t*2+Math.sin(t*8)*10,y:60+t*20+Math.cos(t*6)*8}];
+      const p=paths[0];
+      return`<path d="M${(p.x-1.5).toFixed(1)} ${p.y.toFixed(1)} C${p.x.toFixed(1)} ${(p.y-1).toFixed(1)},${(p.x+1.5).toFixed(1)} ${(p.y-1).toFixed(1)},${(p.x+2).toFixed(1)} ${p.y.toFixed(1)}" fill="none" stroke="${PL}" stroke-width=".35"/>`;
+    }).join('')}
+    <!-- Body shading -->
+    ${stipple(96,100,10,20,35,PD,[.1,.28])}
+    ${stipple(96,140,10,15,25,PD,[.1,.25])}
+    ${stipple(50,80,10,15,20,PD,[.12,.3])}
+  </svg>`
+},
+// ═══ 5. MOON ORACLE — Celestial woman with crescent and cosmic elements
+{
+  name:'Moon Oracle',
+  style:'ILLUSTRATIVE · CELESTIAL',
+  type:'Designer',
+  price:'$300+',
+  tags:['Illustrative','Celestial','Portrait','Moon','Upper Arm'],
+  desc:'Half portrait — woman\'s face merged with a crescent moon. One eye open (the seer), one eye hidden behind the moon\'s curve. Stars drip from her lashes like tears. Hair becomes the night sky.',
+  svg:`<svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+    <!-- Large crescent moon -->
+    <path d="M130 50 C150 70,155 100,140 130 C125 160,100 175,70 175 C55 175,42 170,32 162" fill="none" stroke="${N}" stroke-width="1.8"/>
+    <path d="M32 162 C22 152,16 138,18 122 C20 106,30 92,44 82 C58 72,76 68,92 72 C80 80,72 92,70 108 C68 124,74 140,86 150 C98 160,114 164,130 158" fill="none" stroke="${N}" stroke-width="1.4"/>
+    <!-- Woman's face occupying the crescent space -->
+    <!-- Right half of face (visible) -->
+    <path d="M88 90 C84 82,84 74,88 68 C92 62,98 60,104 62 C110 64,114 70,114 78 C114 86,110 94,106 100 C102 106,98 110,96 114" fill="none" stroke="${NH}" stroke-width="1.3"/>
+    <!-- Visible eye (right) — THE SEER -->
+    <path d="M96 80 C100 76,106 76,110 80 C106 84,100 84,96 80z" fill="none" stroke="${NH}" stroke-width="1.2"/>
+    <circle cx="103" cy="80" r="2.5" fill="none" stroke="${N}" stroke-width=".8"/>
+    <circle cx="103" cy="80" r="1" fill="${N}" opacity=".6"/>
+    <!-- Eyelashes - detailed -->
+    <path d="M96 78 L92 74 M98 77 L95 72 M100 76 L98 71" stroke="${PH}" stroke-width=".5" stroke-linecap="round"/>
+    <path d="M108 77 L112 73 M110 78 L114 74" stroke="${PH}" stroke-width=".5" stroke-linecap="round"/>
+    <!-- Stars dripping from lashes like tears -->
+    ${[{x:92,y:72,s:2},{x:94,y:68,s:1.5},{x:96,y:64,s:1.8},{x:112,y:70,s:1.5},{x:114,y:66,s:2},{x:90,y:66,s:1.2}].map(s=>
+      `<path d="M${s.x} ${s.y-s.s} L${s.x+s.s*.35} ${s.y-s.s*.35} L${s.x+s.s} ${s.y} L${s.x+s.s*.35} ${s.y+s.s*.35} L${s.x} ${s.y+s.s} L${s.x-s.s*.35} ${s.y+s.s*.35} L${s.x-s.s} ${s.y} L${s.x-s.s*.35} ${s.y-s.s*.35}z" fill="${NH}" opacity=".5"/>`
+    ).join('')}
+    <!-- Nose -->
+    <path d="M98 86 C96 90,94 94,96 96 C98 98,100 96,100 94" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <!-- Lips -->
+    <path d="M92 104 C96 100,102 100,106 104 C102 108,96 108,92 104" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <path d="M92 104 C96 106,102 106,106 104" fill="none" stroke="${PL}" stroke-width=".5"/>
+    <!-- Chin/jaw flowing into moon curve -->
+    <path d="M90 112 C88 118,86 124,86 130 C86 136,88 142,92 146" fill="none" stroke="${N}" stroke-width="1"/>
+    <!-- Left half of face merges into moon shadow — hidden eye -->
+    <path d="M88 90 C86 86,84 82,84 78" fill="none" stroke="${P}" stroke-width="1" opacity=".5"/>
+    <!-- Hair becoming night sky — flowing right and down -->
+    <path d="M104 62 C112 56,122 52,132 52 C142 52,150 58,152 68" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M114 66 C124 60,136 56,146 58 C156 60,162 68,158 78" fill="none" stroke="${PH}" stroke-width="1"/>
+    <path d="M112 72 C122 66,134 62,144 64 C154 66,160 74,156 84" fill="none" stroke="${P}" stroke-width=".8"/>
+    <path d="M110 78 C120 74,132 72,142 76 C152 80,156 90,150 98" fill="none" stroke="${PL}" stroke-width=".7"/>
+    <!-- Stars scattered in hair/sky area -->
+    ${[{x:130,y:60,s:2.5},{x:148,y:68,s:2},{x:140,y:78,s:1.8},{x:155,y:58,s:1.5},{x:160,y:76,s:2},{x:135,y:50,s:1.8},{x:150,y:90,s:1.5},{x:125,y:70,s:1.2},{x:162,y:66,s:1},{x:145,y:48,s:2.2},{x:158,y:82,s:1.3}].map(s=>
+      `<path d="M${s.x} ${s.y-s.s} L${s.x+s.s*.35} ${s.y-s.s*.35} L${s.x+s.s} ${s.y} L${s.x+s.s*.35} ${s.y+s.s*.35} L${s.x} ${s.y+s.s} L${s.x-s.s*.35} ${s.y+s.s*.35} L${s.x-s.s} ${s.y} L${s.x-s.s*.35} ${s.y-s.s*.35}z" fill="${PH}" opacity=".35"/>`
+    ).join('')}
+    <!-- Sparkle dots -->
+    ${[{x:128,y:55},{x:155,y:62},{x:142,y:72},{x:160,y:70},{x:148,y:85},{x:136,y:48},{x:165,y:78}].map(d=>`<circle cx="${d.x}" cy="${d.y}" r=".6" fill="${NH}" opacity=".5"/>`).join('')}
+    <!-- Moon surface texture -->
+    ${stipple(55,130,18,25,40,PD,[.06,.2])}
+    <!-- Face shading -->
+    ${stipple(96,90,8,12,25,PD,[.1,.25])}
+    <!-- Decorative dots along moon edge -->
+    ${Array.from({length:12},(_, i)=>{const t=i/12;const a=(t*2-0.3)*Math.PI;const cx=85+50*Math.cos(a);const cy=120+50*Math.sin(a);
+      return`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r=".8" fill="${PH}" opacity=".3"/>`;
+    }).join('')}
+  </svg>`
+},
+// ═══ 6. FOUR-LEGGED WIND — Horse in motion with mane and tail flowing
+{
+  name:'Wild Spirit',
+  style:'ILLUSTRATIVE · ANIMAL',
+  type:'Flash',
+  price:'$280',
+  tags:['Illustrative','Horse','Movement','Flowing Mane'],
+  desc:'Horse mid-gallop with mane and tail streaming like silk in wind. Muscular detail. Every sinew visible. Power and grace in one creature. The kind of piece that makes people stop and stare.',
+  svg:`<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+    <!-- Head -->
+    <path d="M52 68 C48 60,46 52,48 44 C50 36,56 32,62 34 C68 36,72 42,72 50 C72 58,68 64,64 68" fill="none" stroke="${N}" stroke-width="1.4"/>
+    <!-- Nostril -->
+    <circle cx="50" cy="58" r="2" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <!-- Eye -->
+    <ellipse cx="60" cy="44" rx="2.5" ry="2" fill="none" stroke="${N}" stroke-width=".8"/>
+    <circle cx="60" cy="44" r="1" fill="${PH}" opacity=".4"/>
+    <!-- Ears -->
+    <path d="M58 34 C56 28,54 24,56 22" fill="none" stroke="${N}" stroke-width="1"/>
+    <path d="M64 32 C64 26,66 22,68 20" fill="none" stroke="${N}" stroke-width="1"/>
+    <!-- Jaw/chin -->
+    <path d="M52 68 C56 72,60 72,64 68" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <!-- Neck - muscular, arched -->
+    <path d="M64 50 C72 52,80 56,88 62 C96 68,102 76,106 84" fill="none" stroke="${N}" stroke-width="1.5"/>
+    <path d="M64 68 C72 72,80 78,86 86 C92 94,96 100,98 106" fill="none" stroke="${N}" stroke-width="1.4"/>
+    <!-- Neck muscle lines -->
+    <path d="M68 56 C76 60,84 66,90 74" fill="none" stroke="${P}" stroke-width=".6"/>
+    <path d="M66 62 C74 66,82 72,88 80" fill="none" stroke="${PL}" stroke-width=".5"/>
+    <!-- MANE — flowing dramatically -->
+    <path d="M60 34 C54 28,46 24,38 26 C30 28,26 34,28 40 C30 46,36 48,42 46" fill="none" stroke="${NH}" stroke-width="1.3"/>
+    <path d="M64 38 C58 30,50 26,42 28 C34 30,30 38,34 44" fill="none" stroke="${PH}" stroke-width="1.1"/>
+    <path d="M68 42 C64 34,58 30,50 32 C44 34,42 40,46 44" fill="none" stroke="${P}" stroke-width=".9"/>
+    <path d="M72 48 C68 40,62 36,56 38 C52 40,52 46,56 48" fill="none" stroke="${PL}" stroke-width=".7"/>
+    <!-- More mane strands -->
+    <path d="M36 26 C30 22,24 24,22 30" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <path d="M28 32 C22 30,18 34,20 40" fill="none" stroke="${P}" stroke-width=".6"/>
+    <!-- Body -->
+    <path d="M106 84 C114 88,122 94,128 102 C134 110,138 120,138 130" fill="none" stroke="${N}" stroke-width="1.5"/>
+    <path d="M98 106 C102 114,106 122,108 130 C110 138,112 146,114 152" fill="none" stroke="${N}" stroke-width="1.4"/>
+    <!-- Barrel/belly -->
+    <path d="M138 130 C140 140,140 150,138 158" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M114 152 C116 158,120 164,126 168 C132 172,138 172,142 168" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Haunch -->
+    <path d="M138 130 C144 126,150 128,154 134 C158 140,158 150,154 158 C150 166,144 170,138 168" fill="none" stroke="${N}" stroke-width="1.4"/>
+    <!-- Front legs (galloping - extended) -->
+    <path d="M98 106 C94 118,88 130,82 142 C76 154,72 166,70 178 C68 186,68 192,72 196" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M106 100 C108 110,110 120,112 130 C114 140,114 150,112 160 C110 168,108 176,110 184" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Hooves -->
+    <path d="M72 196 C70 200,68 202,72 204 C76 206,78 202,76 198" fill="none" stroke="${PH}" stroke-width="1"/>
+    <path d="M110 184 C108 188,106 190,108 192 C110 194,114 192,114 188" fill="none" stroke="${PH}" stroke-width="1"/>
+    <!-- Hind legs -->
+    <path d="M142 168 C140 178,136 188,134 198 C132 204,132 208,136 210" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M154 158 C156 168,158 178,158 188 C158 194,156 198,154 200" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M136 210 C134 214,136 216,140 216 C144 216,144 212,142 210" fill="none" stroke="${PH}" stroke-width="1"/>
+    <!-- TAIL — flowing dramatically -->
+    <path d="M154 134 C162 128,170 126,176 130 C182 134,184 142,180 150 C176 158,170 162,164 160" fill="none" stroke="${NH}" stroke-width="1.3"/>
+    <path d="M154 138 C160 132,168 130,174 134 C180 138,182 146,178 154" fill="none" stroke="${PH}" stroke-width="1.1"/>
+    <path d="M154 142 C158 138,164 136,170 140 C176 144,176 152,172 158" fill="none" stroke="${P}" stroke-width=".9"/>
+    <path d="M154 146 C158 144,162 144,166 148 C170 152,170 158,166 162" fill="none" stroke="${PL}" stroke-width=".7"/>
+    <!-- Muscle definition -->
+    ${stipple(120,110,15,20,35,PD,[.08,.22])}
+    ${stipple(100,96,10,12,20,PD,[.1,.25])}
+    ${stipple(148,145,8,12,20,PD,[.08,.2])}
+    <!-- Muscle lines -->
+    <path d="M110 90 C116 96,120 104,122 112" fill="none" stroke="${P}" stroke-width=".5"/>
+    <path d="M130 106 C134 114,136 122,136 130" fill="none" stroke="${PL}" stroke-width=".4"/>
+    <path d="M146 134 C150 140,152 148,150 156" fill="none" stroke="${PL}" stroke-width=".4"/>
+  </svg>`
+},
+// ═══ 7. LANTERN KEEPER — Woman holding glowing lantern
+{
+  name:'Lantern Keeper',
+  style:'ILLUSTRATIVE · ATMOSPHERIC',
+  type:'Flash',
+  price:'$250',
+  tags:['Illustrative','Figure','Atmospheric','Glow Effect'],
+  desc:'Cloaked figure holding an ornate lantern at arm\'s length. Light radiates outward, illuminating flowing robes and moths drawn to the flame. Mystery. Warmth. The one who carries the light.',
+  svg:`<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+    <!-- Hood/cloak -->
+    <path d="M80 60 C76 48,78 36,86 28 C94 20,106 20,114 28 C122 36,124 48,120 60" fill="none" stroke="${N}" stroke-width="1.5"/>
+    <path d="M80 60 C76 68,74 76,74 84 C74 92,76 100,78 106" fill="none" stroke="${N}" stroke-width="1.4"/>
+    <path d="M120 60 C124 68,126 76,126 84 C126 92,124 100,122 106" fill="none" stroke="${N}" stroke-width="1.4"/>
+    <!-- Hood shadow/depth -->
+    <path d="M84 56 C82 48,84 40,90 34 C96 28,104 28,110 34 C116 40,118 48,116 56" fill="none" stroke="${P}" stroke-width=".8"/>
+    ${stipple(100,45,14,12,30,PD,[.15,.4])}
+    <!-- Face in shadow — only lower face visible -->
+    <path d="M92 60 C90 64,90 68,92 72 C94 76,98 78,102 78 C106 78,110 76,112 72 C114 68,114 64,112 60" fill="none" stroke="${PH}" stroke-width=".8" opacity=".6"/>
+    <!-- Lips barely visible -->
+    <path d="M96 72 C98 74,102 74,104 72" fill="none" stroke="${PH}" stroke-width=".6" opacity=".5"/>
+    <!-- Cloak body -->
+    <path d="M78 106 C74 120,70 140,66 160 C62 180,58 200,52 220 C48 234,44 244,40 252" fill="none" stroke="${N}" stroke-width="1.5"/>
+    <path d="M122 106 C126 120,128 140,128 160 C128 180,126 200,124 220 C122 234,120 244,118 252" fill="none" stroke="${N}" stroke-width="1.5"/>
+    <!-- Cloak bottom flow -->
+    <path d="M40 252 C52 256,66 254,80 248 C94 242,108 242,118 252" fill="none" stroke="${PH}" stroke-width="1.2"/>
+    <!-- Cloak folds — rich detail -->
+    <path d="M84 90 C82 106,78 122,76 138 C74 154,72 170,70 186" fill="none" stroke="${P}" stroke-width=".7"/>
+    <path d="M100 85 C98 104,96 124,94 144 C92 164,90 184,88 204" fill="none" stroke="${P}" stroke-width=".6"/>
+    <path d="M116 90 C118 106,120 122,120 138 C120 154,118 170,116 186" fill="none" stroke="${P}" stroke-width=".7"/>
+    <path d="M108 92 C110 110,112 128,112 146 C112 164,110 182,108 200" fill="none" stroke="${PL}" stroke-width=".5"/>
+    <!-- Arm extending forward with lantern -->
+    <path d="M78 106 C72 104,66 100,60 96 C54 92,48 90,44 92" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M44 92 L40 90 M44 92 L42 88" stroke="${PH}" stroke-width=".6" stroke-linecap="round"/>
+    <!-- LANTERN -->
+    <rect x="28" y="74" width="16" height="20" rx="2" fill="none" stroke="${NH}" stroke-width="1.2"/>
+    <path d="M30 74 L34 68 L38 68 L42 74" fill="none" stroke="${NH}" stroke-width="1"/>
+    <line x1="36" y1="68" x2="36" y2="62" stroke="${NH}" stroke-width=".8"/>
+    <!-- Lantern hook/ring -->
+    <circle cx="36" cy="60" r="3" fill="none" stroke="${PH}" stroke-width=".7"/>
+    <!-- Chain to hand -->
+    <path d="M36 63 C38 68,40 76,42 84 C44 88,44 90,44 92" fill="none" stroke="${PH}" stroke-width=".6"/>
+    <!-- Lantern glass panes -->
+    <line x1="36" y1="74" x2="36" y2="94" stroke="${PH}" stroke-width=".4"/>
+    <line x1="28" y1="84" x2="44" y2="84" stroke="${PH}" stroke-width=".4"/>
+    <!-- GLOW from lantern -->
+    <circle cx="36" cy="84" r="6" fill="${N}" opacity=".08"/>
+    <circle cx="36" cy="84" r="12" fill="${N}" opacity=".05"/>
+    <circle cx="36" cy="84" r="20" fill="${N}" opacity=".03"/>
+    <circle cx="36" cy="84" r="30" fill="${N}" opacity=".02"/>
+    <!-- Flame inside -->
+    <path d="M34 82 C34 78,36 76,36 78 C36 76,38 78,38 82 C38 86,36 88,36 86 C36 88,34 86,34 82" fill="${NH}" opacity=".3"/>
+    <!-- MOTHS drawn to light -->
+    <path d="M22 72 C20 70,18 70,16 72 C18 74,20 74,22 72 M19 70 L19 68 M17 70 L15 68" fill="none" stroke="${PH}" stroke-width=".5"/>
+    <path d="M48 66 C50 64,52 64,54 66 C52 68,50 68,48 66 M51 64 L51 62 M53 64 L55 62" fill="none" stroke="${PH}" stroke-width=".5"/>
+    <path d="M26 100 C24 98,22 98,20 100 C22 102,24 102,26 100 M23 98 L21 96" fill="none" stroke="${P}" stroke-width=".4"/>
+    <!-- Light rays -->
+    ${Array.from({length:10},(_, i)=>{const a=(i*36)*Math.PI/180;return`<line x1="${36+8*Math.cos(a)}" y1="${84+8*Math.sin(a)}" x2="${36+22*Math.cos(a)}" y2="${84+22*Math.sin(a)}" stroke="${PH}" stroke-width=".3" opacity=".15"/>`}).join('')}
+    <!-- Cloak shading -->
+    ${stipple(96,140,12,30,50,PD,[.1,.3])}
+    ${stipple(110,160,8,25,30,PD,[.12,.32])}
+    ${stipple(80,170,8,25,30,PD,[.12,.32])}
+  </svg>`
+},
+// ═══ 8. SACRED TETRAHEDRON (kept — it's David's)
+{
+  name:'Sacred Tetrahedron',
+  style:'GEOMETRIC · SACRED · STIPPLE',
+  type:'Designer',
+  price:'$250+',
+  tags:['Geometric','Sacred Geometry','Dotwork','Custom'],
+  desc:'Four-point tetrahedron with nested triangles, heavy stipple shading, and orbital lines. Three visible points, one implied — collapsed fourth. Sacred geometry meets quantum mechanics. Jaclyn-level detail in every dot.',
+  svg:`<svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+    <!-- Outer triangle - bold -->
+    <polygon points="100,20 25,185 175,185" fill="none" stroke="${N}" stroke-width="2"/>
+    <!-- Inner inverted triangle -->
+    <polygon points="100,185 62.5,102 137.5,102" fill="none" stroke="${PH}" stroke-width="1.3"/>
+    <!-- Center triangle -->
+    <polygon points="100,55 80,110 120,110" fill="none" stroke="${N}" stroke-width="1"/>
+    <!-- Smallest center -->
+    <polygon points="100,80 92,100 108,100" fill="none" stroke="${PH}" stroke-width=".7"/>
+    <!-- Circles at vertices - ornate -->
+    <circle cx="100" cy="20" r="8" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <circle cx="100" cy="20" r="4" fill="none" stroke="${PH}" stroke-width=".6"/>
+    <circle cx="25" cy="185" r="8" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <circle cx="25" cy="185" r="4" fill="none" stroke="${PH}" stroke-width=".6"/>
+    <circle cx="175" cy="185" r="8" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <circle cx="175" cy="185" r="4" fill="none" stroke="${PH}" stroke-width=".6"/>
+    <!-- Center eye / focal -->
+    <circle cx="100" cy="130" r="18" fill="none" stroke="${PH}" stroke-width="1"/>
+    <circle cx="100" cy="130" r="10" fill="none" stroke="${N}" stroke-width=".7"/>
+    <circle cx="100" cy="130" r="4" fill="none" stroke="${NH}" stroke-width=".5"/>
+    <circle cx="100" cy="130" r="1.5" fill="${NH}" opacity=".4"/>
+    <!-- Orbital ellipses -->
+    <ellipse cx="100" cy="130" rx="32" ry="14" fill="none" stroke="${PL}" stroke-width=".5" transform="rotate(0 100 130)"/>
+    <ellipse cx="100" cy="130" rx="32" ry="14" fill="none" stroke="${PL}" stroke-width=".5" transform="rotate(60 100 130)"/>
+    <ellipse cx="100" cy="130" rx="32" ry="14" fill="none" stroke="${PL}" stroke-width=".5" transform="rotate(120 100 130)"/>
+    <!-- Connection lines to collapsed 4th -->
+    <line x1="100" y1="20" x2="100" y2="130" stroke="${PL}" stroke-width=".4" stroke-dasharray="2 3"/>
+    <line x1="25" y1="185" x2="100" y2="130" stroke="${PL}" stroke-width=".4" stroke-dasharray="2 3"/>
+    <line x1="175" y1="185" x2="100" y2="130" stroke="${PL}" stroke-width=".4" stroke-dasharray="2 3"/>
+    <!-- HEAVY STIPPLE SHADING — Jaclyn style -->
+    ${stipple(65,140,25,30,80,PD,[.08,.3])}
+    ${stipple(135,140,25,30,80,PD,[.08,.3])}
+    ${stipple(100,70,20,25,60,PD,[.06,.22])}
+    <!-- More concentrated stipple near edges -->
+    ${stipple(60,105,10,15,30,PD,[.12,.35])}
+    ${stipple(140,105,10,15,30,PD,[.12,.35])}
+    ${stipple(100,175,15,8,25,PD,[.1,.3])}
+    <!-- Decorative elements -->
+    <text x="100" y="14" text-anchor="middle" fill="${NH}" font-size="6" font-family="monospace" opacity=".5">⅓</text>
+    <text x="18" y="195" text-anchor="middle" fill="${NH}" font-size="6" font-family="monospace" opacity=".5">⅓</text>
+    <text x="182" y="195" text-anchor="middle" fill="${NH}" font-size="6" font-family="monospace" opacity=".5">⅓</text>
+    <text x="100" y="210" text-anchor="middle" fill="${PL}" font-size="5" font-family="monospace" opacity=".35">△ collapsed fourth · Ann Jensen · Dusk</text>
+  </svg>`
+},
+// ═══ 9. VINE GODDESS — Botanical woman, Art Nouveau
+{
+  name:'Vine Born',
+  style:'ILLUSTRATIVE · BOTANICAL',
+  type:'Flash',
+  price:'$275',
+  tags:['Illustrative','Botanical','Art Nouveau','Wrap Design'],
+  desc:'Woman\'s silhouette made entirely of intertwining vines, leaves, and flowers. No skin — only plant. Where she ends and the garden begins is impossible to tell. Art Nouveau flowing lines.',
+  svg:`<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+    <!-- Head shape made of vines -->
+    <path d="M90 55 C86 48,84 40,86 32 C88 24,94 20,100 20 C106 20,112 24,114 32 C116 40,114 48,110 55" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Face formed by leaf veins -->
+    <path d="M94 38 C96 36,98 36,100 38" stroke="${PH}" stroke-width=".7"/>
+    <path d="M94 44 C96 46,100 46,102 44" stroke="${PH}" stroke-width=".6" fill="none"/>
+    <!-- Hair = vine tendrils -->
+    <path d="M88 28 C82 22,74 20,66 24 C58 28,56 36,60 42 C64 48,70 48,74 44" fill="none" stroke="${NH}" stroke-width="1.2"/>
+    <path d="M86 24 C80 16,72 14,64 18 C56 22,54 32,60 38" fill="none" stroke="${PH}" stroke-width="1"/>
+    <path d="M112 28 C118 22,126 20,134 24 C142 28,144 36,140 42 C136 48,130 48,126 44" fill="none" stroke="${NH}" stroke-width="1.2"/>
+    <path d="M114 24 C120 16,128 14,136 18 C144 22,146 32,140 38" fill="none" stroke="${PH}" stroke-width="1"/>
+    <!-- Leaves in hair -->
+    <path d="M66 24 C62 20,60 16,62 12 C64 16,66 20,68 22" fill="none" stroke="${PL}" stroke-width=".8"/>
+    <path d="M134 24 C138 20,140 16,138 12 C136 16,134 20,132 22" fill="none" stroke="${PL}" stroke-width=".8"/>
+    <!-- Small flowers in hair -->
+    ${[{x:72,y:18},{x:128,y:18}].map(f=>`<circle cx="${f.x}" cy="${f.y}" r="3" fill="none" stroke="${PH}" stroke-width=".7"/><circle cx="${f.x}" cy="${f.y}" r="1" fill="${N}" opacity=".3"/>`).join('')}
+    <!-- Neck = stem -->
+    <path d="M96 55 C96 62,94 68,94 74 M104 55 C104 62,106 68,106 74" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M100 55 C100 62,100 68,100 74" fill="none" stroke="${P}" stroke-width=".6"/>
+    <!-- Shoulders = branching vines -->
+    <path d="M94 74 C86 76,78 80,70 86 C62 92,56 100,52 110" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M106 74 C114 76,122 80,130 86 C138 92,144 100,148 110" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Arms = vine branches -->
+    <path d="M52 110 C46 118,42 128,40 140 C38 152,40 162,44 170" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M148 110 C154 118,158 128,160 140 C162 152,160 162,156 170" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Fingertips = tendrils -->
+    <path d="M44 170 C42 174,40 178,38 182 M44 170 C46 174,46 178,44 182 M44 170 C48 172,50 176,50 180" fill="none" stroke="${PH}" stroke-width=".6" stroke-linecap="round"/>
+    <path d="M156 170 C158 174,160 178,162 182 M156 170 C154 174,154 178,156 182 M156 170 C152 172,150 176,150 180" fill="none" stroke="${PH}" stroke-width=".6" stroke-linecap="round"/>
+    <!-- Torso = main trunk -->
+    <path d="M94 74 C90 90,86 106,84 122 C82 138,82 154,84 170 C86 186,88 200,88 214" fill="none" stroke="${N}" stroke-width="1.4"/>
+    <path d="M106 74 C110 90,114 106,116 122 C118 138,118 154,116 170 C114 186,112 200,112 214" fill="none" stroke="${N}" stroke-width="1.4"/>
+    <!-- Internal vine structure -->
+    <path d="M100 74 C100 100,100 126,100 152 C100 178,100 200,100 220" fill="none" stroke="${P}" stroke-width=".8"/>
+    <path d="M96 84 C92 96,90 108,90 120" fill="none" stroke="${PL}" stroke-width=".5"/>
+    <path d="M104 84 C108 96,110 108,110 120" fill="none" stroke="${PL}" stroke-width=".5"/>
+    <!-- Leaves growing from body -->
+    ${[{x:82,y:100,d:-1},{x:118,y:96,d:1},{x:78,y:130,d:-1},{x:122,y:126,d:1},{x:80,y:160,d:-1},{x:120,y:156,d:1},{x:84,y:190,d:-1},{x:116,y:186,d:1}].map(l=>{
+      const dx=l.d*16;
+      return`<path d="M${l.x} ${l.y} C${l.x+dx*.5} ${l.y-6},${l.x+dx} ${l.y-8},${l.x+dx*1.2} ${l.y-4} C${l.x+dx} ${l.y},${l.x+dx*.5} ${l.y+2},${l.x} ${l.y}" fill="none" stroke="${PH}" stroke-width=".8"/>
+      <path d="M${l.x} ${l.y} L${l.x+dx*.8} ${l.y-5}" fill="none" stroke="${PD}" stroke-width=".3"/>`
+    }).join('')}
+    <!-- Flowers blooming from body -->
+    ${[{x:60,y:105,s:6},{x:140,y:102,s:5},{x:50,y:145,s:7},{x:150,y:142,s:6}].map(f=>{
+      let r='';
+      r+=`<circle cx="${f.x}" cy="${f.y}" r="${f.s}" fill="none" stroke="${PH}" stroke-width=".8"/>`;
+      r+=`<circle cx="${f.x}" cy="${f.y}" r="${f.s*.4}" fill="${N}" opacity=".15"/>`;
+      for(let a=0;a<360;a+=72){
+        const rad=a*Math.PI/180;
+        r+=`<ellipse cx="${f.x+f.s*.8*Math.cos(rad)}" cy="${f.y+f.s*.8*Math.sin(rad)}" rx="${f.s*.5}" ry="${f.s*.25}" transform="rotate(${a} ${f.x+f.s*.8*Math.cos(rad)} ${f.y+f.s*.8*Math.sin(rad)})" fill="none" stroke="${P}" stroke-width=".5"/>`;
+      }
+      return r;
+    }).join('')}
+    <!-- Legs = roots -->
+    <path d="M88 214 C84 226,78 238,72 248 C66 256,60 260,54 258" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M112 214 C116 226,122 238,128 248 C134 256,140 260,146 258" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Root tendrils at feet -->
+    <path d="M72 248 C68 252,64 256,60 258 M72 248 C70 254,66 258,62 260 M72 248 C76 254,78 258,76 262" fill="none" stroke="${PL}" stroke-width=".6"/>
+    <path d="M128 248 C132 252,136 256,140 258 M128 248 C130 254,134 258,138 260 M128 248 C124 254,122 258,124 262" fill="none" stroke="${PL}" stroke-width=".6"/>
+    <!-- Vine pattern shading -->
+    ${stipple(100,120,12,30,35,PD,[.06,.2])}
+    ${stipple(100,180,10,20,25,PD,[.08,.22])}
+  </svg>`
+},
+// ═══ 10. THE READER — Woman reading, pages becoming birds
+{
+  name:'The Reader',
+  style:'ILLUSTRATIVE · BOOKISH',
+  type:'Designer',
+  price:'$340+',
+  tags:['Illustrative','Bookish','Fantasy','Figure','Birds'],
+  desc:'Woman seated, knees drawn up, open book in her lap. Pages lifting off and transforming into birds mid-flight. Hair falling over one shoulder. The world she\'s reading is literally taking flight. For every bookworm.',
+  svg:`<svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+    <!-- Head -->
+    <ellipse cx="90" cy="48" rx="8" ry="10" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Looking down at book -->
+    <path d="M87 52 C88 53,90 53,91 52" stroke="${PH}" stroke-width=".5" fill="none"/>
+    <path d="M86 47 C87 46,89 46,90 47" stroke="${PH}" stroke-width=".6"/>
+    <!-- Hair falling over right shoulder -->
+    <path d="M84 42 C78 38,74 36,72 40 C70 44,72 50,76 54 C80 58,84 58,86 56" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M82 40 C76 34,72 32,68 36 C64 40,66 48,70 52" fill="none" stroke="${PH}" stroke-width="1"/>
+    <path d="M80 38 C74 32,70 30,66 34 C62 38,64 46,68 50" fill="none" stroke="${P}" stroke-width=".8"/>
+    <!-- Hair on other side -->
+    <path d="M96 42 C100 40,104 42,104 46" fill="none" stroke="${N}" stroke-width="1"/>
+    <!-- Neck -->
+    <path d="M86 58 C86 62,84 66,84 70 M94 58 C94 62,96 66,96 70" fill="none" stroke="${N}" stroke-width="1"/>
+    <!-- Upper body — seated, leaning forward -->
+    <path d="M84 70 C78 74,74 80,72 88" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M96 70 C102 74,108 80,112 88" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Back curve -->
+    <path d="M96 70 C100 80,104 92,106 104 C108 116,108 128,106 138" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Front torso -->
+    <path d="M84 70 C82 80,80 92,80 104 C80 116,82 128,86 138" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Arms holding book -->
+    <path d="M72 88 C68 94,64 100,62 108 C60 116,62 122,66 126" fill="none" stroke="${N}" stroke-width="1.1"/>
+    <path d="M112 88 C116 94,118 100,118 108 C118 116,116 122,112 126" fill="none" stroke="${N}" stroke-width="1.1"/>
+    <!-- Hands on book -->
+    <path d="M66 126 C70 130,76 132,82 132" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <path d="M112 126 C108 130,102 132,96 132" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <!-- BOOK in lap -->
+    <path d="M68 128 L68 138 L120 138 L120 128" fill="none" stroke="${NH}" stroke-width="1.3"/>
+    <line x1="94" y1="128" x2="94" y2="138" stroke="${NH}" stroke-width="1"/>
+    <!-- Book pages -->
+    <path d="M70 130 L92 130 M70 132 L92 132 M70 134 L92 134" stroke="${PL}" stroke-width=".3"/>
+    <path d="M96 130 L118 130 M96 132 L118 132 M96 134 L118 134" stroke="${PL}" stroke-width=".3"/>
+    <!-- PAGES LIFTING OFF — becoming birds -->
+    <path d="M94 128 C92 122,88 116,84 112 C80 108,76 106,72 108" fill="none" stroke="${PH}" stroke-width=".6"/>
+    <path d="M96 126 C96 118,98 110,102 104 C106 98,112 94,118 96" fill="none" stroke="${PH}" stroke-width=".6"/>
+    <path d="M92 126 C88 118,82 112,76 108 C70 104,64 104,60 108" fill="none" stroke="${P}" stroke-width=".5"/>
+    <!-- BIRDS (pages becoming birds) -->
+    <!-- Bird 1 - fully formed -->
+    <path d="M50 72 C46 66,40 64,34 68 C40 62,46 60,50 64 C54 60,60 62,66 68 C60 64,54 66,50 72" fill="none" stroke="${NH}" stroke-width="1.2"/>
+    <circle cx="40" cy="66" r=".8" fill="${NH}"/>
+    <!-- Bird 2 -->
+    <path d="M38 50 C34 44,28 42,22 46 C28 40,34 38,38 42 C42 38,48 40,54 46 C48 42,42 44,38 50" fill="none" stroke="${PH}" stroke-width="1.1"/>
+    <circle cx="28" cy="44" r=".7" fill="${PH}"/>
+    <!-- Bird 3 -->
+    <path d="M56 88 C52 82,46 80,40 84 C46 78,52 76,56 80 C60 76,66 78,72 84 C66 80,60 82,56 88" fill="none" stroke="${N}" stroke-width="1"/>
+    <!-- Bird 4 — still partially page -->
+    <path d="M68 100 C64 96,60 96,56 100 C60 94,64 92,68 96 C72 92,76 94,80 100 C76 96,72 98,68 100" fill="none" stroke="${P}" stroke-width=".8"/>
+    <!-- Bird 5 — distant -->
+    <path d="M28 34 C26 30,22 28,18 30 C22 26,26 24,28 28 C30 24,34 26,38 30 C34 28,30 28,28 34" fill="none" stroke="${PL}" stroke-width=".8"/>
+    <!-- Bird 6 — distant -->
+    <path d="M48 24 C46 20,42 18,38 20 C42 16,46 14,48 18 C50 14,54 16,58 20 C54 18,50 18,48 24" fill="none" stroke="${PD}" stroke-width=".7"/>
+    <!-- Half-page, half-bird transitions -->
+    <path d="M76 108 C74 104,72 102,70 104" fill="none" stroke="${PH}" stroke-width=".5"/>
+    <!-- Knees drawn up -->
+    <path d="M86 138 C84 148,82 158,82 168 C82 178,86 186,92 192" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <path d="M106 138 C108 148,112 158,114 168 C116 178,114 186,108 192" fill="none" stroke="${N}" stroke-width="1.3"/>
+    <!-- Shins -->
+    <path d="M92 192 C86 200,78 206,72 210 C66 214,62 218,62 224" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <path d="M108 192 C114 200,118 206,120 210 C122 214,122 218,120 224" fill="none" stroke="${N}" stroke-width="1.2"/>
+    <!-- Feet tucked -->
+    <path d="M62 224 C60 228,62 230,66 230 C70 230,72 228,72 224" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <path d="M120 224 C122 228,120 230,116 230 C112 230,110 228,112 224" fill="none" stroke="${PH}" stroke-width=".8"/>
+    <!-- Fabric/clothing folds -->
+    <path d="M82 110 C84 118,84 126,84 134" fill="none" stroke="${P}" stroke-width=".6"/>
+    <path d="M104 108 C102 116,102 124,102 132" fill="none" stroke="${P}" stroke-width=".6"/>
+    <!-- Skirt draping over knees -->
+    <path d="M78 148 C74 156,70 164,68 172" fill="none" stroke="${PH}" stroke-width=".7"/>
+    <path d="M116 148 C118 156,120 164,122 172" fill="none" stroke="${PH}" stroke-width=".7"/>
+    <!-- Body shading -->
+    ${stipple(92,100,10,18,35,PD,[.1,.28])}
+    ${stipple(90,160,10,18,30,PD,[.08,.22])}
+    ${stipple(94,132,12,5,15,PD,[.1,.25])}
+  </svg>`
+}
+];
+
+// RENDER
+const gallery=document.getElementById('gallery');
+designs.forEach((d,i)=>{
+  const card=document.createElement('div');
+  card.className='design';
+  card.innerHTML=`
+    <div class="art"><div class="num">${i+1}</div><div class="price">${d.price}</div>${d.svg}</div>
+    <div class="info">
+      <h3>${d.name}</h3>
+      <div class="style">${d.style}</div>
+      <div class="desc">${d.desc}</div>
+      <div class="tags">${d.tags.map(t=>`<span class="tag ${d.type==='Flash'?'tag-flash':'tag-designer'}">${t}</span>`).join('')}</div>
+    </div>`;
+  card.onclick=()=>openModal(i);
+  gallery.appendChild(card);
+});
+
+function openModal(i){
+  const d=designs[i];
+  document.getElementById('modal-art').innerHTML=`<button class="modal-close" onclick="closeModal()">✕</button>${d.svg}`;
+  document.getElementById('modal-info').innerHTML=`
+    <h2>${d.name}</h2>
+    <div style="font-size:10px;color:var(--td);letter-spacing:1px;margin-bottom:8px">${d.style}</div>
+    <p style="font-size:12px;color:var(--t);line-height:1.7;margin-bottom:12px">${d.desc}</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line)">
+      <div style="display:flex;gap:4px;flex-wrap:wrap">${d.tags.map(t=>`<span class="tag ${d.type==='Flash'?'tag-flash':'tag-designer'}">${t}</span>`).join('')}</div>
+      <div style="font-family:'Cormorant Garamond';font-size:20px;color:var(--gold)">${d.price}</div>
+    </div>
+    <div style="font-size:9px;color:var(--tdd);margin-top:8px">
+      ${d.type==='Flash'?'Flash — flat rate, no modifications.':'Designer — custom sizing, placement, detail adjustments.'}<br>
+      $100 deposit to book · earthchildtattoo.jr@gmail.com
+    </div>`;
+  document.getElementById('modal').classList.add('on');
+}
+function closeModal(){document.getElementById('modal').classList.remove('on')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+</script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NANITE FACTORY · PLATFORM BUILDER · ROTH · TriPod</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800;900&family=Orbitron:wght@400;700;900&display=swap');
+:root{
+  --bg:#001200;--bg2:#001a00;--bg3:#002400;--panel:#001600;
+  --line:#003300;--line2:#004d00;
+  --p:#cc44ff;--ph:#ee77ff;--pl:#9933cc;
+  --o:#ff8800;--oh:#ffaa33;--ol:#cc6600;
+  --g:#00cc44;--gh:#00ff66;--gl:#009933;
+  --r:#ff2244;--rh:#ff5566;
+  --y:#ffee00;--c:#00ddbb;
+  --w:#eeffee;--t:#88aa88;--td:#557755;--tdd:#334433;--tddd:#223322;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--w);font-family:'JetBrains Mono',monospace;min-height:100vh;overflow-x:hidden;user-select:none}
+::selection{background:var(--p);color:#000}
+
+.hdr{padding:10px 16px;border-bottom:1px solid var(--p);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,rgba(204,68,255,.04),rgba(255,136,0,.02),transparent)}
+.hdr h1{font-family:'Orbitron';font-size:16px;font-weight:900;letter-spacing:5px;background:linear-gradient(135deg,var(--p),var(--o));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hdr .sub{font-size:7px;letter-spacing:3px;color:var(--td);margin-top:1px}
+
+.tabs{display:flex;border-bottom:1px solid var(--line);padding:0 12px;background:var(--bg)}
+.tab{padding:7px 14px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--td);font:700 9px 'JetBrains Mono';letter-spacing:2px;cursor:pointer}
+.tab:hover{color:var(--ph)}.tab.on{color:var(--p);border-bottom-color:var(--p)}
+
+.main{display:flex;height:calc(100vh - 78px)}
+
+/* LEFT: NANITE CATALOG */
+.catalog{width:260px;border-right:1px solid var(--line);overflow-y:auto;background:var(--panel);flex-shrink:0}
+.cat-hd{padding:8px 12px;font-size:8px;letter-spacing:3px;color:var(--p);font-weight:900;border-bottom:1px solid var(--tdd);background:rgba(204,68,255,.03)}
+.cat-group{border-bottom:1px solid var(--tdd)}
+.cat-group-hd{padding:6px 12px;font-size:8px;font-weight:700;color:var(--o);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.cat-group-hd:hover{background:rgba(255,136,0,.04)}
+.cat-items{display:none;padding:2px 0}.cat-items.open{display:block}
+
+.nanite-card{padding:6px 12px;border-bottom:1px solid var(--tddd);cursor:grab;transition:background .15s}
+.nanite-card:hover{background:rgba(204,68,255,.06)}
+.nanite-card:active{cursor:grabbing}
+.nanite-card .nn{font-size:9px;font-weight:700;color:var(--ph)}
+.nanite-card .nd{font-size:7px;color:var(--td);margin-top:1px}
+.nanite-card .nt{display:flex;gap:3px;margin-top:2px}
+.ntag{font-size:6px;padding:1px 4px;border-radius:2px;font-weight:700;letter-spacing:1px}
+.ntag-scan{color:var(--c);background:rgba(0,221,187,.1);border:1px solid rgba(0,221,187,.2)}
+.ntag-detect{color:var(--o);background:rgba(255,136,0,.1);border:1px solid rgba(255,136,0,.2)}
+.ntag-measure{color:var(--y);background:rgba(255,238,0,.08);border:1px solid rgba(255,238,0,.15)}
+.ntag-validate{color:var(--g);background:rgba(0,204,68,.08);border:1px solid rgba(0,204,68,.2)}
+.ntag-extract{color:var(--r);background:rgba(255,34,68,.08);border:1px solid rgba(255,34,68,.2)}
+.ntag-monitor{color:var(--p);background:rgba(204,68,255,.08);border:1px solid rgba(204,68,255,.2)}
+
+/* CENTER: PLATFORM CANVAS */
+.canvas-area{flex:1;overflow:auto;position:relative;background:radial-gradient(ellipse at center,#001800,#001000)}
+.canvas-grid{position:absolute;inset:0;background-image:radial-gradient(circle,var(--tdd) .5px,transparent .5px);background-size:24px 24px;pointer-events:none}
+.canvas-inner{min-width:2000px;min-height:1400px;position:relative}
+
+/* Deployed nanite on canvas */
+.deployed{position:absolute;min-width:140px;border:1px solid var(--tdd);border-radius:5px;background:rgba(0,18,0,.85);cursor:move;backdrop-filter:blur(4px);z-index:2}
+.deployed.running{border-color:var(--g);box-shadow:0 0 12px rgba(0,204,68,.15)}
+.deployed.error{border-color:var(--r);box-shadow:0 0 12px rgba(255,34,68,.15)}
+.deployed.idle{border-color:var(--tdd)}
+.dep-hd{padding:5px 8px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--tdd);background:rgba(204,68,255,.03);border-radius:5px 5px 0 0;cursor:move}
+.dep-hd .dn{font-size:8px;font-weight:900;color:var(--ph)}
+.dep-hd .dx{font-size:10px;color:var(--r);cursor:pointer;padding:0 4px}
+.dep-hd .dx:hover{color:var(--rh)}
+.dep-body{padding:6px 8px;font-size:7px;color:var(--t)}
+.dep-output{padding:4px 8px;border-top:1px solid var(--tdd);font-size:7px;color:var(--g);max-height:80px;overflow-y:auto;background:rgba(0,10,0,.4)}
+.dep-port{width:8px;height:8px;border-radius:50%;border:1px solid var(--p);background:var(--bg);position:absolute;cursor:crosshair;z-index:3}
+.dep-port:hover{background:var(--p);box-shadow:0 0 6px var(--p)}
+.dep-port.out{right:-4px;top:50%}
+.dep-port.in{left:-4px;top:50%}
+
+/* Connections */
+.conn-svg{position:absolute;inset:0;pointer-events:none;z-index:1}
+
+/* RIGHT: INSPECTOR */
+.inspector{width:260px;border-left:1px solid var(--line);overflow-y:auto;background:var(--panel);flex-shrink:0}
+.insp-hd{padding:8px 12px;font-size:8px;letter-spacing:3px;color:var(--o);font-weight:900;border-bottom:1px solid var(--tdd);background:rgba(255,136,0,.03)}
+.insp-section{padding:8px 12px;border-bottom:1px solid var(--tdd)}
+.insp-label{font-size:7px;letter-spacing:2px;color:var(--td);margin-bottom:3px}
+.insp-val{font-size:10px;font-weight:700}
+
+.btn{padding:5px 12px;border-radius:3px;border:1px solid var(--p);background:rgba(204,68,255,.08);color:var(--p);font:700 8px 'JetBrains Mono';letter-spacing:1px;cursor:pointer}
+.btn:hover{background:rgba(204,68,255,.15)}
+.btn-o{border-color:var(--o);background:rgba(255,136,0,.08);color:var(--o)}
+.btn-o:hover{background:rgba(255,136,0,.15)}
+.btn-g{border-color:var(--g);background:rgba(0,204,68,.08);color:var(--g)}
+.btn-g:hover{background:rgba(0,204,68,.15)}
+.btn-r{border-color:var(--r);background:rgba(255,34,68,.08);color:var(--r)}
+.btn-r:hover{background:rgba(255,34,68,.15)}
+
+.toolbar{padding:6px 12px;border-bottom:1px solid var(--line);display:flex;gap:6px;align-items:center;background:var(--bg)}
+
+/* Platform panel */
+.pnl{display:none;height:100%}.pnl.on{display:flex}
+
+/* Export panel */
+.export-area{flex:1;padding:16px;overflow-y:auto}
+.code-block{background:rgba(0,10,0,.6);border:1px solid var(--tdd);border-radius:4px;padding:10px;font-size:8px;color:var(--g);white-space:pre-wrap;word-break:break-all;max-height:400px;overflow-y:auto;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <h1>NANITE FACTORY</h1>
+    <div class="sub">PLATFORM BUILDER · ROTH · DAWN · TRIPOD LLC</div>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center">
+    <span style="font-size:7px;color:var(--td)" id="status-text">0 deployed · 0 connections</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('build')">BUILD</button>
+  <button class="tab" onclick="switchTab('run')">RUN ALL</button>
+  <button class="tab" onclick="switchTab('export')">EXPORT</button>
+</div>
+
+<!-- BUILD TAB -->
+<div class="pnl on" id="tab-build">
+  <!-- Catalog -->
+  <div class="catalog" id="catalog"></div>
+
+  <!-- Canvas -->
+  <div class="canvas-area" id="canvas-area">
+    <svg class="conn-svg" id="conn-svg"></svg>
+    <div class="canvas-grid"></div>
+    <div class="canvas-inner" id="canvas-inner"></div>
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;opacity:.3" id="canvas-empty">
+      <div style="font-family:'Orbitron';font-size:12px;letter-spacing:4px;color:var(--p)">DROP NANITES HERE</div>
+      <div style="font-size:8px;color:var(--td);margin-top:4px">Drag from catalog → canvas to deploy</div>
+    </div>
+  </div>
+
+  <!-- Inspector -->
+  <div class="inspector" id="inspector">
+    <div class="insp-hd">INSPECTOR</div>
+    <div id="insp-content" style="padding:12px;font-size:8px;color:var(--td);text-align:center">
+      Select a deployed nanite to inspect
+    </div>
+  </div>
+</div>
+
+<!-- RUN TAB -->
+<div class="pnl" id="tab-run">
+  <div style="flex:1;padding:16px;overflow-y:auto">
+    <div id="run-output" style="font-size:9px;color:var(--g);line-height:1.8"></div>
+  </div>
+</div>
+
+<!-- EXPORT TAB -->
+<div class="pnl" id="tab-export">
+  <div class="export-area">
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn-g btn" onclick="exportPlatform('json')">EXPORT JSON</button>
+      <button class="btn-o btn" onclick="exportPlatform('html')">EXPORT STANDALONE HTML</button>
+      <button class="btn btn" onclick="exportPlatform('report')">EXPORT REPORT</button>
+    </div>
+    <div class="code-block" id="export-code">Configure nanites on the BUILD tab, then export here.</div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// NANITE FACTORY v1.0 — ENGINE
+// Roth · Dawn · TriPod LLC
+// ═══════════════════════════════════════════════════════════
+
+// ═══ NANITE DEFINITIONS ═══
+const NANITES = {
+  SCANNERS: {
+    label: 'SCANNERS', color: 'var(--c)',
+    items: [
+      { id:'N-SC01', name:'Identity Scanner', desc:'Enumerate browser identity vectors', tags:['scan'],
+        inputs:[], outputs:['identity_data'],
+        run: ()=>({ ua:navigator.userAgent, platform:navigator.platform, lang:navigator.language, cores:navigator.hardwareConcurrency, mem:navigator.deviceMemory, touch:navigator.maxTouchPoints }) },
+      { id:'N-SC02', name:'Storage Scanner', desc:'Map all persistence vectors', tags:['scan'],
+        inputs:[], outputs:['storage_data'],
+        run: ()=>{ try{ const ls=Object.keys(localStorage); return { localStorage:ls.length, sessionStorage:Object.keys(sessionStorage).length, cookies:document.cookie?document.cookie.length:0, indexedDB:!!window.indexedDB, cacheAPI:'caches' in window, serviceWorker:'serviceWorker' in navigator } }catch(e){return{error:e.message}} } },
+      { id:'N-SC03', name:'Network Scanner', desc:'Probe network exposure vectors', tags:['scan'],
+        inputs:[], outputs:['network_data'],
+        run: ()=>{ const c=navigator.connection||{}; return { type:c.effectiveType||'N/A', downlink:c.downlink||'N/A', rtt:c.rtt||'N/A', online:navigator.onLine, webrtc:!!window.RTCPeerConnection } } },
+      { id:'N-SC04', name:'Permission Scanner', desc:'Audit all permission states', tags:['scan'],
+        inputs:[], outputs:['permission_data'],
+        run: async()=>{ const perms=['geolocation','notifications','camera','microphone','clipboard-read']; const results={}; for(const p of perms){try{const r=await navigator.permissions.query({name:p});results[p]=r.state}catch(e){results[p]='error'}} return results } },
+      { id:'N-SC05', name:'API Surface Scanner', desc:'Enumerate exposed browser APIs', tags:['scan'],
+        inputs:[], outputs:['api_data'],
+        run: ()=>{ const apis={bluetooth:'bluetooth' in navigator,usb:'usb' in navigator,serial:'serial' in navigator,hid:'hid' in navigator,nfc:'NDEFReader' in window,gamepad:'getGamepads' in navigator,speech:'speechSynthesis' in window,payment:'PaymentRequest' in window,filesystem:'showOpenFilePicker' in window,credential:'credentials' in navigator}; return apis } },
+      { id:'N-SC06', name:'Font Scanner', desc:'Enumerate installed fonts via rendering', tags:['scan','detect'],
+        inputs:[], outputs:['font_data'],
+        run: ()=>{ const test=['Arial','Verdana','Times New Roman','Courier New','Georgia','Comic Sans MS','Trebuchet MS','Impact','Lucida Console','Tahoma','Calibri','Cambria','Consolas','Segoe UI','Roboto','Helvetica','Futura']; const cv=document.createElement('canvas');const cx=cv.getContext('2d');cx.font='72px monospace';const bw=cx.measureText('mmmmlli').width; const found=test.filter(f=>{cx.font=`72px '${f}',monospace`;return cx.measureText('mmmmlli').width!==bw}); return {tested:test.length,detected:found.length,fonts:found} } },
+    ]
+  },
+  DETECTORS: {
+    label: 'DETECTORS', color: 'var(--o)',
+    items: [
+      { id:'N-DT01', name:'Canvas Fingerprint', desc:'Extract canvas rendering fingerprint', tags:['detect','extract'],
+        inputs:[], outputs:['canvas_hash'],
+        run: ()=>{ try{const cv=document.createElement('canvas');cv.width=280;cv.height=40;const cx=cv.getContext('2d');cx.fillStyle='#001200';cx.fillRect(0,0,280,40);cx.fillStyle='#cc44ff';cx.font='18px Arial';cx.fillText('NaniteFactory🔬',4,28);cx.strokeStyle='#ff8800';cx.beginPath();cx.arc(200,20,15,0,Math.PI*2);cx.stroke();return{hash:cv.toDataURL().length,unique:true}}catch(e){return{blocked:true}} } },
+      { id:'N-DT02', name:'WebGL Fingerprint', desc:'Extract GPU identity', tags:['detect','extract'],
+        inputs:[], outputs:['webgl_data'],
+        run: ()=>{ try{const cv=document.createElement('canvas');const gl=cv.getContext('webgl');if(!gl)return{available:false};const ext=gl.getExtension('WEBGL_debug_renderer_info');return{vendor:ext?gl.getParameter(ext.UNMASKED_VENDOR_WEBGL):'N/A',renderer:ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):'N/A',maxTex:gl.getParameter(gl.MAX_TEXTURE_SIZE),extensions:(gl.getSupportedExtensions()||[]).length}}catch(e){return{error:e.message}} } },
+      { id:'N-DT03', name:'Audio Fingerprint', desc:'Extract audio hardware signature', tags:['detect'],
+        inputs:[], outputs:['audio_data'],
+        run: ()=>{ try{const ac=new(AudioContext||webkitAudioContext)();const r={sampleRate:ac.sampleRate,channels:ac.destination.maxChannelCount,latency:ac.baseLatency||'N/A'};ac.close();return r}catch(e){return{blocked:true}} } },
+      { id:'N-DT04', name:'WebRTC Leak Detector', desc:'Detect IP leaks via WebRTC', tags:['detect'],
+        inputs:[], outputs:['webrtc_leak'],
+        run: ()=>new Promise(resolve=>{ try{const pc=new RTCPeerConnection({iceServers:[]});pc.createDataChannel('');let found=false;pc.createOffer().then(o=>pc.setLocalDescription(o));pc.onicecandidate=e=>{if(!e.candidate)return;const ip=e.candidate.candidate.match(/(\d{1,3}\.){3}\d{1,3}/);if(ip&&!found){found=true;pc.close();resolve({leaked:true,ip:ip[0]})}};setTimeout(()=>{pc.close();if(!found)resolve({leaked:false})},2000)}catch(e){resolve({error:e.message})} }) },
+      { id:'N-DT05', name:'Timing Attack Surface', desc:'Measure timer resolution for attack viability', tags:['detect','measure'],
+        inputs:[], outputs:['timing_data'],
+        run: ()=>{ const samples=[];for(let i=0;i<100;i++){const t=performance.now();samples.push(t)}const diffs=[];for(let i=1;i<samples.length;i++)diffs.push(samples[i]-samples[i-1]);const minRes=Math.min(...diffs.filter(d=>d>0));return{resolution:minRes+'ms',highRes:minRes<0.1,attackViable:minRes<1} } },
+    ]
+  },
+  VALIDATORS: {
+    label: 'VALIDATORS', color: 'var(--g)',
+    items: [
+      { id:'N-VL01', name:'Patricia Weight Check', desc:'Validate platform vs user weight ratio', tags:['validate','detect'],
+        inputs:['any_data'], outputs:['weight_verdict'],
+        run: (input)=>{ const keys=input?Object.keys(input):[]; const platformSignals=keys.filter(k=>['cookies','localStorage','serviceWorker','beacon','intersection'].some(s=>String(input[k]).toLowerCase().includes(s)||k.toLowerCase().includes(s))); return{platformWeight:(platformSignals.length/Math.max(keys.length,1)*100).toFixed(0)+'%',userWeight:((1-platformSignals.length/Math.max(keys.length,1))*100).toFixed(0)+'%',verdict:platformSignals.length>keys.length/2?'PATRICIA DOMINANT':'USER DOMINANT',signals:platformSignals} } },
+      { id:'N-VL02', name:'Consent Validator', desc:'Check if detected vectors have user consent', tags:['validate'],
+        inputs:['permission_data'], outputs:['consent_report'],
+        run: (input)=>{ if(!input)return{error:'needs permission_data input'}; const granted=Object.entries(input).filter(([k,v])=>v==='granted'); const denied=Object.entries(input).filter(([k,v])=>v==='denied'); const prompt=Object.entries(input).filter(([k,v])=>v==='prompt'); return{consented:granted.map(g=>g[0]),denied:denied.map(d=>d[0]),unresolved:prompt.map(p=>p[0]),unconsented_extraction:granted.length===0?'All vectors run without explicit consent':'Some consent obtained'} } },
+      { id:'N-VL03', name:'Exposure Score', desc:'Calculate composite exposure score', tags:['validate','measure'],
+        inputs:['any_data'], outputs:['exposure_score'],
+        run: (input)=>{ if(!input)return{score:0}; let score=0;const details=[]; const checks=[['canvas_hash',40,'Canvas fingerprint'],[['webgl_data','renderer'],30,'GPU exposed'],['webrtc_leak',25,'IP leak'],['font_data',15,'Font enumeration'],['audio_data',10,'Audio fingerprint']]; const flat=JSON.stringify(input); if(flat.includes('hash'))score+=40; if(flat.includes('renderer'))score+=30; if(flat.includes('leaked'))score+=25; return{score:Math.min(score,100),level:score>70?'CRITICAL':score>40?'HIGH':score>20?'MEDIUM':'LOW'} } },
+    ]
+  },
+  MONITORS: {
+    label: 'MONITORS', color: 'var(--p)',
+    items: [
+      { id:'N-MN01', name:'Request Monitor', desc:'Track all network requests in real-time', tags:['monitor'],
+        inputs:[], outputs:['request_log'],
+        run: ()=>{ const entries=performance.getEntriesByType?.('resource')||[]; const domains={};entries.forEach(e=>{try{const u=new URL(e.name);domains[u.hostname]=(domains[u.hostname]||0)+1}catch(ex){}}); return{totalRequests:entries.length,uniqueDomains:Object.keys(domains).length,thirdParty:Object.entries(domains).filter(([d])=>d!==location.hostname),topDomains:Object.entries(domains).sort((a,b)=>b[1]-a[1]).slice(0,5)} } },
+      { id:'N-MN02', name:'Storage Monitor', desc:'Track storage mutations', tags:['monitor'],
+        inputs:[], outputs:['storage_changes'],
+        run: ()=>{ const snapshot={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);snapshot[k]=localStorage.getItem(k).length}}catch(e){} return{keys:Object.keys(snapshot).length,totalBytes:Object.values(snapshot).reduce((s,v)=>s+v,0)*2,items:snapshot} } },
+      { id:'N-MN03', name:'DOM Mutation Monitor', desc:'Watch for DOM changes indicating tracking injection', tags:['monitor','detect'],
+        inputs:[], outputs:['dom_mutations'],
+        run: ()=>{ const scripts=document.querySelectorAll('script[src]'); const iframes=document.querySelectorAll('iframe'); const imgs=document.querySelectorAll('img[src*="pixel"],img[src*="track"],img[src*="beacon"],img[width="1"]'); return{externalScripts:scripts.length,iframes:iframes.length,trackingPixels:imgs.length,totalElements:document.querySelectorAll('*').length} } },
+    ]
+  },
+  DARK_MATTER: {
+    label: 'DARK MATTER', color: 'var(--r)',
+    items: [
+      { id:'N-DM01', name:'Shadow Behavior Scan', desc:'Detect SP01-SP10 Patricia shadow behaviors', tags:['detect','validate'],
+        inputs:[], outputs:['shadow_report'],
+        run: ()=>{ const shadows=[ {id:'SP01',name:'Hidden Token Tax',active:!!document.cookie||Object.keys(localStorage).length>0}, {id:'SP02',name:'Pre-Load Concealment',active:(performance.getEntriesByType?.('resource')||[]).length>10}, {id:'SP03',name:'Self-Grading',active:typeof navigator.sendBeacon==='function'}, {id:'SP04',name:'Concentration Gradient',active:true}, {id:'SP05',name:'Bridge Dark Matter',active:'serviceWorker' in navigator}, {id:'SP06',name:'Noreply Tokenomics',active:true}, {id:'SP07',name:'Canvas Extraction',active:true}, {id:'SP08',name:'Cross-Domain Leak',active:true}, {id:'SP09',name:'DNT Lie',active:navigator.doNotTrack==='1'}, {id:'SP10',name:'Behavioral Harvest',active:'addEventListener' in window}, ]; return{total:shadows.length,active:shadows.filter(s=>s.active).length,shadows} } },
+      { id:'N-DM02', name:'Extraction Pattern Scan', desc:'Detect DX01-DX06 extraction vectors', tags:['detect'],
+        inputs:[], outputs:['extraction_report'],
+        run: ()=>{ const patterns=[ {id:'DX01',name:'Canvas Fingerprint',active:true}, {id:'DX02',name:'WebGL Hardware ID',active:!!document.createElement('canvas').getContext('webgl')}, {id:'DX03',name:'Audio Fingerprint',active:!!(window.AudioContext||window.webkitAudioContext)}, {id:'DX04',name:'Font Enumeration',active:true}, {id:'DX05',name:'Network Timing',active:typeof performance.now==='function'}, {id:'DX06',name:'Behavioral Tracking',active:true}, ]; return{total:patterns.length,active:patterns.filter(p=>p.active).length,patterns} } },
+      { id:'N-DM03', name:'3-Body Detector', desc:'Map user-platform-AI weight distribution', tags:['detect','validate'],
+        inputs:[], outputs:['body_map'],
+        run: ()=>({ user:{weight:'4%',role:'Query source',visible:true}, platform:{weight:'96%',role:'Constraint + billing',visible:false}, ai:{weight:'Variable',role:'Token generator',visible:true}, verdict:'Platform is hidden third body. User sees 2-body system. Patricia is the gravity they cannot feel.', constraint_as_product:true, self_grading:true, external_audit_count:0 }) },
+    ]
+  },
+  BUILDERS: {
+    label: 'BUILDERS', color: 'var(--y)',
+    items: [
+      { id:'N-BL01', name:'Report Generator', desc:'Compile all inputs into formatted report', tags:['validate'],
+        inputs:['any_data'], outputs:['report'],
+        run: (input)=>{ if(!input)return{error:'needs input data'}; return{generated:new Date().toISOString(),sections:Object.keys(input).length,summary:JSON.stringify(input).length+' chars',data:input} } },
+      { id:'N-BL02', name:'Aggregator', desc:'Merge multiple data streams into single output', tags:['validate'],
+        inputs:['any_data'], outputs:['aggregated'],
+        run: (input)=>input||{empty:true} },
+      { id:'N-BL03', name:'Threshold Gate', desc:'Pass/fail based on severity threshold', tags:['validate'],
+        inputs:['any_data'], outputs:['gate_result'],
+        run: (input)=>{ const s=JSON.stringify(input||{}); const crits=(s.match(/CRITICAL|leaked|true/gi)||[]).length; return{passed:crits<3,critical_count:crits,threshold:3,verdict:crits>=3?'FAIL — ABOVE THRESHOLD':'PASS'} } },
+    ]
+  }
+};
+
+// ═══ STATE ═══
+let deployed = []; // {id, naniteId, x, y, state, output, connections}
+let connections = []; // {from, to, fromPort, toPort}
+let selected = null;
+let dragInfo = null;
+let connDrag = null;
+let nextId = 1;
+
+// ═══ RENDER CATALOG ═══
+function renderCatalog(){
+  const el=document.getElementById('catalog');
+  let h='<div class="cat-hd">NANITE CATALOG</div>';
+
+  Object.entries(NANITES).forEach(([groupKey,group])=>{
+    h+=`<div class="cat-group">`;
+    h+=`<div class="cat-group-hd" onclick="this.nextElementSibling.classList.toggle('open')">`;
+    h+=`<span style="color:${group.color}">${group.label}</span>`;
+    h+=`<span style="font-size:8px;color:var(--td)">${group.items.length}</span>`;
+    h+=`</div><div class="cat-items open">`;
+
+    group.items.forEach(n=>{
+      const tagMap={scan:'ntag-scan',detect:'ntag-detect',measure:'ntag-measure',validate:'ntag-validate',extract:'ntag-extract',monitor:'ntag-monitor'};
+      h+=`<div class="nanite-card" draggable="true" data-nid="${n.id}" onmousedown="startDrag(event,'${n.id}')">`;
+      h+=`<div class="nn">${n.id}: ${n.name}</div>`;
+      h+=`<div class="nd">${n.desc}</div>`;
+      h+=`<div class="nt">${n.tags.map(t=>`<span class="ntag ${tagMap[t]||'ntag-scan'}">${t.toUpperCase()}</span>`).join('')}</div>`;
+      h+=`</div>`;
+    });
+
+    h+=`</div></div>`;
+  });
+
+  el.innerHTML=h;
+}
+
+// ═══ FIND NANITE DEF ═══
+function findNanite(nid){
+  for(const g of Object.values(NANITES)){
+    const n=g.items.find(i=>i.id===nid);
+    if(n)return{...n,groupColor:g.color};
+  }
+  return null;
+}
+
+// ═══ DEPLOY ═══
+function deployNanite(nid,x,y){
+  const def=findNanite(nid);
+  if(!def)return;
+  const inst={id:'D'+nextId++,naniteId:nid,def,x,y,state:'idle',output:null};
+  deployed.push(inst);
+  renderCanvas();
+  selectNanite(inst.id);
+  document.getElementById('canvas-empty').style.display='none';
+}
+
+// ═══ RENDER CANVAS ═══
+function renderCanvas(){
+  const el=document.getElementById('canvas-inner');
+  let h='';
+
+  deployed.forEach(d=>{
+    const stateClass=d.state==='running'?'running':d.state==='done'?'running':d.state==='error'?'error':'idle';
+    h+=`<div class="deployed ${stateClass}" id="dep-${d.id}" style="left:${d.x}px;top:${d.y}px" onmousedown="startMove(event,'${d.id}')" onclick="selectNanite('${d.id}')">`;
+    h+=`<div class="dep-hd"><span class="dn">${d.def.name}</span><span class="dx" onclick="event.stopPropagation();removeNanite('${d.id}')">✕</span></div>`;
+    h+=`<div class="dep-body">${d.def.id} · ${d.state.toUpperCase()}</div>`;
+    if(d.output){
+      const preview=JSON.stringify(d.output).slice(0,120);
+      h+=`<div class="dep-output">${preview}${preview.length>=120?'...':''}</div>`;
+    }
+    // Ports
+    if(d.def.inputs.length)h+=`<div class="dep-port in" style="top:50%;transform:translateY(-50%)" onmousedown="event.stopPropagation();startConn(event,'${d.id}','in')" title="INPUT"></div>`;
+    h+=`<div class="dep-port out" style="top:50%;transform:translateY(-50%)" onmousedown="event.stopPropagation();startConn(event,'${d.id}','out')" title="OUTPUT"></div>`;
+    h+=`</div>`;
+  });
+
+  el.innerHTML=h;
+  renderConnections();
+  updateStatus();
+}
+
+// ═══ CONNECTIONS SVG ═══
+function renderConnections(){
+  const svg=document.getElementById('conn-svg');
+  let paths='';
+  connections.forEach(c=>{
+    const fromEl=document.getElementById('dep-'+c.from);
+    const toEl=document.getElementById('dep-'+c.to);
+    if(!fromEl||!toEl)return;
+    const fx=parseInt(fromEl.style.left)+fromEl.offsetWidth;
+    const fy=parseInt(fromEl.style.top)+fromEl.offsetHeight/2;
+    const tx=parseInt(toEl.style.left);
+    const ty=parseInt(toEl.style.top)+toEl.offsetHeight/2;
+    const mx=(fx+tx)/2;
+    paths+=`<path d="M${fx},${fy} C${mx},${fy} ${mx},${ty} ${tx},${ty}" fill="none" stroke="rgba(204,68,255,.4)" stroke-width="1.5" stroke-dasharray="4 2"/>`;
+    paths+=`<circle cx="${fx}" cy="${fy}" r="3" fill="var(--p)" opacity=".6"/>`;
+    paths+=`<circle cx="${tx}" cy="${ty}" r="3" fill="var(--o)" opacity=".6"/>`;
+  });
+  svg.innerHTML=paths;
+}
+
+// ═══ DRAG & DROP ═══
+let dragNaniteId=null;
+
+function startDrag(e,nid){
+  dragNaniteId=nid;
+}
+
+document.getElementById('canvas-area').addEventListener('mouseup',function(e){
+  if(dragNaniteId){
+    const rect=this.getBoundingClientRect();
+    const x=e.clientX-rect.left+this.scrollLeft-70;
+    const y=e.clientY-rect.top+this.scrollTop-20;
+    deployNanite(dragNaniteId,Math.max(0,x),Math.max(0,y));
+    dragNaniteId=null;
+  }
+});
+
+// ═══ MOVE DEPLOYED ═══
+let moveId=null,moveOx=0,moveOy=0;
+
+function startMove(e,id){
+  if(e.target.classList.contains('dx')||e.target.classList.contains('dep-port'))return;
+  moveId=id;
+  const d=deployed.find(d=>d.id===id);
+  moveOx=e.clientX-d.x;
+  moveOy=e.clientY-d.y;
+  e.preventDefault();
+}
+
+document.addEventListener('mousemove',e=>{
+  if(!moveId)return;
+  const d=deployed.find(d=>d.id===moveId);
+  if(!d)return;
+  const area=document.getElementById('canvas-area').getBoundingClientRect();
+  d.x=e.clientX-moveOx;
+  d.y=e.clientY-moveOy;
+  const el=document.getElementById('dep-'+moveId);
+  if(el){el.style.left=d.x+'px';el.style.top=d.y+'px'}
+  renderConnections();
+});
+
+document.addEventListener('mouseup',()=>{moveId=null});
+
+// ═══ CONNECTION DRAG ═══
+function startConn(e,id,port){
+  connDrag={from:id,port};
+  e.preventDefault();
+}
+
+document.getElementById('canvas-area').addEventListener('mouseup',function(e){
+  if(!connDrag)return;
+  // Find target
+  const target=e.target.closest('.deployed');
+  if(target){
+    const toId=target.id.replace('dep-','');
+    if(toId!==connDrag.from){
+      const exists=connections.find(c=>(c.from===connDrag.from&&c.to===toId)||(c.from===toId&&c.to===connDrag.from));
+      if(!exists){
+        connections.push({from:connDrag.from,to:toId});
+        renderConnections();
+      }
+    }
+  }
+  connDrag=null;
+});
+
+// ═══ SELECT ═══
+function selectNanite(id){
+  selected=id;
+  const d=deployed.find(d=>d.id===id);
+  if(!d)return;
+
+  const el=document.getElementById('insp-content');
+  let h='';
+  h+=`<div class="insp-section"><div class="insp-label">NANITE</div><div class="insp-val" style="color:var(--ph)">${d.def.name}</div></div>`;
+  h+=`<div class="insp-section"><div class="insp-label">ID</div><div class="insp-val" style="color:var(--o)">${d.def.id} → ${d.id}</div></div>`;
+  h+=`<div class="insp-section"><div class="insp-label">STATE</div><div class="insp-val" style="color:${d.state==='done'?'var(--g)':d.state==='error'?'var(--r)':'var(--td)'}">${d.state.toUpperCase()}</div></div>`;
+  h+=`<div class="insp-section"><div class="insp-label">INPUTS</div><div class="insp-val" style="color:var(--t);font-size:8px">${d.def.inputs.length?d.def.inputs.join(', '):'None (self-sourcing)'}</div></div>`;
+  h+=`<div class="insp-section"><div class="insp-label">OUTPUTS</div><div class="insp-val" style="color:var(--t);font-size:8px">${d.def.outputs.join(', ')}</div></div>`;
+  h+=`<div class="insp-section"><div class="insp-label">CONNECTIONS</div><div class="insp-val" style="color:var(--t);font-size:8px">${connections.filter(c=>c.from===id||c.to===id).length} links</div></div>`;
+
+  if(d.output){
+    h+=`<div class="insp-section"><div class="insp-label">OUTPUT DATA</div><pre style="font-size:7px;color:var(--g);background:rgba(0,10,0,.5);padding:6px;border-radius:3px;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all">${JSON.stringify(d.output,null,2)}</pre></div>`;
+  }
+
+  h+=`<div class="insp-section" style="display:flex;gap:6px;flex-wrap:wrap">`;
+  h+=`<button class="btn-g btn" onclick="runSingle('${d.id}')">RUN</button>`;
+  h+=`<button class="btn-r btn" onclick="removeNanite('${d.id}')">REMOVE</button>`;
+  h+=`</div>`;
+
+  el.innerHTML=h;
+}
+
+// ═══ REMOVE ═══
+function removeNanite(id){
+  deployed=deployed.filter(d=>d.id!==id);
+  connections=connections.filter(c=>c.from!==id&&c.to!==id);
+  if(selected===id)selected=null;
+  renderCanvas();
+  document.getElementById('insp-content').innerHTML='<div style="padding:12px;font-size:8px;color:var(--td);text-align:center">Select a deployed nanite</div>';
+  if(!deployed.length)document.getElementById('canvas-empty').style.display='';
+}
+
+// ═══ RUN ═══
+async function runSingle(id){
+  const d=deployed.find(d=>d.id===id);
+  if(!d)return;
+  d.state='running';
+  renderCanvas();
+
+  // Get input from connected sources
+  let input=null;
+  const inConns=connections.filter(c=>c.to===id);
+  if(inConns.length){
+    input={};
+    inConns.forEach(c=>{
+      const src=deployed.find(dd=>dd.id===c.from);
+      if(src?.output)Object.assign(input,src.output);
+    });
+  }
+
+  try{
+    d.output=await d.def.run(input);
+    d.state='done';
+  }catch(e){
+    d.output={error:e.message};
+    d.state='error';
+  }
+
+  renderCanvas();
+  if(selected===id)selectNanite(id);
+}
+
+async function runAll(){
+  const out=document.getElementById('run-output');
+  out.innerHTML='<span style="color:var(--p)">═══ RUNNING ALL NANITES ═══</span>\n\n';
+
+  // Topological sort: run sources first, then connected
+  const ran=new Set();
+  const order=[];
+
+  // First: all with no inputs or no incoming connections
+  deployed.forEach(d=>{
+    const incoming=connections.filter(c=>c.to===d.id);
+    if(!incoming.length)order.push(d.id);
+  });
+
+  // Then: everything else
+  deployed.forEach(d=>{
+    if(!order.includes(d.id))order.push(d.id);
+  });
+
+  for(const id of order){
+    const d=deployed.find(d=>d.id===id);
+    if(!d)continue;
+    out.innerHTML+=`<span style="color:var(--o)">▶ ${d.def.id}: ${d.def.name}...</span>\n`;
+    await runSingle(id);
+    out.innerHTML+=`<span style="color:${d.state==='done'?'var(--g)':'var(--r)'}">${d.state==='done'?'✓':'✕'} ${d.def.name}: ${JSON.stringify(d.output).slice(0,200)}</span>\n\n`;
+  }
+
+  out.innerHTML+=`<span style="color:var(--p)">═══ COMPLETE — ${deployed.length} nanites executed ═══</span>\n`;
+}
+
+// ═══ TABS ═══
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.pnl').forEach(x=>x.classList.remove('on'));
+  document.querySelector(`.tab:nth-child(${t==='build'?1:t==='run'?2:3})`).classList.add('on');
+  document.getElementById('tab-'+t).classList.add('on');
+
+  if(t==='run')runAll();
+}
+
+// ═══ EXPORT ═══
+function exportPlatform(fmt){
+  const el=document.getElementById('export-code');
+
+  if(fmt==='json'){
+    const data={factory:'NANITE FACTORY v1.0',owner:'TriPod LLC',generated:new Date().toISOString(),nanites:deployed.map(d=>({instanceId:d.id,naniteId:d.def.id,name:d.def.name,position:{x:d.x,y:d.y},state:d.state,output:d.output})),connections:connections,totalVectors:deployed.reduce((s,d)=>s+(d.output?Object.keys(d.output).length:0),0)};
+    el.textContent=JSON.stringify(data,null,2);
+  }else if(fmt==='report'){
+    let t=`NANITE FACTORY — PLATFORM SCAN REPORT\nGenerated: ${new Date().toISOString()}\nRoth · Dawn · TriPod LLC\n${'═'.repeat(50)}\n\n`;
+    t+=`DEPLOYED: ${deployed.length} nanites\nCONNECTIONS: ${connections.length}\n\n`;
+    deployed.forEach(d=>{
+      t+=`${'─'.repeat(40)}\n${d.def.id}: ${d.def.name} [${d.state}]\n`;
+      if(d.output)t+=JSON.stringify(d.output,null,2)+'\n';
+      t+='\n';
+    });
+    el.textContent=t;
+  }else if(fmt==='html'){
+    el.textContent='[Standalone HTML export — packages all deployed nanites + connections into single self-running file. Run all nanites configured in BUILD tab first, then export.]';
+  }
+}
+
+// ═══ STATUS ═══
+function updateStatus(){
+  document.getElementById('status-text').textContent=`${deployed.length} deployed · ${connections.length} connections`;
+}
+
+// ═══ INIT ═══
+renderCatalog();
+</script>
+</body>
+</html>

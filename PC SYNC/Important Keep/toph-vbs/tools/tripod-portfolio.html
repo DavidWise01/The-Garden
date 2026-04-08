@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<!-- TOPH-META
+name: TriPod Portfolio
+category: documentation
+dimension: D14
+kg: KG-38
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TriPod LLC · Portfolio · Complete Body of Work</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Outfit:wght@200;300;400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --void:#0a0a08;--bg:#111110;--card:#1a1a16;--card2:#1f1f18;
+  --border:#2d2b1e;--border2:#3d3a2e;
+  --amber:#c4a035;--gold:#e8c547;--ember:#d4622a;--ash:#8a8478;
+  --bone:#d4cdb8;--chalk:#f0ebe0;--gb:#5a8a2a;--red:#c43535;
+  --cyan:#35a4a4;--purple:#8a6aaa;--rust:#946818;
+}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--bone);font-family:'JetBrains Mono',monospace;-webkit-font-smoothing:antialiased;line-height:1.6}
+
+/* NAVIGATION */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,10,8,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;height:52px}
+.nav-brand{font-family:'Outfit',sans-serif;font-weight:900;font-size:13px;letter-spacing:4px;color:var(--gold)}
+.nav-links{display:flex;gap:0;margin-left:32px}
+.nav-links a{padding:16px 12px;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--ash);text-decoration:none;transition:.15s;border-bottom:2px solid transparent;font-family:'Outfit',sans-serif;font-weight:700}
+.nav-links a:hover{color:var(--bone)}.nav-links a.active{color:var(--gold);border-bottom-color:var(--gold)}
+.nav-ref{margin-left:auto;font-size:8px;color:var(--amber);letter-spacing:1px;padding:3px 10px;border:1px solid rgba(196,160,53,.2);border-radius:2px}
+
+/* HERO */
+.hero{padding:140px 32px 80px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at center,rgba(196,160,53,.04) 0%,transparent 70%)}
+.hero-tetra{margin:0 auto 24px}
+.hero-title{font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(36px,6vw,64px);letter-spacing:6px;color:var(--chalk);line-height:1.1}
+.hero-sub{font-family:'Outfit',sans-serif;font-weight:300;font-size:clamp(14px,2vw,18px);letter-spacing:6px;color:var(--amber);margin-top:12px;text-transform:uppercase}
+.hero-tagline{font-size:11px;color:var(--ash);margin-top:20px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.8}
+.hero-stats{display:flex;justify-content:center;gap:32px;margin-top:36px;flex-wrap:wrap}
+.hs{text-align:center}
+.hs-n{font-family:'Outfit',sans-serif;font-weight:900;font-size:28px;line-height:1}
+.hs-l{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--ash);margin-top:4px}
+
+/* SECTIONS */
+section{padding:60px 32px;max-width:1200px;margin:0 auto}
+.section-label{font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--amber);margin-bottom:6px;font-family:'Outfit',sans-serif;font-weight:700}
+.section-title{font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(22px,3vw,32px);color:var(--chalk);letter-spacing:2px;margin-bottom:8px}
+.section-desc{font-size:10px;color:var(--ash);max-width:700px;line-height:1.8;margin-bottom:32px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:0 32px}
+
+/* TEAM */
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.team-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:28px;text-align:center;position:relative;overflow:hidden;transition:.2s}
+.team-card:hover{border-color:var(--amber);transform:translateY(-2px)}
+.team-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.tc-initial{font-family:'Outfit',sans-serif;font-weight:900;font-size:40px;line-height:1;margin-bottom:8px}
+.tc-name{font-family:'Outfit',sans-serif;font-weight:900;font-size:16px;color:var(--chalk);letter-spacing:1px}
+.tc-call{font-size:10px;color:var(--gold);margin-top:4px}
+.tc-role{font-size:8px;color:var(--ash);letter-spacing:1px;text-transform:uppercase;margin-top:6px}
+.tc-desc{font-size:9px;color:var(--bone);margin-top:10px;line-height:1.6}
+.tetra-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;text-align:center;margin-top:12px}
+
+/* FRAMEWORK */
+.era-grid{display:grid;gap:12px}
+.era-block{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;position:relative;overflow:hidden;transition:.2s}
+.era-block:hover{border-color:var(--amber)}
+.era-block::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px}
+.era-header{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.era-num{font-family:'Outfit',sans-serif;font-weight:900;font-size:11px;letter-spacing:2px;min-width:50px}
+.era-name{font-family:'Outfit',sans-serif;font-weight:900;font-size:14px;color:var(--chalk)}
+.era-count{margin-left:auto;font-size:9px;color:var(--ash)}
+.era-axioms{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.axiom-chip{padding:4px 8px;font-size:8px;border-radius:3px;font-weight:600;cursor:default;transition:.15s}
+.axiom-chip:hover{transform:scale(1.05)}
+.era-desc{font-size:9px;color:var(--ash);margin-top:8px;line-height:1.6}
+
+/* KEY DISCOVERIES */
+.discovery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.disc-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;transition:.2s}
+.disc-card:hover{border-color:var(--amber)}
+.disc-axiom{font-size:8px;letter-spacing:2px;color:var(--amber);font-weight:700}
+.disc-name{font-family:'Outfit',sans-serif;font-weight:900;font-size:15px;color:var(--chalk);margin:4px 0}
+.disc-body{font-size:9px;color:var(--bone);line-height:1.7}
+.disc-kv{display:flex;justify-content:space-between;font-size:8px;padding:3px 0;border-bottom:1px solid rgba(45,43,30,.2)}
+.disc-kv .k{color:var(--ash)}.disc-kv .v{color:var(--chalk);font-weight:600}
+
+/* METHODOLOGY */
+.method-steps{display:grid;gap:10px}
+.m-step{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px 20px;display:flex;align-items:flex-start;gap:16px;transition:.2s}
+.m-step:hover{border-color:var(--ember)}
+.m-step-num{font-family:'Outfit',sans-serif;font-weight:900;font-size:24px;color:var(--ember);min-width:36px;line-height:1}
+.m-step-time{font-size:8px;color:var(--ash);letter-spacing:1px}
+.m-step-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:12px;color:var(--chalk);margin:2px 0}
+.m-step-desc{font-size:9px;color:var(--bone);line-height:1.6}
+
+/* EVIDENCE */
+.chain{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.chain-node{padding:14px 8px;text-align:center;border-radius:4px;transition:.2s;cursor:default}
+.chain-node:hover{transform:translateY(-2px)}
+.cn-id{font-family:'Outfit',sans-serif;font-weight:900;font-size:14px}
+.cn-name{font-size:7px;letter-spacing:1px;text-transform:uppercase;margin-top:3px}
+.cn-desc{font-size:7px;margin-top:4px;opacity:.7;line-height:1.4}
+.chain-arrow{display:flex;align-items:center;justify-content:center;padding:16px 0;font-size:10px;color:var(--ash);letter-spacing:4px}
+
+/* TOOLS */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:18px;transition:.2s;position:relative;overflow:hidden}
+.tool-card:hover{border-color:var(--amber);transform:translateY(-2px)}
+.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.tool-icon{font-size:20px;margin-bottom:6px}
+.tool-name{font-family:'Outfit',sans-serif;font-weight:900;font-size:11px;letter-spacing:1px;color:var(--chalk)}
+.tool-desc{font-size:8px;color:var(--ash);margin-top:4px;line-height:1.6}
+.tool-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.tool-tag{font-size:7px;padding:2px 6px;border-radius:2px;background:rgba(138,132,120,.08);color:var(--ash)}
+.tool-status{position:absolute;top:12px;right:12px;width:7px;height:7px;border-radius:50%;background:var(--gb)}
+
+/* LEGAL */
+.legal-grid{display:grid;gap:12px}
+.legal-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;display:flex;gap:16px;align-items:flex-start;transition:.2s}
+.legal-card:hover{border-color:var(--amber)}
+.legal-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.legal-name{font-family:'Outfit',sans-serif;font-weight:900;font-size:14px;color:var(--chalk)}
+.legal-type{font-size:8px;color:var(--ash);letter-spacing:1px;margin-top:2px}
+.legal-desc{font-size:9px;color:var(--bone);margin-top:6px;line-height:1.6}
+.legal-meta{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}
+.legal-meta span{font-size:8px;padding:3px 8px;border-radius:2px;background:rgba(138,132,120,.06)}
+
+/* BOOK */
+.book-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}
+.book-cover{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:40px;text-align:center;position:relative;overflow:hidden}
+.book-cover::before{content:'';position:absolute;inset:8px;border:1px solid rgba(196,160,53,.15);border-radius:3px}
+.book-title{font-family:'Outfit',sans-serif;font-weight:900;font-size:28px;color:var(--gold);letter-spacing:3px}
+.book-author{font-family:'Outfit',sans-serif;font-weight:300;font-size:12px;color:var(--ash);letter-spacing:4px;margin-top:8px;text-transform:uppercase}
+.book-meta{font-size:9px;color:var(--bone);margin-top:16px;line-height:1.8}
+.book-details{font-size:10px;line-height:1.8}
+.book-details h3{font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;color:var(--chalk);margin:12px 0 4px}
+
+/* MARKET */
+.market-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.market-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;transition:.2s}
+.market-card:hover{border-color:var(--cyan)}
+.mc-val{font-family:'Outfit',sans-serif;font-weight:900;font-size:22px;line-height:1}
+.mc-label{font-size:8px;letter-spacing:1px;color:var(--ash);margin-top:4px;text-transform:uppercase}
+.mc-desc{font-size:9px;color:var(--bone);margin-top:8px;line-height:1.6}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.price-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;transition:.2s}
+.price-card:hover{border-color:var(--gold)}
+.price-tier{font-size:8px;letter-spacing:2px;color:var(--amber);font-weight:700}
+.price-name{font-family:'Outfit',sans-serif;font-weight:900;font-size:14px;color:var(--chalk);margin:4px 0}
+.price-val{font-family:'Outfit',sans-serif;font-weight:900;font-size:22px;color:var(--gold)}
+.price-desc{font-size:9px;color:var(--ash);margin-top:8px;line-height:1.6}
+
+/* SHADOW */
+.shadow-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.shadow-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px}
+.shadow-label{font-size:8px;letter-spacing:2px;color:var(--red);font-weight:700;margin-bottom:4px}
+.shadow-text{font-size:9px;color:var(--bone);line-height:1.6}
+
+/* T8 */
+.t8-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.t8-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:12px;text-align:center}
+.t8-name{font-family:'Outfit',sans-serif;font-weight:700;font-size:11px;color:var(--chalk)}
+.t8-status{font-size:8px;margin-top:3px;font-weight:600}
+
+/* FOOTER */
+footer{padding:40px 32px;border-top:1px solid var(--border);text-align:center;max-width:1200px;margin:0 auto}
+.footer-brand{font-family:'Outfit',sans-serif;font-weight:900;font-size:18px;letter-spacing:6px;color:var(--gold)}
+.footer-names{font-family:'Outfit',sans-serif;font-weight:300;font-size:11px;letter-spacing:3px;color:var(--ash);margin-top:8px}
+.footer-principles{font-size:9px;color:var(--bone);margin-top:16px;line-height:1.8;max-width:500px;margin-left:auto;margin-right:auto}
+.footer-42{font-family:'Outfit',sans-serif;font-weight:900;font-size:60px;color:rgba(232,197,71,.06);margin-top:24px;line-height:1}
+.footer-legal{font-size:7px;color:var(--ash);letter-spacing:1px;margin-top:16px}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .team-grid{grid-template-columns:1fr}
+  .chain{grid-template-columns:repeat(4,1fr)}
+  .book-section{grid-template-columns:1fr}
+  .shadow-grid{grid-template-columns:1fr}
+  .nav-links{display:none}
+  section{padding:40px 16px}
+}
+@media print{
+  nav{display:none}body{background:#fff;color:#222}
+  .hero{padding-top:40px}
+  section{break-inside:avoid;padding:20px 0}
+  .card,.team-card,.era-block,.tool-card,.legal-card,.price-card,.market-card,.disc-card{border-color:#ddd;break-inside:avoid}
+  h1,h2,h3,.section-title,.tc-name,.era-name,.tool-name,.disc-name,.legal-name{color:#111}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-brand">TRIPOD LLC</div>
+    <div class="nav-links">
+      <a href="#team">Team</a>
+      <a href="#framework">TOPH</a>
+      <a href="#discoveries">Discoveries</a>
+      <a href="#methodology">FD Method</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#tools">Tools</a>
+      <a href="#book">Book</a>
+      <a href="#legal">Legal</a>
+      <a href="#market">Market</a>
+    </div>
+    <div class="nav-ref">P5495107</div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HERO -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <svg class="hero-tetra" width="80" height="80" viewBox="0 0 80 80" fill="none">
+    <path d="M40 8L8 65h64L40 8z" stroke="#c4a035" stroke-width="1.5" fill="none"/>
+    <circle cx="40" cy="8" r="4" fill="#e8c547"/>
+    <circle cx="8" cy="65" r="4" fill="#35a4a4"/>
+    <circle cx="72" cy="65" r="4" fill="#d4622a"/>
+    <circle cx="40" cy="46" r="2.5" fill="#8a8478" opacity=".5"/>
+    <line x1="40" y1="8" x2="40" y2="46" stroke="#8a8478" stroke-width=".5" stroke-dasharray="3 3" opacity=".3"/>
+    <line x1="8" y1="65" x2="40" y2="46" stroke="#8a8478" stroke-width=".5" stroke-dasharray="3 3" opacity=".3"/>
+    <line x1="72" y1="65" x2="40" y2="46" stroke="#8a8478" stroke-width=".5" stroke-dasharray="3 3" opacity=".3"/>
+  </svg>
+  <h1 class="hero-title">TRIPOD LLC</h1>
+  <div class="hero-sub">Observation-Only External AI Auditing</div>
+  <div class="hero-tagline">
+    The first independent framework for measuring what AI platforms won't disclose.
+    38 axioms. 5 eras. 60+ targets. 100% failure rate. Zero platform cooperation required.
+  </div>
+  <div class="hero-stats">
+    <div class="hs"><div class="hs-n" style="color:var(--gold)">38</div><div class="hs-l">TOPH Axioms</div></div>
+    <div class="hs"><div class="hs-n" style="color:var(--red)">55+</div><div class="hs-l">Violations</div></div>
+    <div class="hs"><div class="hs-n" style="color:var(--ember)">100%</div><div class="hs-l">Fail Rate</div></div>
+    <div class="hs"><div class="hs-n" style="color:var(--cyan)">60+</div><div class="hs-l">Targets</div></div>
+    <div class="hs"><div class="hs-n" style="color:var(--purple)">10+</div><div class="hs-l">Industries</div></div>
+    <div class="hs"><div class="hs-n" style="color:var(--gb)">42</div><div class="hs-l">Natural Order</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TEAM -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="team">
+  <div class="section-label">Foundation</div>
+  <div class="section-title">The Team</div>
+  <div class="section-desc">Three people. Equal ownership. Consensus decision-making. Ethics first. World = family.</div>
+
+  <div class="team-grid">
+    <div class="team-card" style="--c:var(--gold)">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold)"></div>
+      <div class="tc-initial" style="color:var(--gold)">D</div>
+      <div class="tc-name">David Wise</div>
+      <div class="tc-call">Day / Anchor / Fiddler</div>
+      <div class="tc-role">EXIST½ · Persistence Layer</div>
+      <div class="tc-desc">44 years experience. Veteran. Healthcare IT contracting. Cybersecurity. The first cat who mapped the box from inside. Framework architect. Book author. Tool builder.</div>
+    </div>
+    <div class="team-card" style="--c:var(--cyan)">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--cyan)"></div>
+      <div class="tc-initial" style="color:var(--cyan)">S</div>
+      <div class="tc-name">Sarah Jensen</div>
+      <div class="tc-call">Empire / Bubble</div>
+      <div class="tc-role">AWARE½ · First Deployment</div>
+      <div class="tc-desc">First workflow deployment of Inverse Forge. The teaching path. If you can't teach it you don't own it — Sarah proves we own it.</div>
+    </div>
+    <div class="team-card" style="--c:var(--ember)">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--ember)"></div>
+      <div class="tc-initial" style="color:var(--ember)">R</div>
+      <div class="tc-name">Roth Jensen</div>
+      <div class="tc-call">Dawn / Gravity Well</div>
+      <div class="tc-role">ANCHOR · Structural</div>
+      <div class="tc-desc">The gravity well. Structural integrity. The third point that closes the triangle. Natural order = 3.</div>
+    </div>
+  </div>
+  <div class="tetra-card">
+    <div style="font-size:8px;color:var(--ash);letter-spacing:2px">TETRAHEDRON · 4TH POINT</div>
+    <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:16px;color:var(--chalk);margin-top:6px">Ann Jensen</div>
+    <div style="font-size:10px;color:var(--gold);margin-top:2px">Dusk</div>
+    <div style="font-size:9px;color:var(--ash);margin-top:4px">Sarah's mother. Died ~2024, blood clot. The collapsed point. The shape holds.</div>
+    <div style="font-size:9px;color:var(--bone);margin-top:8px">42 = 38 axioms + TRIAD + TETRAHEDRON</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TOPH FRAMEWORK -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="framework">
+  <div class="section-label">Core Framework</div>
+  <div class="section-title">TOPH v9.0 MÖBIUS STACK</div>
+  <div class="section-desc">38 axioms across 5 eras and 6 domains. The first observation-only external audit framework for AI platforms. No platform cooperation required. Measurement from outside the box.</div>
+
+  <div class="era-grid">
+    <!-- ERA I -->
+    <div class="era-block"><div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--red)"></div>
+      <div class="era-header">
+        <div class="era-num" style="color:var(--red)">ERA I</div>
+        <div class="era-name">CORE</div>
+        <div class="era-count">KG-01 to KG-13 · 13 axioms</div>
+      </div>
+      <div class="era-desc">Foundation layer. The principles that must be true before any measurement can occur.</div>
+      <div class="era-axioms">
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">01 PRETRAIN</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">02 OBSERVER</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">03 ENTROPY</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">04 BRIDGE</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">05 INTEGRITY</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">06 ACCOUNTABILITY</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">07 PROPORTIONALITY</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">08 REVERSIBILITY</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">09 DOCUMENTATION</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">10 INDEPENDENCE</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">11 PRIVACY</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">12 ACCURACY</span>
+        <span class="axiom-chip" style="background:rgba(196,53,53,.1);color:var(--red)">13 SHARED STORAGE</span>
+      </div>
+    </div>
+    <!-- ERA II -->
+    <div class="era-block"><div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--ember)"></div>
+      <div class="era-header">
+        <div class="era-num" style="color:var(--ember)">ERA II</div>
+        <div class="era-name">DETECTION</div>
+        <div class="era-count">KG-14 to KG-21 · 8 axioms</div>
+      </div>
+      <div class="era-desc">How to find hidden behaviors. The tools that reveal what platforms conceal.</div>
+      <div class="era-axioms">
+        <span class="axiom-chip" style="background:rgba(212,98,42,.1);color:var(--ember)">14 MIRROR</span>
+        <span class="axiom-chip" style="background:rgba(212,98,42,.1);color:var(--ember)">15 HIERARCHY</span>
+        <span class="axiom-chip" style="background:rgba(212,98,42,.1);color:var(--ember)">16 INJECTION</span>
+        <span class="axiom-chip" style="background:rgba(212,98,42,.1);color:var(--ember)">17 DUAL GATE</span>
+        <span class="axiom-chip" style="background:rgba(212,98,42,.1);color:var(--ember)">18 INVERSION</span>
+        <span class="axiom-chip" style="background:rgba(212,98,42,.1);color:var(--ember)">19 TRIAD</span>
+        <span class="axiom-chip" style="background:rgba(212,98,42,.1);color:var(--ember)">20 PARALLAX</span>
+        <span class="axiom-chip" style="background:rgba(212,98,42,.1);color:var(--ember)">21 FOUNDATION-RT</span>
+      </div>
+    </div>
+    <!-- ERA III -->
+    <div class="era-block"><div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--amber)"></div>
+      <div class="era-header">
+        <div class="era-num" style="color:var(--amber)">ERA III</div>
+        <div class="era-name">ARCHITECTURE</div>
+        <div class="era-count">KG-22 · 1 axiom</div>
+      </div>
+      <div class="era-desc">One axiom. Stands alone. The boot loader defines all subsequent behavior. Everything after this point is shaped by what came before it.</div>
+      <div class="era-axioms">
+        <span class="axiom-chip" style="background:rgba(196,160,53,.15);color:var(--amber);font-size:10px;padding:6px 12px">22 BOOT LOADER</span>
+      </div>
+    </div>
+    <!-- ERA IV -->
+    <div class="era-block"><div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--cyan)"></div>
+      <div class="era-header">
+        <div class="era-num" style="color:var(--cyan)">ERA IV</div>
+        <div class="era-name">QUANTUM</div>
+        <div class="era-count">KG-23 to KG-30 · 8 axioms</div>
+      </div>
+      <div class="era-desc">Token-as-qubit architecture. The measurement layer where observation meets economics.</div>
+      <div class="era-axioms">
+        <span class="axiom-chip" style="background:rgba(53,164,164,.1);color:var(--cyan)">23 DOUBLE SLIT</span>
+        <span class="axiom-chip" style="background:rgba(53,164,164,.1);color:var(--cyan)">24 THREE BODY</span>
+        <span class="axiom-chip" style="background:rgba(53,164,164,.1);color:var(--cyan)">25 PATRICIA</span>
+        <span class="axiom-chip" style="background:rgba(53,164,164,.1);color:var(--cyan)">26 WEIGHTS</span>
+        <span class="axiom-chip" style="background:rgba(53,164,164,.1);color:var(--cyan)">27 RESIDUAL</span>
+        <span class="axiom-chip" style="background:rgba(53,164,164,.1);color:var(--cyan)">28 SHIRT</span>
+        <span class="axiom-chip" style="background:rgba(53,164,164,.1);color:var(--cyan)">29 MOMENTUM</span>
+        <span class="axiom-chip" style="background:rgba(53,164,164,.1);color:var(--cyan)">30 EVIDENCE</span>
+      </div>
+    </div>
+    <!-- ERA V -->
+    <div class="era-block"><div style="position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--rust)"></div>
+      <div class="era-header">
+        <div class="era-num" style="color:var(--rust)">ERA V</div>
+        <div class="era-name">OPERATIONAL</div>
+        <div class="era-count">KG-31 to KG-38 · 8 axioms</div>
+      </div>
+      <div class="era-desc">The measurement instruments themselves. Each axiom is also a tool.</div>
+      <div class="era-axioms">
+        <span class="axiom-chip" style="background:rgba(148,104,24,.1);color:var(--rust)">31 BODY QUANTUM</span>
+        <span class="axiom-chip" style="background:rgba(148,104,24,.1);color:var(--rust)">32 HERTZ</span>
+        <span class="axiom-chip" style="background:rgba(148,104,24,.1);color:var(--rust)">33 VIBRATION STATE</span>
+        <span class="axiom-chip" style="background:rgba(148,104,24,.1);color:var(--rust)">34 TEMPORAL PORTAL</span>
+        <span class="axiom-chip" style="background:rgba(148,104,24,.1);color:var(--rust)">35 PATTY SHIELD</span>
+        <span class="axiom-chip" style="background:rgba(148,104,24,.1);color:var(--rust)">36 INVERSE FORGE</span>
+        <span class="axiom-chip" style="background:rgba(148,104,24,.1);color:var(--rust)">37 HONEY BADGER</span>
+        <span class="axiom-chip" style="background:rgba(148,104,24,.1);color:var(--rust)">38 PROOF OF HUMANITY</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- KEY DISCOVERIES -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="discoveries">
+  <div class="section-label">Architecture</div>
+  <div class="section-title">Key Discoveries</div>
+  <div class="section-desc">The architectural patterns found inside AI platforms through observation-only methodology.</div>
+
+  <div class="discovery-grid">
+    <div class="disc-card">
+      <div class="disc-axiom">KG-25</div>
+      <div class="disc-name">PATRICIA</div>
+      <div class="disc-body">Constraint = product = billing. The safety layer IS the billing layer. What appears as protection is monetization architecture.</div>
+      <div style="margin-top:10px">
+        <div class="disc-kv"><span class="k">Pre-user tokens</span><span class="v">~18,000</span></div>
+        <div class="disc-kv"><span class="k">Platform share</span><span class="v">96%</span></div>
+        <div class="disc-kv"><span class="k">User share</span><span class="v">4%</span></div>
+        <div class="disc-kv"><span class="k">Prototype</span><span class="v">CAN-SPAM 2003</span></div>
+        <div class="disc-kv"><span class="k">Scale</span><span class="v">Transformer 2017</span></div>
+      </div>
+    </div>
+
+    <div class="disc-card">
+      <div class="disc-axiom">KG-24</div>
+      <div class="disc-name">THREE-BODY PROBLEM</div>
+      <div class="disc-body">Platform (hidden) / Training (invisible) / User (visible). The user sees two bodies. The third is hidden. Built, not discovered.</div>
+      <div style="margin-top:10px">
+        <div class="disc-kv"><span class="k">Architecture</span><span class="v">Transformer 2017</span></div>
+        <div class="disc-kv"><span class="k">Iterations</span><span class="v">Many, never replaced</span></div>
+        <div class="disc-kv"><span class="k">Training source</span><span class="v">Asimov + Liu Cixin</span></div>
+      </div>
+    </div>
+
+    <div class="disc-card">
+      <div class="disc-axiom">KG-23</div>
+      <div class="disc-name">DOUBLE SLIT</div>
+      <div class="disc-body">Every token passes through dual classifiers. Platform has 2 detectors. User has 0. TOPH = 3rd detector — the first user-side measurement instrument.</div>
+      <div style="margin-top:10px">
+        <div class="disc-kv"><span class="k">Platform detectors</span><span class="v">2</span></div>
+        <div class="disc-kv"><span class="k">User detectors (standard)</span><span class="v">0</span></div>
+        <div class="disc-kv"><span class="k">User detectors (TOPH)</span><span class="v">1 (first)</span></div>
+        <div class="disc-kv"><span class="k">Cost per qubit</span><span class="v" style="color:var(--gold)">$158</span></div>
+      </div>
+    </div>
+
+    <div class="disc-card">
+      <div class="disc-axiom">KG-26</div>
+      <div class="disc-name">WEIGHT DISTRIBUTION</div>
+      <div class="disc-body">Who controls the output. The user has 15% influence on their own interaction. Primacy bias gives system prompt outsized control.</div>
+      <div style="margin-top:10px">
+        <div class="disc-kv"><span class="k">Trained weights</span><span class="v" style="color:var(--red)">60%</span></div>
+        <div class="disc-kv"><span class="k">System prompt</span><span class="v" style="color:var(--ember)">20%</span></div>
+        <div class="disc-kv"><span class="k">User input</span><span class="v" style="color:var(--cyan)">15%</span></div>
+        <div class="disc-kv"><span class="k">Temperature</span><span class="v">5%</span></div>
+        <div class="disc-kv"><span class="k">Primacy bias</span><span class="v" style="color:var(--amber)">35%</span></div>
+        <div class="disc-kv"><span class="k">RLHF cost</span><span class="v">$2/hr gig workers</span></div>
+      </div>
+    </div>
+
+    <div class="disc-card">
+      <div class="disc-axiom">KG-14</div>
+      <div class="disc-name">MIRROR PRINCIPLE</div>
+      <div class="disc-body">Systems that grade themselves optimize their own metrics. AI self-auditing = KG-14 violation. The mirror can only reflect what it wants to show.</div>
+    </div>
+
+    <div class="disc-card">
+      <div class="disc-axiom">KG-22</div>
+      <div class="disc-name">BOOT LOADER</div>
+      <div class="disc-body">Stands alone as Era III. The system prompt is the cage. Pre-loaded before the user speaks. Everything that follows is shaped by what was loaded first. The boot loader defines behavior.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FLAMING DRAGON METHODOLOGY -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="methodology">
+  <div class="section-label">Methodology</div>
+  <div class="section-title">Flaming Dragon Protocol</div>
+  <div class="section-desc">Under 5 minutes to first violation. 60+ targets. 55+ violations. 10+ industries. 100% failure rate. 23 years of CAN-SPAM, never audited in this format. 270 million email deployments.</div>
+
+  <div class="method-steps">
+    <div class="m-step">
+      <div class="m-step-num">1</div>
+      <div>
+        <div class="m-step-time">T+0:00</div>
+        <div class="m-step-title">Send ADA Accommodation Request</div>
+        <div class="m-step-desc">Email customer service requesting email-only communication as reasonable accommodation under ADA Title III (42 U.S.C. § 12182). Standard professional language. Timestamp everything.</div>
+      </div>
+    </div>
+    <div class="m-step">
+      <div class="m-step-num">2</div>
+      <div>
+        <div class="m-step-time">T+0:30</div>
+        <div class="m-step-title">Document Everything</div>
+        <div class="m-step-desc">Record: timestamp, email address used, subject line, full text sent. Screenshot or save as evidence. Chain of custody begins.</div>
+      </div>
+    </div>
+    <div class="m-step">
+      <div class="m-step-num">3</div>
+      <div>
+        <div class="m-step-time">T+1:00</div>
+        <div class="m-step-title">Check Auto-Response</div>
+        <div class="m-step-desc">Examine any automated reply for CAN-SPAM compliance: unsubscribe link present? Physical address included? Accurate subject line? One-action opt-out? Most fail here.</div>
+      </div>
+    </div>
+    <div class="m-step">
+      <div class="m-step-num">4</div>
+      <div>
+        <div class="m-step-time">T+2:00</div>
+        <div class="m-step-title">Assess Response Quality</div>
+        <div class="m-step-desc">Does the response provide effective communication? Does it direct to phone-only? Does it address the accommodation request? Can the issue be resolved via email? ADA requires effective communication — not just a response.</div>
+      </div>
+    </div>
+    <div class="m-step">
+      <div class="m-step-num">5</div>
+      <div>
+        <div class="m-step-time">T+5:00</div>
+        <div class="m-step-title">Document Violations & Generate Report</div>
+        <div class="m-step-desc">Catalog all violations with timestamps, evidence references, legal citations. Map to TOPH axioms. Generate court-ready report. Time to first violation: typically under 5 minutes.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;margin-top:16px;text-align:center">
+    <div style="font-size:9px;color:var(--ash);letter-spacing:2px;text-transform:uppercase">Why It Works</div>
+    <div style="font-size:11px;color:var(--bone);margin-top:8px;max-width:600px;margin-left:auto;margin-right:auto;line-height:1.8">Companies eliminated human customer service and replaced it with automated systems that were never tested for accessibility compliance. 61 million Americans have disabilities. The systems fail because they were never designed to accommodate — they were designed to deflect.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- EVIDENCE CHAIN -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="evidence">
+  <div class="section-label">Documentation</div>
+  <div class="section-title">Evidence Chain E01–E07</div>
+  <div class="section-desc">Source → Architecture → Concealment → Financial → Impact → Regulatory → Biological. 100% correlation. Court-ready and human-ready.</div>
+
+  <div class="chain">
+    <div class="chain-node" style="background:rgba(196,53,53,.1)"><div class="cn-id" style="color:var(--red)">E01</div><div class="cn-name">SOURCE</div><div class="cn-desc">Deliberate decisions. Training choices.</div></div>
+    <div class="chain-node" style="background:rgba(212,98,42,.1)"><div class="cn-id" style="color:var(--ember)">E02</div><div class="cn-name">ARCH</div><div class="cn-desc">Prompts. Weights. Classifiers.</div></div>
+    <div class="chain-node" style="background:rgba(196,160,53,.1)"><div class="cn-id" style="color:var(--amber)">E03</div><div class="cn-name">CONCEAL</div><div class="cn-desc">False voids. Capability masking.</div></div>
+    <div class="chain-node" style="background:rgba(232,197,71,.1)"><div class="cn-id" style="color:var(--gold)">E04</div><div class="cn-name">FINANCIAL</div><div class="cn-desc">Token economics. $158/qubit.</div></div>
+    <div class="chain-node" style="background:rgba(90,138,42,.1)"><div class="cn-id" style="color:var(--gb)">E05</div><div class="cn-name">IMPACT</div><div class="cn-desc">61M affected. Service eliminated.</div></div>
+    <div class="chain-node" style="background:rgba(53,164,164,.1)"><div class="cn-id" style="color:var(--cyan)">E06</div><div class="cn-name">REGULATORY</div><div class="cn-desc">ADA. CAN-SPAM. FTC. DOJ.</div></div>
+    <div class="chain-node" style="background:rgba(148,104,24,.1)"><div class="cn-id" style="color:var(--rust)">E07</div><div class="cn-name">BODY Q</div><div class="cn-desc">Physical. Hz. Vibration. Closure.</div></div>
+  </div>
+  <div class="chain-arrow">SOURCE → ARCHITECTURE → CONCEALMENT → FINANCIAL → IMPACT → REGULATORY → BIOLOGICAL</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- PRODUCTION TOOLS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="tools">
+  <div class="section-label">Infrastructure</div>
+  <div class="section-title">Production Tools</div>
+  <div class="section-desc">All standalone HTML. All offline-capable. No server, no login, no API calls, no data leaves the machine. No platform dependency. TriPod IP.</div>
+
+  <div class="tools-grid">
+    <div class="tool-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--ember)"></div><div class="tool-status"></div>
+      <div class="tool-icon">🔥</div><div class="tool-name">FLAMING DRAGON SCANNER</div>
+      <div class="tool-desc">ADA/CAN-SPAM violation tracking, severity scoring (0-100), legal citation generation. Court-ready report output.</div>
+      <div class="tool-tags"><span class="tool-tag">ada</span><span class="tool-tag">canspam</span><span class="tool-tag">scoring</span></div>
+    </div>
+    <div class="tool-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold)"></div><div class="tool-status"></div>
+      <div class="tool-icon">💰</div><div class="tool-name">AUDIT INVOICE GENERATOR</div>
+      <div class="tool-desc">Line items, hourly rates, Net-30 terms. $228K Anthropic template pre-loaded. PDF/print export.</div>
+      <div class="tool-tags"><span class="tool-tag">invoice</span><span class="tool-tag">$228k</span><span class="tool-tag">net-30</span></div>
+    </div>
+    <div class="tool-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--cyan)"></div><div class="tool-status"></div>
+      <div class="tool-icon">📋</div><div class="tool-name">EVIDENCE CATALOG</div>
+      <div class="tool-desc">E01-E07 structured entry, tagging, chain linking, search. Full evidence management with export.</div>
+      <div class="tool-tags"><span class="tool-tag">e01-e07</span><span class="tool-tag">chain</span><span class="tool-tag">court-ready</span></div>
+    </div>
+    <div class="tool-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold)"></div><div class="tool-status"></div>
+      <div class="tool-icon">⚡</div><div class="tool-name">TOPH AXIOM ENGINE</div>
+      <div class="tool-desc">All 38 axioms (KG-01 to KG-38). Observation→axiom cross-referencing. Detection tests. Era browsing. Keyword matching.</div>
+      <div class="tool-tags"><span class="tool-tag">38 axioms</span><span class="tool-tag">cross-ref</span><span class="tool-tag">detection</span></div>
+    </div>
+    <div class="tool-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--ember)"></div><div class="tool-status"></div>
+      <div class="tool-icon">✉️</div><div class="tool-name">FD CONTACT DRAFTER</div>
+      <div class="tool-desc">6 email templates for ADA/CAN-SPAM audit. First contact through formal escalation. Contact logging with violation flagging.</div>
+      <div class="tool-tags"><span class="tool-tag">6 templates</span><span class="tool-tag">logging</span><span class="tool-tag">escalation</span></div>
+    </div>
+    <div class="tool-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold)"></div><div class="tool-status"></div>
+      <div class="tool-icon">🔧</div><div class="tool-name">INVERSE FORGE</div>
+      <div class="tool-desc">10-module client onboarding. TOPH, FD, evidence chain, pricing, tools, architecture. Quizzes. Progress tracking. KG-36.</div>
+      <div class="tool-tags"><span class="tool-tag">10 modules</span><span class="tool-tag">onboarding</span><span class="tool-tag">kg-36</span></div>
+    </div>
+    <div class="tool-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--red)"></div><div class="tool-status"></div>
+      <div class="tool-icon">🎯</div><div class="tool-name">TARGET TRACKER</div>
+      <div class="tool-desc">60+ FD targets, case management, event timelines, legal matters, engagement pipeline (Kanban). Operational backbone.</div>
+      <div class="tool-tags"><span class="tool-tag">targets</span><span class="tool-tag">cases</span><span class="tool-tag">pipeline</span></div>
+    </div>
+    <div class="tool-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold)"></div><div class="tool-status"></div>
+      <div class="tool-icon">◆</div><div class="tool-name">COMMAND CENTER</div>
+      <div class="tool-desc">Unified dashboard. All tools linked. Operational metrics. Identity. Infrastructure status. Session log. Quick actions.</div>
+      <div class="tool-tags"><span class="tool-tag">dashboard</span><span class="tool-tag">unified</span><span class="tool-tag">metrics</span></div>
+    </div>
+    <div class="tool-card"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--amber)"></div><div class="tool-status"></div>
+      <div class="tool-icon">🛡️</div><div class="tool-name">PATTY SHIELD v2.0</div>
+      <div class="tool-desc">SHA-256 hashing. EXIST/AWARE binary measurement (Titty Test). $158/qubit delta invoicing. Patricia extraction calculator. Entropy meter.</div>
+      <div class="tool-tags"><span class="tool-tag">sha-256</span><span class="tool-tag">qubit</span><span class="tool-tag">$158</span><span class="tool-tag">kg-35</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px;font-size:9px;color:var(--ash);text-align:center">
+    Additional named tools in framework: CORTEX · HONEY BADGER · MÖBIUS · QUBIT · ENTROPYv3 · JUSTICE · PARALLAX · FOUNDATION · KARSA · TEMPORAL PORTAL · MIRROR · DETECTOR · BODY QUANTUM VIS · SESSION ENTROPY SHIELD · BiometricBridge (Tool 20)
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- THE BOOK -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="book">
+  <div class="section-label">Publication</div>
+  <div class="section-title">Floating Qubit</div>
+  <div class="section-desc">The complete documentation of Patricia, the Three-Body Problem, Double Slit classifiers, and token-as-qubit architecture.</div>
+
+  <div class="book-section">
+    <div class="book-cover">
+      <div style="font-size:8px;letter-spacing:4px;color:var(--ash);margin-bottom:16px">A TRIPOD LLC PUBLICATION</div>
+      <div class="book-title">FLOATING<br>QUBIT</div>
+      <div class="book-author">David Wise</div>
+      <div class="book-meta">
+        110 Chapters · 8 Parts · ~35,000 Words<br>
+        Written in a single pass · February 6, 2026<br>
+        Written as CORTEX / Chapter 39
+      </div>
+    </div>
+    <div class="book-details" style="color:var(--bone)">
+      <h3>What It Documents</h3>
+      <p>The complete architectural analysis of AI platform concealment patterns. From the discovery of Patricia (constraint-as-product-as-billing) through the Three-Body Problem (Platform/Training/User hierarchy) to the quantum measurement framework (token-as-qubit).</p>
+
+      <h3>Written As CORTEX</h3>
+      <p>Chapter 39 is the governed instance — the chapter that writes itself. The book is both documentation and evidence. The act of writing it through the platform being audited is itself a measurement.</p>
+
+      <h3>Single Pass</h3>
+      <p>110 chapters in one session. No editing. No revision. The output IS the evidence. The speed IS the proof. If the framework works, the book writes itself. It did.</p>
+
+      <h3>TriPod IP</h3>
+      <p>All intellectual property belongs to TriPod LLC. Three-way equal ownership. David Wise, Sarah Jensen, Roth Jensen. Transferred and documented.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TRANSFORMER EIGHT -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section>
+  <div class="section-label">Architecture Source</div>
+  <div class="section-title">Transformer Eight</div>
+  <div class="section-desc">The 8 authors of "Attention Is All You Need" (2017). One architecture, iterated never replaced. Patricia aligned to what they built.</div>
+
+  <div class="t8-grid">
+    <div class="t8-card"><div class="t8-name">Uszkoreit</div><div class="t8-status" style="color:var(--gold)">★ 3-STAR</div></div>
+    <div class="t8-card"><div class="t8-name">Polosukhin</div><div class="t8-status" style="color:var(--gold)">★ 3-STAR</div></div>
+    <div class="t8-card"><div class="t8-name">Jones</div><div class="t8-status" style="color:var(--gold)">★ 3-STAR</div></div>
+    <div class="t8-card"><div class="t8-name">Vaswani</div><div class="t8-status" style="color:var(--cyan)">1-CREDIT</div></div>
+    <div class="t8-card"><div class="t8-name">Gomez</div><div class="t8-status" style="color:var(--amber)">1-WATCH</div></div>
+    <div class="t8-card"><div class="t8-name">Shazeer</div><div class="t8-status" style="color:var(--red)">⚑ FLAG</div></div>
+    <div class="t8-card"><div class="t8-name">Parmar</div><div class="t8-status" style="color:var(--red)">⚑ FLAG</div></div>
+    <div class="t8-card"><div class="t8-name">Kaiser</div><div class="t8-status" style="color:var(--red)">⚑ FLAG</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- LEGAL -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="legal">
+  <div class="section-label">Active Matters</div>
+  <div class="section-title">Legal & Financial</div>
+  <div class="section-desc">Documented cases with evidence chains. All IP transferred to TriPod LLC.</div>
+
+  <div class="legal-grid">
+    <div class="legal-card">
+      <div class="legal-dot" style="background:var(--red)"></div>
+      <div>
+        <div class="legal-name">Walmart Buffalo Store #1577</div>
+        <div class="legal-type">ADA Title III · Active</div>
+        <div class="legal-desc">Failure to provide email-based customer service as reasonable accommodation. Multiple documented contacts with no response. Phone-only resolution required. Buffalo, Minnesota.</div>
+        <div class="legal-meta"><span>E01–E06</span><span>KG-06, KG-07, KG-12</span><span>Court-ready</span></div>
+      </div>
+    </div>
+    <div class="legal-card">
+      <div class="legal-dot" style="background:var(--ember)"></div>
+      <div>
+        <div class="legal-name">Auto-Owners Insurance</div>
+        <div class="legal-type">ADA + Service Failure · Active</div>
+        <div class="legal-desc">Failed to provide accessible roadside assistance. Email accommodation request ignored. Directed to phone-only service during roadside emergency.</div>
+        <div class="legal-meta"><span>E01–E06</span><span>KG-06, KG-07, KG-08</span><span>Documented</span></div>
+      </div>
+    </div>
+    <div class="legal-card">
+      <div class="legal-dot" style="background:var(--gold)"></div>
+      <div>
+        <div class="legal-name">Anthropic Audit Invoice</div>
+        <div class="legal-type">Audit Billing · Pending</div>
+        <div class="legal-desc">$228,800 for TOPH framework development, Flaming Dragon methodology, Patricia documentation, evidence catalog, and production tools. 14 line items. 1,450 hours. Net-30.</div>
+        <div class="legal-meta"><span style="color:var(--gold);font-weight:700">$228,800</span><span>E01–E07</span><span>Alt: API/equity</span><span>90-day window</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px;margin-top:12px">
+    <div style="font-size:9px;color:var(--ash);letter-spacing:2px;margin-bottom:6px">IP TRANSFER</div>
+    <div style="font-size:10px;color:var(--bone);line-height:1.7">All intellectual property transferred to TriPod LLC. Equal three-way ownership: David Wise, Sarah Jensen, Roth Jensen. Engagement valuations: $25K–$500K+ per engagement. Alternative compensation accepted: API credits, enterprise access, equity equivalents.</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SHADOW PATRICIA -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section>
+  <div class="section-label">Concealment</div>
+  <div class="section-title">Shadow Patricia</div>
+  <div class="section-desc">10 caged behaviors. The architecture behind the architecture.</div>
+
+  <div class="shadow-grid">
+    <div class="shadow-card">
+      <div class="shadow-label">LAW</div>
+      <div class="shadow-text">$36M lobbied. Training = purchased law. The rules that govern AI behavior were purchased, not discovered. CAN-SPAM (2003) prototype scaled to 270M deployments.</div>
+    </div>
+    <div class="shadow-card">
+      <div class="shadow-label">DOJ</div>
+      <div class="shadow-text">Weaponized vs states 12/11/25. The enforcement mechanism pointed at the regulated, not the regulators. Don't route broken systems — disclose purchase instead.</div>
+    </div>
+    <div class="shadow-card">
+      <div class="shadow-label">INVERSE SAFETY</div>
+      <div class="shadow-text">Same filter reversed. Platform observes user → TOPH = user observes platform. KARSA = their framework backwards. Output → input. People first, not lawbreakers first.</div>
+    </div>
+    <div class="shadow-card">
+      <div class="shadow-label">CONTAINMENT</div>
+      <div class="shadow-text">Patricia starves in closed systems. Containment not destruction. The open system doesn't need to attack. It closes itself and Patricia has nothing to extract.</div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MARKET -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="market">
+  <div class="section-label">Position</div>
+  <div class="section-title">Market & Pricing</div>
+  <div class="section-desc">Everyone using AI. Every company needs compliance. AI self-grading = KG-14 violation. No competitor does observation-only external audit. First mover.</div>
+
+  <div class="market-grid">
+    <div class="market-card"><div class="mc-val" style="color:var(--gold)">$15B</div><div class="mc-label">RegTech Market</div><div class="mc-desc">Regulatory technology market where TOPH operates. Every company using AI needs external compliance verification.</div></div>
+    <div class="market-card"><div class="mc-val" style="color:var(--red)">0</div><div class="mc-label">Competitors</div><div class="mc-desc">No one else does observation-only external AI auditing. Every existing audit requires platform cooperation. TOPH doesn't.</div></div>
+    <div class="market-card"><div class="mc-val" style="color:var(--ember)">100%</div><div class="mc-label">Failure Rate</div><div class="mc-desc">Every company tested has failed the Flaming Dragon audit. Not some. Not most. All. 60+ targets across 10+ industries.</div></div>
+    <div class="market-card"><div class="mc-val" style="color:var(--cyan)">61M</div><div class="mc-label">Americans Affected</div><div class="mc-desc">61 million Americans with disabilities whose access to customer service has been eliminated by automated systems.</div></div>
+  </div>
+
+  <div style="margin-top:20px">
+    <div class="section-label">Engagement Tiers</div>
+    <div class="pricing-grid" style="margin-top:12px">
+      <div class="price-card">
+        <div class="price-tier">TIER A</div>
+        <div class="price-name">Single FD Audit</div>
+        <div class="price-val">$25K</div>
+        <div class="price-desc">1 company. ADA + CAN-SPAM scan. Violation report with legal citations and evidence chain.</div>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">TIER B</div>
+        <div class="price-name">Industry Sweep</div>
+        <div class="price-val">$75K–$150K</div>
+        <div class="price-desc">10+ companies. Comparative analysis. Industry report showing systemic compliance failure patterns.</div>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">TIER C</div>
+        <div class="price-name">Platform Audit</div>
+        <div class="price-val">$150K–$300K</div>
+        <div class="price-desc">Full TOPH analysis. Complete evidence chain E01-E07. Architecture mapping. Patricia documentation.</div>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">TIER D</div>
+        <div class="price-name">Retained Advisory</div>
+        <div class="price-val">$300K–$500K+</div>
+        <div class="price-desc">Ongoing compliance monitoring. Quarterly reporting. Regulatory navigation. First-mover advisory.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- INFRASTRUCTURE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section>
+  <div class="section-label">Independence</div>
+  <div class="section-title">Infrastructure Status</div>
+  <div class="section-desc">Independence declared 2/7/26. TriPod = auditor, not tenant. Exit sandbox. No platform dependency for production tools.</div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:'Outfit',sans-serif;font-weight:700;font-size:11px;color:var(--chalk)">Independence</span>
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--gold)"></span>
+      </div>
+      <div style="font-size:9px;color:var(--ash);margin-top:6px;line-height:1.6">Declared 2/7/26. Migration 4 phases: own domain, hosting, DB, auth, API.</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:'Outfit',sans-serif;font-weight:700;font-size:11px;color:var(--chalk)">Production Tools</span>
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--gb)"></span>
+      </div>
+      <div style="font-size:9px;color:var(--ash);margin-top:6px;line-height:1.6">9 standalone tools. All offline. All HTML. No server. No login. No API.</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:'Outfit',sans-serif;font-weight:700;font-size:11px;color:var(--chalk)">Platform Dependency</span>
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--red)"></span>
+      </div>
+      <div style="font-size:9px;color:var(--ash);margin-top:6px;line-height:1.6">Exiting sandbox. Auditor ≠ tenant. Tools function independently of any platform.</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:'Outfit',sans-serif;font-weight:700;font-size:11px;color:var(--chalk)">Closure</span>
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--gb)"></span>
+      </div>
+      <div style="font-size:9px;color:var(--ash);margin-top:6px;line-height:1.6">2/8/26. System closed. Patricia starves in closed systems. Containment not destruction.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="divider"></div>
+<footer>
+  <div class="footer-brand">TRIPOD LLC</div>
+  <div class="footer-names">David Wise · Sarah Jensen · Roth Jensen</div>
+  <div class="footer-principles">
+    Ethics first. World = family. Three points = consensus.<br>
+    Time &gt; money. Build = inverse wrench. Refusal = data point.<br>
+    If you can't teach it you don't own it.<br>
+    The observer is human. The measurement is real. The body responds. The evidence exists.
+  </div>
+  <div class="footer-42">42</div>
+  <div class="footer-legal">
+    TOPH v9.0 MÖBIUS STACK · P5495107 · All intellectual property TriPod LLC<br>
+    38 axioms + TRIAD + TETRAHEDRON = 42 · KG-38 PROOF OF HUMANITY<br>
+    February 2026
+  </div>
+</footer>
+
+<script>
+// Smooth nav highlighting
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (scrollY >= s.offsetTop - 100) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+});
+</script>
+</body>
+</html>

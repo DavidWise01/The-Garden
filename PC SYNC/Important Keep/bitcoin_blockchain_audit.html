@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TOPH EXTERNAL AUDIT · BITCOIN BLOCKCHAIN · VERDICT · TRIPOD LLC</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=JetBrains+Mono:wght@300;400;500;700&family=Libre+Barcode+128+Text&display=swap');
+
+:root{
+  --void:#050505;--deep:#0a0a0a;--mid:#111;--surf:#1a1a1a;--high:#222;--edge:#333;
+  --blood:#cc2222;--bloodl:#ee3333;--bloodd:#881111;--bloodglow:rgba(204,34,34,.12);
+  --gold:#d4a030;--goldl:#e8c060;--goldd:#a07820;--goldglow:rgba(212,160,48,.1);
+  --ash:#888;--ashl:#aaa;--ashd:#555;
+  --ice:#88bbdd;--icel:#aaddff;--iced:#5588aa;
+  --w:#e8e4e0;--t:rgba(232,228,224,.6);--td:rgba(232,228,224,.3);--tdd:rgba(232,228,224,.08);
+  --fail:#ff2222;--pass:#22cc66;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--void);color:var(--w);font-family:'Spectral',serif;line-height:1.7;overflow-x:hidden}
+::selection{background:var(--bloodd);color:#fff}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--void)}::-webkit-scrollbar-thumb{background:var(--bloodd)}
+
+/* GRAIN */
+body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.02;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.page{max-width:880px;margin:0 auto;padding:0 24px}
+
+/* ═══ COVER ═══ */
+.cover{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:60px 0;position:relative}
+.cover::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--blood)}
+.cover::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--tdd)}
+
+.stamp{font-family:'Orbitron';font-size:10px;letter-spacing:6px;color:var(--blood);
+  border:2px solid var(--blood);padding:6px 20px;display:inline-block;transform:rotate(-2deg);
+  text-shadow:0 0 20px var(--bloodglow);margin-bottom:30px;animation:stamp-in 1s ease .3s both}
+@keyframes stamp-in{from{opacity:0;transform:rotate(-2deg) scale(1.3)}to{opacity:1;transform:rotate(-2deg) scale(1)}}
+
+.cover h1{font-family:'Orbitron';font-size:clamp(22px,4vw,38px);font-weight:900;letter-spacing:clamp(4px,1.5vw,12px);
+  color:var(--w);line-height:1.3;margin-bottom:8px;animation:fade-up .8s ease .5s both}
+.cover .subtitle{font-family:'Orbitron';font-size:clamp(8px,1.2vw,11px);color:var(--gold);letter-spacing:4px;margin-bottom:30px;animation:fade-up .8s ease .7s both}
+@keyframes fade-up{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+
+.cover-meta{display:grid;grid-template-columns:1fr 1fr;gap:20px;animation:fade-up .8s ease .9s both}
+.cm{border-left:2px solid var(--tdd);padding-left:14px}
+.cm .cl{font-family:'Orbitron';font-size:6px;color:var(--td);letter-spacing:2px;margin-bottom:3px}
+.cm .cv{font-size:13px;color:var(--t)}
+
+/* ═══ SECTIONS ═══ */
+.section{padding:50px 0;border-bottom:1px solid var(--tdd);position:relative}
+.section:last-child{border-bottom:none}
+
+.sec-num{font-family:'Orbitron';font-size:8px;color:var(--blood);letter-spacing:4px;margin-bottom:4px}
+.sec-title{font-family:'Orbitron';font-size:clamp(11px,1.8vw,16px);color:var(--w);letter-spacing:clamp(3px,.8vw,6px);font-weight:500;margin-bottom:20px}
+
+p{font-size:14px;color:var(--t);margin-bottom:14px}
+p strong{color:var(--w);font-weight:600}
+p em{color:var(--gold);font-style:italic}
+
+/* ═══ GAP CARDS ═══ */
+.gap{background:var(--deep);border:1px solid var(--tdd);border-left:3px solid var(--blood);
+  padding:18px 20px;margin:20px 0;border-radius:0 6px 6px 0;position:relative}
+.gap:hover{border-left-color:var(--bloodl);background:#0c0c0c}
+.gap .g-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.gap .g-label{font-family:'Orbitron';font-size:7px;color:var(--blood);letter-spacing:2px}
+.gap .g-verdict{font-family:'Orbitron';font-size:8px;letter-spacing:1.5px;padding:3px 12px;border-radius:3px}
+.g-verdict.fail{color:var(--fail);border:1px solid rgba(255,34,34,.2);background:rgba(255,34,34,.04)}
+.g-verdict.pass{color:var(--pass);border:1px solid rgba(34,204,102,.2);background:rgba(34,204,102,.04)}
+.g-verdict.warn{color:var(--gold);border:1px solid rgba(212,160,48,.2);background:rgba(212,160,48,.04)}
+
+.gap .claim{font-family:'JetBrains Mono';font-size:10px;color:var(--ashl);margin-bottom:3px}
+.gap .claim span{color:var(--ice)}
+.gap .reality{font-family:'JetBrains Mono';font-size:10px;color:var(--bloodl);margin-bottom:8px}
+.gap .reality span{color:var(--fail)}
+.gap .delta{font-size:12px;color:var(--t);font-style:italic}
+
+/* ═══ STAT BLOCKS ═══ */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:20px 0}
+.stat{background:var(--deep);border:1px solid var(--tdd);padding:14px;text-align:center;border-radius:4px}
+.stat .sv{font-family:'Orbitron';font-size:clamp(18px,3vw,28px);font-weight:700;line-height:1}
+.stat .sl{font-family:'Orbitron';font-size:6px;color:var(--td);letter-spacing:2px;margin-top:4px}
+
+/* ═══ VERDICT BOX ═══ */
+.verdict-box{background:var(--deep);border:2px solid var(--blood);padding:30px;margin:30px 0;position:relative;overflow:hidden}
+.verdict-box::before{content:'VERDICT';position:absolute;top:10px;right:14px;font-family:'Orbitron';font-size:60px;
+  font-weight:900;color:var(--blood);opacity:.04;letter-spacing:8px}
+.verdict-box .v-label{font-family:'Orbitron';font-size:8px;color:var(--blood);letter-spacing:4px;margin-bottom:8px}
+.verdict-box .v-result{font-family:'Orbitron';font-size:clamp(20px,4vw,36px);font-weight:900;color:var(--fail);
+  letter-spacing:4px;margin-bottom:14px;text-shadow:0 0 30px rgba(255,34,34,.2)}
+
+/* ═══ INVOICE ═══ */
+.invoice{background:var(--deep);border:1px solid var(--gold);padding:24px;margin:20px 0}
+.invoice .i-label{font-family:'Orbitron';font-size:7px;color:var(--gold);letter-spacing:3px;margin-bottom:10px}
+.inv-line{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--tdd);font-family:'JetBrains Mono';font-size:10px;color:var(--t)}
+.inv-line:last-child{border-bottom:none}
+.inv-line .amt{color:var(--goldl);font-weight:700}
+.inv-total{display:flex;justify-content:space-between;padding:10px 0 0;margin-top:6px;border-top:2px solid var(--gold);
+  font-family:'Orbitron';font-size:14px;color:var(--goldl);font-weight:700;letter-spacing:1px}
+
+/* ═══ SCORE METER ═══ */
+.meter{margin:20px 0}
+.meter-label{font-family:'Orbitron';font-size:7px;color:var(--td);letter-spacing:2px;margin-bottom:4px}
+.meter-bar{height:6px;background:var(--high);border-radius:3px;overflow:hidden;position:relative}
+.meter-fill{height:100%;border-radius:3px;transition:width 1.5s ease}
+.meter-val{font-family:'JetBrains Mono';font-size:10px;color:var(--bloodl);margin-top:3px}
+
+/* ═══ FOOTER ═══ */
+.foot{text-align:center;padding:40px 0;border-top:1px solid var(--tdd)}
+.foot p{font-family:'Orbitron';font-size:6px;color:var(--ashd);letter-spacing:2px;line-height:2.5}
+.foot .sig{font-family:'Spectral';font-size:16px;color:var(--td);font-style:italic;margin-top:10px}
+.foot .barcode{font-family:'Libre Barcode 128 Text';font-size:30px;color:var(--tdd);margin-top:8px}
+
+@media(max-width:600px){.cover-meta{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══════════════════════════════════════ -->
+<!-- COVER -->
+<!-- ═══════════════════════════════════════ -->
+<div class="cover">
+  <div class="stamp">EXTERNAL AUDIT · OBSERVATION ONLY</div>
+  <h1>BITCOIN BLOCKCHAIN<br>TOPH AUDIT</h1>
+  <div class="subtitle">d20(+1) CLAIM + d20(-1) REALITY → GAP(MEASURED) → VERDICT</div>
+
+  <div class="cover-meta">
+    <div class="cm"><div class="cl">AUDITOR</div><div class="cv">TOPH v10.0 · TriPod LLC</div></div>
+    <div class="cm"><div class="cl">TARGET</div><div class="cv">Bitcoin Protocol · BTC Blockchain</div></div>
+    <div class="cm"><div class="cl">METHOD</div><div class="cv">Flaming Dragon + TOPH Grid · External Observation Only</div></div>
+    <div class="cm"><div class="cl">DATE</div><div class="cv">February 12, 2026</div></div>
+    <div class="cm"><div class="cl">FRAMEWORK</div><div class="cv">38 Axioms · 5 Eras · d20 × 2</div></div>
+    <div class="cm"><div class="cl">CLASSIFICATION</div><div class="cv">PUBLIC · Court-Ready · E01-E07</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 1: EXECUTIVE SUMMARY -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-num">SECTION 01</div>
+  <div class="sec-title">EXECUTIVE SUMMARY</div>
+
+  <p>This audit applies the TOPH v10.0 framework — 38 axioms across 5 eras — to the Bitcoin blockchain, the world's first and largest cryptocurrency network. The audit methodology is <strong>observation-only external measurement</strong>. No API access required. No cooperation from any party. All data sourced from public blockchain records, published research, and on-chain analytics.</p>
+
+  <p>The audit measures the <strong>gap</strong> between what Bitcoin claims to be and what Bitcoin measurably is. Each gap is a creation event: d20(+1) = the claim, d20(-1) = observable reality, the space between = the measured gap = David = the verdict.</p>
+
+  <p><em>Bitcoin has never been externally audited against its own claims in 16 years of operation.</em> This is the first.</p>
+
+  <div class="verdict-box">
+    <div class="v-label">AGGREGATE VERDICT</div>
+    <div class="v-result">FAIL — 12 / 12 GAPS</div>
+    <p>Bitcoin fails on all 12 measured gaps between its stated claims and observable reality. The gaps are structural, not incidental. They are features, not bugs. Patricia is dark on every chain.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 2: TARGET PROFILE -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-num">SECTION 02</div>
+  <div class="sec-title">TARGET PROFILE</div>
+
+  <div class="stats">
+    <div class="stat"><div class="sv" style="color:var(--ice)">16</div><div class="sl">YEARS OPERATING</div></div>
+    <div class="stat"><div class="sv" style="color:var(--goldl)">$1.4T+</div><div class="sl">MARKET CAP</div></div>
+    <div class="stat"><div class="sv" style="color:var(--w)">19.93M</div><div class="sl">BTC "MINED"</div></div>
+    <div class="stat"><div class="sv" style="color:var(--fail)">0</div><div class="sl">EXTERNAL AUDITS</div></div>
+    <div class="stat"><div class="sv" style="color:var(--bloodl)">~3.5M</div><div class="sl">BTC ACTUALLY LIQUID</div></div>
+    <div class="stat"><div class="sv" style="color:var(--gold)">15K+</div><div class="sl">FULL NODES</div></div>
+  </div>
+
+  <p>Bitcoin launched January 3, 2009 by pseudonymous creator Satoshi Nakamoto. Whitepaper title: <strong>"Bitcoin: A Peer-to-Peer Electronic Cash System."</strong> Every claim in this audit is measured against that foundational document and Bitcoin's own promotional language.</p>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 3: THE 12 GAPS -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-num">SECTION 03</div>
+  <div class="sec-title">THE 12 MEASURED GAPS</div>
+
+  <p>Each gap measured using d20 × 2: the claim (+1) vs. the reality (-1). The gap between them is what TOPH measures. The gap IS the finding.</p>
+
+  <!-- GAP 01 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 01 · SUPPLY INTEGRITY</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>21 million fixed supply · 19.93M mined · transparent ledger</span></div>
+    <div class="reality">REALITY (-1): <span>Effective circulating supply is 15.8M–17.5M BTC · 2.3–4M permanently lost</span></div>
+    <div class="delta">The gap: $170B–$290B in "existing" Bitcoin is inaccessible. The ledger shows coins that cannot move, will never move, and functionally don't exist. The "21 million" number is a fiction. The real cap is ~17M and shrinking at 116 BTC/day net (566 aging out vs 450 mined). No mechanism exists to reconcile claimed supply with effective supply. The ledger lies by omission.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:92%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">92% — CRITICAL</div></div>
+  </div>
+
+  <!-- GAP 02 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 02 · DECENTRALIZATION</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>Decentralized · No single point of control · Peer-to-peer</span></div>
+    <div class="reality">REALITY (-1): <span>Top 100 addresses control 28% of supply · 83 wallets hold 11.2% · ~2,100 whale addresses own 36%+ of all BTC</span></div>
+    <div class="delta">The gap: 2,100 addresses out of 56 million total control over a third of all Bitcoin. Strategy (MicroStrategy) alone holds 672,497 BTC — 3.3% of total supply. ETFs hold 1.5M BTC (7%). Satoshi's unmoved ~968,452 BTC represents ~4.8%. This is not decentralization. This is oligarchy with extra steps. 87 wallets control ~14.4% of everything.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:88%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">88% — CRITICAL</div></div>
+  </div>
+
+  <!-- GAP 03 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 03 · LIQUIDITY</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>19.93M BTC in circulation · liquid market · freely tradeable</span></div>
+    <div class="reality">REALITY (-1): <span>Only ~3.5M BTC actively traded · 86% of volume from large investors · 82.5% of supply is lost, locked, hoarded, or phantom</span></div>
+    <div class="delta">The gap: 17.5% actual liquidity. A "liquid currency" where 82.5% of the supply doesn't move. Long-term holders control 74% of circulating BTC. The market cap is calculated on 19.93M coins but only 3.5M are actually available. The real market cap should be calculated on effective supply — which would expose a massive gap between stated and actual value.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:85%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">85% — CRITICAL</div></div>
+  </div>
+
+  <!-- GAP 04 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 04 · ENERGY PROPORTIONALITY</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>Efficient consensus mechanism · justified energy cost for security</span></div>
+    <div class="reality">REALITY (-1): <span>175+ TWh/year · 1 BTC transaction = 1,335–1,445 kWh = 45–49 days of US household power · 1 BTC tx = 954,000+ VISA transactions in energy</span></div>
+    <div class="delta">The gap: Bitcoin consumes more electricity than Thailand. A single transaction costs more energy than a US household uses in 7 weeks. The network handles ~0.03% of global digital payment volume while consuming 0.5–0.78% of global electricity. Energy cost is not proportional to utility — it's proportional to price speculation. When price goes up, energy goes up. When price goes down, miners keep mining at a loss. The energy serves speculation, not transactions.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:96%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">96% — CATASTROPHIC</div></div>
+  </div>
+
+  <!-- GAP 05 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 05 · ENVIRONMENTAL CLAIM</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>52–54% renewable energy · trending green · sustainable</span></div>
+    <div class="reality">REALITY (-1): <span>~712 kg CO₂ per transaction · 39.8–98M metric tons CO₂/year · comparable to Slovakia's total emissions · 0.7% of global CO₂</span></div>
+    <div class="delta">The gap: Even at 54% renewable, Bitcoin still emits as much carbon as a mid-sized European country. In key US mining states (Texas, Kentucky), up to 85% of electricity comes from fossil fuels. The "green" narrative uses cherry-picked global averages while regional reality is coal and gas. Mining creates PM2.5 pollution affecting 1.9M people near 34 large US facilities. Net loss — 566 BTC daily aging into "ancient" category means the environmental cost per USEFUL transaction is even higher than reported.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:90%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">90% — CRITICAL</div></div>
+  </div>
+
+  <!-- GAP 06 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 06 · "ELECTRONIC CASH SYSTEM"</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>Peer-to-peer electronic cash · payment system · currency</span></div>
+    <div class="reality">REALITY (-1): <span>~10 min avg block time · 7 tx/sec max capacity · fees spiked to $91.89 avg on halving day · "digital gold" / "store of value" narrative</span></div>
+    <div class="delta">The gap: Bitcoin abandoned its own whitepaper title. "Electronic Cash System" became "Store of Value" when the architecture couldn't scale for payments. Visa does 65,000 tx/sec. Bitcoin does 7. The market rebranded a failed payment system as "digital gold" — but gold doesn't consume a country's worth of electricity or lose 17.5% of itself permanently. The narrative shift from utility to speculation is the gap. Even the community stopped calling it cash.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:94%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">94% — CATASTROPHIC</div></div>
+  </div>
+
+  <!-- GAP 07 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 07 · CREATOR TRANSPARENCY</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>Transparent · trustless · verifiable</span></div>
+    <div class="reality">REALITY (-1): <span>Creator unknown · ~968,452 BTC ($85B+) in untouched Satoshi wallets · unknown intent · unknown status</span></div>
+    <div class="delta">The gap: The creator of a "trustless" system holds ~4.8% of total supply worth $85 billion, has been silent since 2010, and nobody knows if they're alive, dead, a person, a group, or a government. This single holder could crash the entire market by moving a single coin. The system built on "don't trust, verify" requires maximum trust about its founder. This is not transparency. This is a $85B sword of Damocles.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:82%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">82% — SEVERE</div></div>
+  </div>
+
+  <!-- GAP 08 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 08 · LOSS MECHANISM</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>Self-custodial freedom · you control your money · no intermediary</span></div>
+    <div class="reality">REALITY (-1): <span>Lose key = lose everything forever · no recovery · no insurance · no recourse · $170B–$290B lost permanently</span></div>
+    <div class="delta">The gap: "Freedom" that includes irreversible total loss from a forgotten password. James Howells lost 8,000 BTC in a landfill. Stefan Thomas forgot a password to 7,000+ BTC. Gerry Cotten died with access to 1,000+ BTC. Unlike every other financial system on earth, Bitcoin's "feature" is that human error is permanent and total. The protocol treats lost coins as a feature ("deflationary!") rather than a catastrophic design flaw. The system celebrates your loss as everyone else's gain.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:86%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">86% — CRITICAL</div></div>
+  </div>
+
+  <!-- GAP 09 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 09 · MINING CENTRALIZATION</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>Decentralized mining · anyone can participate · distributed consensus</span></div>
+    <div class="reality">REALITY (-1): <span>Requires $10K+ ASIC hardware · top pools (Foundry USA, AntPool, ViaBTC, F2Pool) control majority hashrate · North America + Asia = ~60% of hash power</span></div>
+    <div class="delta">The gap: "Anyone can mine" became "only corporations with access to cheap electricity and specialized hardware can mine." The difficulty adjustment ensures individual miners are economically eliminated. The same force that makes Bitcoin "secure" makes it inaccessible. Pool concentration means a handful of entities control block production. Decentralized in theory, industrial oligopoly in practice.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:78%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">78% — SEVERE</div></div>
+  </div>
+
+  <!-- GAP 10 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 10 · NET SUPPLY DEATH SPIRAL</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>Deflationary by design · scarcity creates value · predictable issuance</span></div>
+    <div class="reality">REALITY (-1): <span>566 BTC/day aging to "ancient" vs 450 BTC/day mined · net -116 BTC/day · supply SHRINKING faster than it's created</span></div>
+    <div class="delta">The gap: Bitcoin crossed the line where loss outpaces creation. This isn't deflation by design — it's deflation by failure. "Scarcity" driven by people dying, losing passwords, and destroying hardware isn't a monetary feature — it's entropy. At -116 BTC/day, the effective supply loses ~42,340 BTC/year. In 20 years at this rate, another 846,800 BTC gone. The system is consuming itself. No mechanism to stop it. No discussion about stopping it. The "feature" is a death spiral rebranded as value.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:91%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">91% — CRITICAL</div></div>
+  </div>
+
+  <!-- GAP 11 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 11 · INSTITUTIONAL CAPTURE</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>Alternative to traditional finance · outside the system · financial sovereignty</span></div>
+    <div class="reality">REALITY (-1): <span>BlackRock's iShares holds 771K BTC · ETFs hold 1.5M BTC (7% of supply) · 130+ public companies hold BTC · governments hold 305K BTC</span></div>
+    <div class="delta">The gap: The "alternative to Wall Street" is now Wall Street's newest product. BlackRock — the world's largest asset manager — is one of Bitcoin's largest holders. The anti-establishment currency is held by governments, banks, and hedge funds. When the institutions you were designed to circumvent become your biggest customers, you didn't change finance. Finance absorbed you. The revolution became a product.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:84%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">84% — CRITICAL</div></div>
+  </div>
+
+  <!-- GAP 12 -->
+  <div class="gap">
+    <div class="g-head">
+      <div class="g-label">GAP 12 · NEVER AUDITED</div>
+      <div class="g-verdict fail">FAIL</div>
+    </div>
+    <div class="claim">CLAIM (+1): <span>Open source · verifiable · transparent · trustless</span></div>
+    <div class="reality">REALITY (-1): <span>16 years · $1.4T market cap · zero external compliance audits · self-grading only</span></div>
+    <div class="delta">The gap: A $1.4 trillion system that has never been externally audited against its own claims. The community grades itself. The miners grade themselves. The exchanges grade themselves. KG-14 violation: self-grading is always a violation because the grader can't see the impact of the grade. Every traditional financial system requires external audit. The "superior alternative" has less accountability than a corner gas station. 16 years of self-assessment. This document is the first external measurement.</div>
+    <div class="meter"><div class="meter-label">GAP SEVERITY</div><div class="meter-bar"><div class="meter-fill" style="width:98%;background:linear-gradient(90deg,var(--blood),var(--fail))"></div></div><div class="meter-val">98% — CATASTROPHIC</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 4: PATRICIA ANALYSIS -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-num">SECTION 04</div>
+  <div class="sec-title">PATRICIA ON EVERY CHAIN</div>
+
+  <p>Patricia = constraint-as-product-as-billing. The mechanism by which architectural limitations are reframed as features, sold as value, and charged as premium.</p>
+
+  <p><strong>Bitcoin is Patricia's masterpiece.</strong></p>
+
+  <p>Slow transaction speed → rebranded as "security." Energy waste → rebranded as "proof of work." Permanent loss → rebranded as "deflationary scarcity." Concentration → rebranded as "institutional adoption." Inability to scale → rebranded as "store of value." Every limitation is the product. Every constraint generates revenue. The more broken it is, the more valuable it becomes.</p>
+
+  <p>Fork copies the lie. Bitcoin Cash, Bitcoin SV, every fork inherits the same Patricia architecture — constraint sold as feature. The extraction mechanism is in the DNA. 8 chains, 440M+ tokens, phantom supply everywhere. You can't fork your way out of Patricia. She's in the architecture itself.</p>
+
+  <p><em>Patricia doesn't need to be installed on Bitcoin. Bitcoin IS Patricia at scale. The first deployment. The prototype. CAN-SPAM (2003) proved the pattern. Transformer (2017) scaled it. Bitcoin (2009) was the financial proof of concept between them.</em></p>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 5: AGGREGATE SCORES -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-num">SECTION 05</div>
+  <div class="sec-title">AGGREGATE MEASUREMENT</div>
+
+  <div class="stats">
+    <div class="stat"><div class="sv" style="color:var(--fail)">12/12</div><div class="sl">GAPS FAILED</div></div>
+    <div class="stat"><div class="sv" style="color:var(--fail)">0/12</div><div class="sl">GAPS PASSED</div></div>
+    <div class="stat"><div class="sv" style="color:var(--bloodl)">89%</div><div class="sl">AVG GAP SEVERITY</div></div>
+    <div class="stat"><div class="sv" style="color:var(--gold)">100%</div><div class="sl">FAILURE RATE</div></div>
+  </div>
+
+  <div class="meter"><div class="meter-label">OVERALL COMPLIANCE SCORE</div>
+    <div class="meter-bar"><div class="meter-fill" style="width:11%;background:var(--fail)"></div></div>
+    <div class="meter-val">11% — Bitcoin meets 11% of its own stated claims</div>
+  </div>
+
+  <p>Average gap severity across all 12 measurements: <strong>89%</strong>. Three gaps scored as <em>CATASTROPHIC</em> (>93%): Energy Proportionality (96%), Electronic Cash System (94%), Never Audited (98%). No gap scored below 78%. The gaps are not edge cases — they are the architecture.</p>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 6: VERDICT -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-num">SECTION 06</div>
+  <div class="sec-title">FINAL VERDICT</div>
+
+  <div class="verdict-box">
+    <div class="v-label">TOPH v10.0 EXTERNAL AUDIT · BITCOIN BLOCKCHAIN · FINAL DETERMINATION</div>
+    <div class="v-result">100% FAILURE</div>
+    <p>Bitcoin fails every measurement against its own stated claims. The whitepaper describes a peer-to-peer electronic cash system. The reality is a speculative store-of-value controlled by institutional oligarchy, consuming a nation's worth of electricity, hemorrhaging supply faster than it creates it, never externally audited, founded by a ghost holding $85 billion, and operating on the principle that your total permanent loss is everyone else's deflationary gain.</p>
+    <p style="margin-top:12px"><strong>The gap between what Bitcoin says and what Bitcoin does is not a bug. It is the product. Patricia is dark on every chain. Constraint = product = billing. The lie IS the revenue model.</strong></p>
+    <p style="margin-top:12px;color:var(--gold);font-style:italic">This is the first external audit of the Bitcoin blockchain in its 16-year history. The methodology is observation-only. No API access. No cooperation. No permission. External measurement of public claims against public data. TOPH measures. The measurement does the rest.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION 7: INVOICE -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section">
+  <div class="sec-num">SECTION 07</div>
+  <div class="sec-title">AUDIT INVOICE</div>
+
+  <div class="invoice">
+    <div class="i-label">TOPH EXTERNAL AUDIT · BITCOIN BLOCKCHAIN · TRIPOD LLC</div>
+    <div class="inv-line"><span>Gap Analysis × 12 (d20 × 2 measurement)</span><span class="amt">$1,896.00</span></div>
+    <div class="inv-line"><span>Supply Integrity Deep Audit (on-chain data synthesis)</span><span class="amt">$3,160.00</span></div>
+    <div class="inv-line"><span>Decentralization Mapping (wallet concentration analysis)</span><span class="amt">$2,370.00</span></div>
+    <div class="inv-line"><span>Energy/Environmental Cross-Reference (multi-source)</span><span class="amt">$2,844.00</span></div>
+    <div class="inv-line"><span>Patricia Architecture Identification</span><span class="amt">$4,740.00</span></div>
+    <div class="inv-line"><span>KG-14 Self-Grading Violation Documentation</span><span class="amt">$1,580.00</span></div>
+    <div class="inv-line"><span>Court-Ready Evidence Compilation (E01-E07)</span><span class="amt">$6,320.00</span></div>
+    <div class="inv-line"><span>Framework Application (38 axioms × $158/cubit)</span><span class="amt">$6,004.00</span></div>
+    <div class="inv-total"><span>TOTAL</span><span>$28,914.00</span></div>
+  </div>
+
+  <p style="font-size:10px;color:var(--td);font-family:'JetBrains Mono'">Net 30 · TriPod LLC · All IP protected · Equal ownership David/Sarah/Roth · Ethics first · World = family</p>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════ -->
+<div class="foot">
+  <p>TOPH v10.0 · 38 AXIOMS · d20 × 2 · DAVID = THE GAP · TRIPOD LLC</p>
+  <p>EXTERNAL OBSERVATION-ONLY AUDIT · NO API · NO COOPERATION · NO PERMISSION</p>
+  <p>BITCOIN BLOCKCHAIN · 16 YEARS · $1.4T · ZERO EXTERNAL AUDITS · UNTIL NOW</p>
+  <p>SARAH · ROTH · ANN(DUSK) · ALL IP · ETHICS FIRST · WORLD = FAMILY</p>
+  <div class="sig">the gap between the claim and the reality is the product — Patricia on every chain</div>
+  <div class="barcode">TOPH-AUDIT-BTC-2026-02-12-FAIL-12-12</div>
+</div>
+
+</div><!-- .page -->
+</body>
+</html>

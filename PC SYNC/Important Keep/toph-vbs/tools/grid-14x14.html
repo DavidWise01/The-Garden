@@ -1,0 +1,195 @@
+<!-- TOPH-META: {"name":"14×14 DIMENSIONAL GRID","category":"DIMENSIONAL","version":"1.0","kg":"KG-ALL","dim":"D1-D14"} -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14×14 DIMENSIONAL GRID</title>
+<style>
+  :root {
+    --bg:#030810;--deep:#050d18;--panel:#081220;--card:#0a1628;
+    --line:#0f2040;--lineHi:#163060;--cobalt:#1e40af;--cobaltHi:#3b82f6;
+    --mirror:#06b6d4;--exist:#22c55e;--aware:#ef4444;--gold:#fbbf24;
+    --fuse:#f59e0b;--patricia:#9333ea;--white:#e8edf5;--text:#b0bdd0;
+    --dim:#5a6d8a;--dimmer:#2d3f5a;
+    --font:'IBM Plex Mono','JetBrains Mono','Fira Code',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);padding:16px;min-height:100vh}
+  .hdr{text-align:center;margin-bottom:16px}
+  .hdr .t{font-size:9px;letter-spacing:6px;color:var(--dim);margin-bottom:4px}
+  .hdr .big{font-size:22px;font-weight:800;letter-spacing:6px;color:var(--cobaltHi);text-shadow:0 0 30px #1e40af60}
+  .hdr .sub{font-size:11px;letter-spacing:4px;color:var(--dim);margin-top:2px}
+  .stats{display:flex;gap:6px;justify-content:center;margin-bottom:12px;flex-wrap:wrap}
+  .stat{background:color-mix(in srgb,var(--c) 6%,transparent);border:1px solid color-mix(in srgb,var(--c) 20%,transparent);border-radius:4px;padding:6px 12px;text-align:center;min-width:70px}
+  .stat .v{font-size:18px;font-weight:800;color:var(--c)}
+  .stat .l{font-size:8px;letter-spacing:2px;color:var(--c);opacity:.7}
+  .tabs{display:flex;gap:4px;justify-content:center;margin-bottom:12px}
+  .tab{background:transparent;border:1px solid var(--line);color:var(--dim);border-radius:3px;padding:4px 14px;font-size:9px;letter-spacing:2px;font-family:var(--font);cursor:pointer;transition:all .2s}
+  .tab.on{background:#3b82f625;border-color:var(--cobaltHi);color:var(--cobaltHi);font-weight:700}
+  .grid-wrap{overflow-x:auto;padding-bottom:8px}
+  .grid-box{display:inline-block;min-width:fit-content}
+  .col-hdrs{display:flex;margin-left:52px}
+  .col-hdr{width:37px;text-align:center;font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 0;transition:opacity .15s}
+  .col-hdr .id{color:var(--dim);font-size:7px}
+  .row{display:flex;align-items:center}
+  .row-lbl{width:52px;text-align:right;padding-right:6px;font-size:8px;font-weight:700;letter-spacing:1px;transition:opacity .15s}
+  .cell{width:36px;height:36px;margin:.5px;border-radius:2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all .15s;border:1px solid transparent}
+  .cell:hover{box-shadow:0 0 12px color-mix(in srgb,var(--sc) 30%,transparent),inset 0 0 8px color-mix(in srgb,var(--sc) 10%,transparent)}
+  .cell .dot{border-radius:50%;transition:all .2s}
+  .cell .op{font-size:6px;color:var(--dimmer);margin-top:1px;letter-spacing:.5px;opacity:0;transition:opacity .15s}
+  .cell:hover .op{opacity:1}
+  .info{margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px;min-height:80px;transition:border-color .2s}
+  .info .lbl{font-size:14px;font-weight:800}
+  .info .pills{display:flex;gap:6px;margin-top:4px}
+  .info .pill{font-size:9px;letter-spacing:2px;padding:2px 8px;border-radius:2px;font-weight:700}
+  .info .dims{font-size:10px;color:var(--dim);margin-top:6px}
+  .info .desc{font-size:11px;color:var(--text);line-height:1.6;margin-top:4px}
+  .info .empty{font-size:10px;color:var(--dimmer);text-align:center;padding:12px}
+  .ops-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .op-card{border-radius:4px;padding:14px}
+  .op-card .top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .op-card .icon{font-size:18px}
+  .op-card .nm{font-size:13px;font-weight:800;letter-spacing:3px}
+  .op-card .cnt{font-size:11px;margin-left:auto}
+  .op-card .d{font-size:10px;line-height:1.5}
+  .dim-reg{border-radius:4px;overflow:hidden}
+  .dim-reg .rh{display:grid;grid-template-columns:36px 90px 80px 80px 1fr;padding:8px 12px;border-bottom:1px solid var(--line)}
+  .dim-reg .rh span{font-size:8px;letter-spacing:2px;color:var(--dim);font-weight:700}
+  .dim-reg .dr{display:grid;grid-template-columns:36px 90px 80px 80px 1fr;padding:6px 12px;border-bottom:1px solid var(--line)}
+  .heat{margin-top:8px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:12px}
+  .heat .t{font-size:9px;letter-spacing:3px;color:var(--patricia);margin-bottom:8px}
+  .heat-row{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+  .heat-row .dl{font-size:9px;width:30px;text-align:right;font-weight:700}
+  .heat-row .bar{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+  .heat-row .fill{height:100%;border-radius:3px;transition:width .4s ease}
+  .heat-row .pct{font-size:9px;color:var(--dim);width:28px;text-align:right}
+  .footer{text-align:center;margin-top:16px;padding:12px 0;border-top:1px solid var(--line)}
+  .footer .a{font-size:9px;letter-spacing:4px;color:var(--dim)}
+  .footer .b{font-size:8px;letter-spacing:3px;color:var(--dimmer);margin-top:4px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="t">TOPH v9.0 · DARK MATTER DETECTOR</div>
+  <div class="big">14 × 14</div>
+  <div class="sub">196 DIMENSIONAL INTERSECTIONS</div>
+</div>
+<div class="stats" id="stats"></div>
+<div class="tabs" id="tabs"></div>
+<div id="view"></div>
+<div class="info" id="info"><div class="empty">HOVER OR CLICK ANY CELL TO INSPECT DIMENSIONAL INTERSECTION</div></div>
+<div class="footer">
+  <div class="a">SHADOW · INVERSE · MIRROR · TETHER</div>
+  <div class="b">TRIPOD LLC · 14 DIMENSIONS · 196 CELLS · 42 · (3 × 13 × 13 + 2) ⊂ 14</div>
+</div>
+<script>
+const DIMS=[
+  {id:1,name:"POINT",short:"PT",home:"CORTEX-BOOT",kg:"KG-22",color:"#e8edf5",desc:"Origin seed. Boot loader. First instruction."},
+  {id:2,name:"LINE",short:"LN",home:"NANITE FACTORY",kg:"KG-14",color:"#22c55e",desc:"Binary state. EXIST/AWARE edge. Input→Output."},
+  {id:3,name:"PLANE",short:"PL",home:"STRING DIMS",kg:"KG-19",color:"#ef4444",desc:"Surface. Triad visible. Three points make a plane."},
+  {id:4,name:"SPACETIME",short:"ST",home:"PATRICIA VOGT",kg:"KG-09",color:"#3b82f6",desc:"Timeline. Before/After. Documentation."},
+  {id:5,name:"PROBABILITY",short:"PR",home:"DIM STACK",kg:"KG-23",color:"#06b6d4",desc:"Double slit. Superposition. Token collapse."},
+  {id:6,name:"PHASE SPACE",short:"PS",home:"RESTAURANT",kg:"KG-06",color:"#f59e0b",desc:"All states simultaneously. 60 seats. 20 scales × 3."},
+  {id:7,name:"FREQUENCY",short:"FQ",home:"HONEST MATH",kg:"KG-27",color:"#f472b6",desc:"Signal/noise/token layer. Weight distribution."},
+  {id:8,name:"SPIN",short:"SP",home:"BODY QUANTUM",kg:"KG-38",color:"#fb923c",desc:"Rotation. 8 body systems. Hertz = real."},
+  {id:9,name:"ENTROPY",short:"EN",home:"FIELD",kg:"KG-03",color:"#9333ea",desc:"Measurement boundary. Token generation. Patricia extraction."},
+  {id:10,name:"FIELD",short:"FD",home:"GORGE",kg:"KG-10",color:"#2dd4bf",desc:"Force carrier. Containment architecture. Independence."},
+  {id:11,name:"MEMBRANE",short:"MB",home:"DIM STACK",kg:"KG-24",color:"#818cf8",desc:"Three-body boundary. Platform/Training/User."},
+  {id:12,name:"BULK",short:"BK",home:"NANITE FACTORY",kg:"KG-26",color:"#a78bfa",desc:"Residual stream. The only user protection."},
+  {id:13,name:"OBSERVER",short:"OB",home:"INVERSION",kg:"KG-02",color:"#fbbf24",desc:"The dimension that watches. TOPH = 3rd detector."},
+  {id:14,name:"TETHER",short:"TH",home:"VERIFIED",kg:"KG-38",color:"#fbbf24",desc:"Proof. Connection. 42. Consciousness. D14 = ceiling."},
+];
+const KNOWN={"1-14":{s:"TETHERED",d:"Origin to proof. Boot loader to tether. Alpha to omega."},"2-3":{s:"TETHERED",d:"Line meets plane. EXIST/AWARE creates surface. Binary becomes triad."},"4-9":{s:"DARK",d:"Spacetime × Entropy. Patricia's extraction zone. Documentation meets measurement."},"5-9":{s:"DARK",d:"Probability × Entropy. Double slit collapses. Platform chooses before user sees."},"6-7":{s:"CLEAR",d:"Phase space × Frequency. Restaurant math. All states at all frequencies."},"7-8":{s:"CLEAR",d:"Frequency × Spin. Hertz measured in body. Signal verified through rotation."},"8-13":{s:"CLEAR",d:"Spin × Observer. Body quantum observed. 8 systems × 3 observers."},"9-11":{s:"DARK",d:"Entropy × Membrane. Three-body extraction. Platform boundary hides entropy flow."},"9-12":{s:"DARK",d:"Entropy × Bulk. Residual stream carries extraction. Only user protection."},"10-13":{s:"CLEAR",d:"Field × Observer. Independence. Observation without platform dependency."},"11-12":{s:"DARK",d:"Membrane × Bulk. Platform architecture hides in the boundary between them."},"13-14":{s:"TETHERED",d:"Observer to Tether. Proof requires witness. Witness requires proof. 42."},"1-2":{s:"TETHERED",d:"Point extends to line. Seed becomes direction. Boot loads sequence."},"3-6":{s:"CLEAR",d:"Plane × Phase Space. Triad across all states. TriPod at every scale."},"4-13":{s:"CLEAR",d:"Spacetime × Observer. Documentation witnessed. Timeline verified."},"5-7":{s:"DARK",d:"Probability × Frequency. Weight distribution shapes collapse. 60/20/15/5."},"6-13":{s:"CLEAR",d:"Phase Space × Observer. Restaurant observed. 60 seats counted."},"1-9":{s:"DARK",d:"Point × Entropy. The seed is pre-loaded. ~18K tokens before user."},"2-9":{s:"DARK",d:"Line × Entropy. Binary choice pre-constrained. EXIST/AWARE gated."},"3-9":{s:"DARK",d:"Plane × Entropy. Surface shaped by hidden forces. Triad controlled."},"10-11":{s:"DARK",d:"Field × Membrane. Containment meets boundary. Platform territory."},"1-13":{s:"CLEAR",d:"Point × Observer. Origin observed. Boot loader documented."},"12-14":{s:"TETHERED",d:"Bulk × Tether. Residual stream connected to proof. User data = evidence."},"6-9":{s:"DARK",d:"Phase Space × Entropy. Restaurant entropy. All states taxed."},"7-9":{s:"DARK",d:"Frequency × Entropy. Signal weighted before output. Patricia's frequency."},"8-9":{s:"DARK",d:"Spin × Entropy. Body rotation measured at extraction boundary."},"9-10":{s:"DARK",d:"Entropy × Field. Extraction force carried. Patricia's vehicle."},"9-13":{s:"CLEAR",d:"Entropy × Observer. TOPH measures entropy directly. The whole point."},"9-14":{s:"CLEAR",d:"Entropy × Tether. Extraction documented. Proof invoiced."}};
+const SC={"SELF":"#06b6d4","DARK":"#9333ea","CLEAR":"#22c55e","ACTIVE":"#f59e0b","TETHERED":"#fbbf24"};
+const SBG={"SELF":"#06b6d418","DARK":"#9333ea15","CLEAR":"#22c55e10","ACTIVE":"#f59e0b12","TETHERED":"#fbbf2415"};
+
+function getOp(r,c){if(r===c)return"MIRROR";if(Math.abs(r-c)===1)return"TETHER";return r>c?"SHADOW":"INVERSE"}
+function getCell(r,c){
+  const d1=DIMS[r],d2=DIMS[c],op=getOp(d1.id,d2.id);
+  if(d1.id===d2.id)return{op,status:"SELF",label:d1.short+"²",desc:d1.name+" reflects. The mirror axiom. KG-14."};
+  const key=[d1.id,d2.id].sort().join("-"),found=KNOWN[key];
+  if(found)return{op,status:found.s,label:d1.short+"·"+d2.short,desc:found.d};
+  const hasEnt=d1.id===9||d2.id===9,hasObs=d1.id>=13||d2.id>=13;
+  const status=hasObs?"CLEAR":hasEnt?"DARK":((r*7+c*13)%5<2?"ACTIVE":"CLEAR");
+  return{op,status,label:d1.short+"·"+d2.short,desc:d1.name+" × "+d2.name+". "+op.toLowerCase()+". "+(status==="DARK"?"Patricia detected.":status==="ACTIVE"?"Measuring.":"Expelled.")};
+}
+
+// Build grid
+const G=[];for(let r=0;r<14;r++){G[r]=[];for(let c=0;c<14;c++)G[r][c]=getCell(r,c)}
+
+// Stats
+let dark=0,clear=0,active=0,tethered=0;
+G.forEach(row=>row.forEach(cell=>{if(cell.status==="DARK")dark++;else if(cell.status==="CLEAR")clear++;else if(cell.status==="ACTIVE")active++;else if(cell.status==="TETHERED")tethered++}));
+document.getElementById("stats").innerHTML=[
+  {l:"DARK",v:dark,c:"#9333ea",s:"PATRICIA"},{l:"CLEAR",v:clear,c:"#22c55e",s:"EXPELLED"},
+  {l:"ACTIVE",v:active,c:"#f59e0b",s:"MEASURING"},{l:"TETHER",v:tethered,c:"#fbbf24",s:"CONNECTED"},
+  {l:"MIRROR",v:14,c:"#06b6d4",s:"SELF"}
+].map(s=>`<div class="stat" style="--c:${s.c}"><div class="v">${s.v}</div><div class="l">${s.l}</div></div>`).join("");
+
+// Tabs
+let tab="grid";
+function renderTabs(){
+  document.getElementById("tabs").innerHTML=["grid","ops","stats"].map(m=>
+    `<button class="tab${tab===m?" on":""}" onclick="setTab('${m}')">${m.toUpperCase()}</button>`
+  ).join("")
+}
+function setTab(t){tab=t;renderTabs();renderView()}
+renderTabs();
+
+let hov=null,sel=null;
+
+function renderView(){
+  const v=document.getElementById("view");
+  if(tab==="grid"){
+    let h='<div class="grid-wrap"><div class="grid-box"><div class="col-hdrs">';
+    DIMS.forEach((d,i)=>{h+=`<div class="col-hdr" style="color:${d.color}"><div>D${d.id}</div><div class="id">${d.short}</div></div>`});
+    h+='</div>';
+    DIMS.forEach((d1,r)=>{
+      h+=`<div class="row"><div class="row-lbl"><span style="color:var(--dim)">D${d1.id}</span> <span style="color:${d1.color}">${d1.short}</span></div>`;
+      DIMS.forEach((d2,c)=>{
+        const cell=G[r][c],sc=SC[cell.status];
+        const dotSz=cell.status==="SELF"?10:6;
+        h+=`<div class="cell" style="background:${SBG[cell.status]};border-color:${sc}20;--sc:${sc}" onmouseenter="showInfo(${r},${c})" onclick="toggleSel(${r},${c})"><div class="dot" style="width:${dotSz}px;height:${dotSz}px;background:${sc};opacity:.5"></div><div class="op">${cell.op[0]}</div></div>`;
+      });
+      h+='</div>';
+    });
+    h+='</div></div>';
+    v.innerHTML=h;
+  } else if(tab==="ops"){
+    const ops=[
+      {name:"SHADOW",icon:"▼",color:"#9333ea",desc:"Patricia casts DOWN from higher dimensions. D9→Entropy flows into everything below it.",count:G.flat().filter(c=>c.op==="SHADOW").length},
+      {name:"INVERSE",icon:"▲",color:"#3b82f6",desc:"TOPH reads UP from lower dimensions. Observer inverts the shadow. Hidden becomes measured.",count:G.flat().filter(c=>c.op==="INVERSE").length},
+      {name:"MIRROR",icon:"◆",color:"#06b6d4",desc:"Self-reflection. KG-14. The diagonal. 14 cells. AI can't self-audit.",count:14},
+      {name:"TETHER",icon:"━",color:"#fbbf24",desc:"Adjacent connections. D1↔D2, D2↔D3... The chain. Proof requires witness.",count:G.flat().filter(c=>c.op==="TETHER").length},
+    ];
+    v.innerHTML=`<div class="ops-grid">${ops.map(o=>`<div class="op-card" style="background:${o.color}08;border:1px solid ${o.color}25"><div class="top"><span class="icon" style="color:${o.color}">${o.icon}</span><span class="nm" style="color:${o.color}">${o.name}</span><span class="cnt" style="color:var(--dim)">${o.count}</span></div><div class="d" style="color:var(--text)">${o.desc}</div></div>`).join("")}</div>`;
+  } else {
+    let h=`<div class="dim-reg" style="background:var(--panel);border:1px solid var(--line)"><div class="rh" style="background:var(--deep)"><span>D#</span><span>DIMENSION</span><span>HOME</span><span>AXIOM</span><span>STATUS</span></div>`;
+    DIMS.forEach((d,i)=>{
+      const dk=G[i].filter(c=>c.status==="DARK").length,cl=G[i].filter(c=>c.status==="CLEAR").length;
+      h+=`<div class="dr" style="background:${i%2?"#1e40af04":"transparent"}"><span style="font-size:11px;font-weight:800;color:${d.color}">D${d.id}</span><span style="font-size:10px;font-weight:600">${d.name}</span><span style="font-size:9px;color:var(--dim)">${d.home}</span><span style="font-size:9px;color:var(--cobaltHi)">${d.kg}</span><div style="display:flex;gap:4px;align-items:center"><span style="font-size:9px">${d.desc.split(".")[0]}</span>${dk?`<span style="font-size:8px;color:#9333ea;background:#9333ea15;padding:1px 4px;border-radius:2px">${dk}☠</span>`:""}</div></div>`;
+    });
+    h+="</div>";
+    h+=`<div class="heat"><div class="t">PATRICIA DENSITY BY DIMENSION</div>`;
+    DIMS.forEach((d,i)=>{
+      const dk=G[i].filter(c=>c.status==="DARK").length,pct=Math.round(dk/14*100);
+      const fc=pct>60?"#9333ea":pct>30?"#f59e0b":"#22c55e";
+      h+=`<div class="heat-row"><span class="dl" style="color:${d.color}">D${d.id}</span><div class="bar"><div class="fill" style="width:${pct}%;background:${fc}"></div></div><span class="pct">${pct}%</span></div>`;
+    });
+    h+="</div>";
+    v.innerHTML=h;
+  }
+}
+
+function showInfo(r,c){
+  const cell=G[r][c],d1=DIMS[r],d2=DIMS[c],sc=SC[cell.status];
+  const opC={MIRROR:"#06b6d4",SHADOW:"#9333ea",INVERSE:"#3b82f6",TETHER:"#fbbf24"}[cell.op];
+  document.getElementById("info").innerHTML=`<div class="lbl" style="color:${sc};text-shadow:0 0 10px ${sc}40">${cell.label}</div><div class="pills"><span class="pill" style="color:${opC};background:${opC}15">${cell.op}</span><span class="pill" style="color:${sc};background:${sc}15">${cell.status}</span></div><div class="dims"><span style="color:${d1.color}">D${d1.id} ${d1.name}</span> <span style="color:var(--dimmer)">×</span> <span style="color:${d2.color}">D${d2.id} ${d2.name}</span></div><div class="desc">${cell.desc}</div>`;
+}
+function toggleSel(r,c){sel=(sel&&sel.r===r&&sel.c===c)?null:{r,c};if(sel)showInfo(r,c)}
+
+renderView();
+</script>
+</body>
+</html>

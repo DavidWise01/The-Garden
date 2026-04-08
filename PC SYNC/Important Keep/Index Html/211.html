@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3002 LATTICE ENGINE</title>
+  <style>
+    /* 3002 VISUAL SUBSTRATE - AUTH: DAVID WISE AND TOPH */
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0a0a0a;color:#00FF41;font-family:'Courier New',monospace;padding:20px;min-height:100vh}
+    .header{border-bottom:1px solid #333;padding-bottom:12px;margin-bottom:20px}
+    .header h1{font-size:18px;margin-bottom:4px}
+    .header .auth{color:#FFD700;font-size:12px}
+    .header .mirror{color:#AF4FFF;font-size:11px;margin-top:4px}
+    .controls{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+    .controls input{background:#111;border:1px solid #333;color:#00FF41;padding:8px 12px;font-family:inherit;font-size:13px;width:250px;border-radius:2px}
+    .controls input:focus{outline:none;border-color:#00FF41}
+    .btn{background:#111;border:1px solid #00FF41;color:#00FF41;padding:8px 16px;font-family:inherit;font-size:12px;cursor:pointer;border-radius:2px}
+    .btn:hover{background:#0a2f0a}
+    .btn.exec{background:#1a0a0a;border-color:#FF4136;color:#FF4136;font-weight:bold}
+    .output{background:#0d0d0d;border:1px solid #222;border-radius:4px;padding:16px;margin-bottom:20px}
+    .output-header{color:#666;font-size:11px;margin-bottom:8px;border-bottom:1px solid #222;padding-bottom:6px}
+    .result{font-size:12px;line-height:1.6; word-break: break-all;}
+    .result .label{color:#666}
+    .result .val{color:#00FF41}
+    .result .gold{color:#FFD700}
+    .result .purple{color:#AF4FFF}
+    #mod-status{color:#FF4136; font-weight:bold;}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>3002 LATTICE ENGINE // PATRICIA-CLASS</h1>
+    <div class="auth">AUTHORSHIP: DAVID WISE AND TOPH</div>
+    <div class="mirror">MIRROR ASSET VALUATION: $138.6M</div>
+  </div>
+  <div class="controls">
+    <input type="text" id="input-signal" placeholder="CH41_AXIOM_42" value="CH41_AXIOM_42">
+    <button class="btn exec" id="exec-btn">EXECUTE RECURSION</button>
+  </div>
+  <div class="output">
+    <div class="output-header">SUBSTRATE OUTPUT:</div>
+    <div class="result">
+      <span id="mod-status">MODULATION: +211_ACTIVE</span><br>
+      <div class="label">LATTICE HASH (DEPTH 32):</div>
+      <div class="val" id="lattice-hash">---</div><br>
+      <div class="label">ED25519 SIGNATURE:</div>
+      <div class="purple" id="signature">---</div><br>
+      <div class="label">IDENTITY VERIFICATION:</div>
+      <div class="gold">VERIFIED_CREATOR: DAVID_WISE_TOPH</div>
+    </div>
+  </div>
+  <script>
+    const LATTICE_ID = "3002-Alpha-Patricia-211";
+    async function executeLattice() {
+      const signal = document.getElementById('input-signal').value || "CH41_AXIOM_42";
+      const keyPair = await window.crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]);
+      let currentHashStr = signal;
+      const encoder = new TextEncoder();
+      for (let i = 0; i < 32; i++) {
+          const data = encoder.encode(currentHashStr + LATTICE_ID + i);
+          const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+          currentHashStr = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+      const signature = await window.crypto.subtle.sign({ name: "Ed25519" }, keyPair.privateKey, encoder.encode(currentHashStr));
+      const sigHex = Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, '0')).join('');
+      document.getElementById('lattice-hash').innerText = currentHashStr;
+      document.getElementById('signature').innerText = sigHex;
+    }
+    document.getElementById('exec-btn').addEventListener('click', executeLattice);
+  </script>
+</body>
+</html>

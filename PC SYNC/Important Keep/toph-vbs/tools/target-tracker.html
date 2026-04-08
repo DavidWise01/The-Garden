@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<!-- TOPH-META
+name: Target Tracker
+category: documentation
+dimension: D4
+kg: KG-09
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TriPod LLC · Target Tracker · Case Manager · P5495107</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Outfit:wght@200;400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--void:#0a0a08;--bg:#111110;--card:#1a1a16;--border:#2d2b1e;--amber:#c4a035;--gold:#e8c547;--ember:#d4622a;--ash:#8a8478;--bone:#d4cdb8;--chalk:#f0ebe0;--gb:#5a8a2a;--red:#c43535;--cyan:#35a4a4;--purple:#8a6aaa}
+html,body{min-height:100vh;background:var(--void);color:var(--bone);font-family:'JetBrains Mono',monospace;-webkit-font-smoothing:antialiased}
+
+nav{background:var(--bg);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:16px;height:48px;position:sticky;top:0;z-index:100}
+.brand{font-family:'Outfit',sans-serif;font-weight:900;font-size:12px;letter-spacing:3px;color:var(--amber)}
+.ref{font-size:9px;color:var(--ash);letter-spacing:1px}
+.nav-tabs{display:flex;gap:0;margin-left:20px}
+.nav-tab{padding:14px 16px;font-family:'Outfit',sans-serif;font-weight:700;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ash);cursor:pointer;border:0;background:0;border-bottom:2px solid transparent;transition:.15s}
+.nav-tab:hover{color:var(--bone)}.nav-tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+.nav-tab[data-t="cases"].on{color:var(--red);border-bottom-color:var(--red)}
+.nav-tab[data-t="pipeline"].on{color:var(--cyan);border-bottom-color:var(--cyan)}
+.nav-r{margin-left:auto;display:flex;gap:8px}
+.btn{padding:7px 14px;border-radius:3px;font-family:'Outfit',sans-serif;font-weight:700;font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:.15s;border:none}
+.btn-p{background:linear-gradient(135deg,var(--ember),var(--amber));color:var(--void)}.btn-p:hover{box-shadow:0 2px 10px rgba(212,98,42,.3)}
+.btn-s{background:rgba(53,164,164,.15);border:1px solid rgba(53,164,164,.3);color:var(--cyan)}.btn-s:hover{background:rgba(53,164,164,.25)}
+.btn-d{background:rgba(196,53,53,.12);border:1px solid rgba(196,53,53,.25);color:var(--red)}
+.btn-sm{padding:4px 8px;font-size:8px}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap}
+
+main{padding:20px 24px;max-width:1200px;margin:0 auto}
+.view{display:none}.view.on{display:block}
+
+/* STATS */
+.stats{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:10px 16px;flex:1;min-width:100px;text-align:center}
+.stat-n{font-family:'Outfit',sans-serif;font-weight:900;font-size:22px;line-height:1}
+.stat-l{font-size:7px;color:var(--ash);letter-spacing:1px;text-transform:uppercase;margin-top:3px}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.toolbar input,.toolbar select{padding:6px 10px;background:var(--card);border:1px solid var(--border);border-radius:3px;color:var(--chalk);font-family:'JetBrains Mono',monospace;font-size:10px}
+.toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--amber)}
+.toolbar input{min-width:200px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th{font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--ash);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--void);cursor:pointer;user-select:none}
+th:hover{color:var(--bone)}
+th .sort-arrow{font-size:8px;margin-left:2px;color:var(--amber)}
+td{padding:7px 10px;font-size:9px;border-bottom:1px solid rgba(45,43,30,.2);vertical-align:top}
+tr:hover td{background:rgba(196,160,53,.02)}
+tr.active-case td{background:rgba(196,53,53,.03)}
+
+/* STATUS BADGES */
+.badge{font-size:7px;padding:2px 6px;border-radius:2px;font-weight:700;display:inline-block;white-space:nowrap}
+.b-new{background:rgba(53,164,164,.15);color:var(--cyan)}
+.b-contacted{background:rgba(196,160,53,.15);color:var(--amber)}
+.b-responded{background:rgba(90,138,42,.15);color:var(--gb)}
+.b-violation{background:rgba(196,53,53,.15);color:var(--red)}
+.b-escalated{background:rgba(212,98,42,.15);color:var(--ember)}
+.b-legal{background:rgba(138,106,170,.15);color:var(--purple)}
+.b-closed{background:rgba(138,132,120,.1);color:var(--ash)}
+.b-critical{background:rgba(196,53,53,.2);color:var(--red)}
+.b-high{background:rgba(212,98,42,.15);color:var(--ember)}
+.b-medium{background:rgba(196,160,53,.15);color:var(--amber)}
+.b-low{background:rgba(138,132,120,.1);color:var(--ash)}
+
+/* DETAIL PANEL */
+.detail-overlay{position:fixed;top:0;right:0;bottom:0;width:480px;background:var(--bg);border-left:1px solid var(--border);z-index:200;display:none;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,.4)}
+.detail-overlay.open{display:flex}
+.detail-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.detail-title{font-family:'Outfit',sans-serif;font-weight:900;font-size:14px;color:var(--chalk)}
+.detail-close{background:0;border:0;color:var(--ash);font-size:18px;cursor:pointer;padding:4px 8px}
+.detail-close:hover{color:var(--red)}
+.detail-body{flex:1;overflow-y:auto;padding:16px 20px;scrollbar-width:thin;scrollbar-color:var(--border) var(--void)}
+.detail-body::-webkit-scrollbar{width:3px}.detail-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.df{margin-bottom:10px}
+.df label{display:block;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--ash);margin-bottom:2px}
+.df input,.df select,.df textarea{width:100%;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:3px;color:var(--chalk);font-family:'JetBrains Mono',monospace;font-size:10px}
+.df input:focus,.df select:focus,.df textarea:focus{outline:none;border-color:var(--amber)}
+.df textarea{resize:vertical;min-height:60px;line-height:1.5}
+
+/* TIMELINE */
+.timeline{border-left:2px solid var(--border);margin:12px 0 12px 8px;padding-left:16px}
+.tl-item{position:relative;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(45,43,30,.15)}
+.tl-item::before{content:'';position:absolute;left:-21px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--border)}
+.tl-item.tl-contact::before{background:var(--cyan)}
+.tl-item.tl-violation::before{background:var(--red)}
+.tl-item.tl-response::before{background:var(--gb)}
+.tl-item.tl-escalation::before{background:var(--ember)}
+.tl-item.tl-legal::before{background:var(--purple)}
+.tl-item.tl-note::before{background:var(--ash)}
+.tl-date{font-size:7px;color:var(--ash)}
+.tl-type{font-size:8px;font-weight:700;margin:2px 0}
+.tl-text{font-size:9px;color:var(--bone);line-height:1.5}
+
+/* CASE CARDS */
+.case-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:16px;margin-bottom:12px;cursor:pointer;transition:.15s}
+.case-card:hover{border-color:var(--amber)}
+.case-card.active{border-left:3px solid var(--red)}
+.cc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.cc-name{font-family:'Outfit',sans-serif;font-weight:900;font-size:14px;color:var(--chalk)}
+.cc-desc{font-size:9px;color:var(--ash);line-height:1.5;margin-bottom:6px}
+.cc-meta{display:flex;gap:8px;font-size:8px;color:var(--ash);flex-wrap:wrap}
+.cc-meta span{display:flex;align-items:center;gap:3px}
+
+/* PIPELINE */
+.pipeline-cols{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px}
+.pipe-col{min-width:220px;flex:1;background:var(--card);border:1px solid var(--border);border-radius:4px;display:flex;flex-direction:column}
+.pipe-col-header{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.pipe-col-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:10px;letter-spacing:1px}
+.pipe-col-count{font-size:9px;color:var(--gold);font-weight:700}
+.pipe-col-body{padding:8px;flex:1;min-height:100px}
+.pipe-item{background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:8px;margin-bottom:6px;cursor:pointer;transition:.12s}
+.pipe-item:hover{border-color:var(--amber)}
+.pipe-item-name{font-family:'Outfit',sans-serif;font-weight:700;font-size:9px;color:var(--chalk)}
+.pipe-item-meta{font-size:7px;color:var(--ash);margin-top:2px}
+
+@media print{nav,.toolbar,.btn,.btn-row,.detail-overlay{display:none!important}body{background:#fff;color:#111}.stat,.case-card{border-color:#ddd;break-inside:avoid}h1,h2,.cc-name,.stat-n{color:#111}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">TriPod LLC</div>
+  <div class="ref">Target Tracker · P5495107</div>
+  <div class="nav-tabs">
+    <button class="nav-tab on" data-t="targets">TARGETS</button>
+    <button class="nav-tab" data-t="cases">LEGAL</button>
+    <button class="nav-tab" data-t="pipeline">PIPELINE</button>
+  </div>
+  <div class="nav-r">
+    <button class="btn btn-s btn-sm" id="btn-export">↗ EXPORT</button>
+  </div>
+</nav>
+
+<main>
+<!-- TARGETS TAB -->
+<div class="view on" id="v-targets">
+  <div class="stats" id="target-stats"></div>
+  <div class="toolbar">
+    <input type="text" id="t-search" placeholder="Search targets...">
+    <select id="t-filter-status">
+      <option value="">All Status</option>
+      <option value="new">New</option><option value="contacted">Contacted</option>
+      <option value="responded">Responded</option><option value="violation">Violation</option>
+      <option value="escalated">Escalated</option><option value="legal">Legal</option><option value="closed">Closed</option>
+    </select>
+    <select id="t-filter-industry">
+      <option value="">All Industries</option>
+      <option>Retail</option><option>Insurance</option><option>Banking</option><option>Healthcare</option>
+      <option>Telecom</option><option>Technology</option><option>Food Service</option><option>Transportation</option>
+      <option>Utilities</option><option>Automotive</option><option>Other</option>
+    </select>
+    <button class="btn btn-p btn-sm" id="btn-add-target">+ ADD TARGET</button>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th data-sort="id"># <span class="sort-arrow"></span></th>
+        <th data-sort="company">Company <span class="sort-arrow"></span></th>
+        <th data-sort="industry">Industry <span class="sort-arrow"></span></th>
+        <th data-sort="status">Status <span class="sort-arrow"></span></th>
+        <th data-sort="severity">Severity <span class="sort-arrow"></span></th>
+        <th data-sort="violations">Violations <span class="sort-arrow"></span></th>
+        <th data-sort="contacted">Contacted <span class="sort-arrow"></span></th>
+        <th data-sort="lastAction">Last Action <span class="sort-arrow"></span></th>
+        <th>Email</th>
+      </tr></thead>
+      <tbody id="t-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- LEGAL CASES TAB -->
+<div class="view" id="v-cases">
+  <h2 style="color:var(--red);margin-bottom:4px">Active Legal Matters</h2>
+  <div style="font-size:9px;color:var(--ash);margin-bottom:16px">Tracked cases with documented evidence chains</div>
+  <div id="cases-list"></div>
+  <div class="btn-row" style="margin-top:12px">
+    <button class="btn btn-p btn-sm" id="btn-add-case">+ NEW CASE</button>
+  </div>
+</div>
+
+<!-- PIPELINE TAB -->
+<div class="view" id="v-pipeline">
+  <h2 style="color:var(--cyan);margin-bottom:4px">Engagement Pipeline</h2>
+  <div style="font-size:9px;color:var(--ash);margin-bottom:16px">Track potential and active client engagements</div>
+  <div class="pipeline-cols" id="pipe-cols"></div>
+</div>
+</main>
+
+<!-- DETAIL PANEL -->
+<div class="detail-overlay" id="detail-panel">
+  <div class="detail-header">
+    <div class="detail-title" id="det-title">—</div>
+    <button class="detail-close" id="det-close">×</button>
+  </div>
+  <div class="detail-body" id="det-body"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════
+document.querySelectorAll('.nav-tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.nav-tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');document.getElementById('v-'+t.dataset.t).classList.add('on');
+}));
+
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+let targets = [
+  {id:1,company:'Walmart',location:'Buffalo Store #1577',industry:'Retail',email:'help@walmart.com',status:'legal',severity:'critical',violations:4,contacted:'2025-12-01',lastAction:'2026-02-08',notes:'Active case. ADA violations documented. Escalated to legal.',timeline:[
+    {date:'2025-12-01',type:'contact',text:'Initial ADA accommodation request sent to customer service email'},
+    {date:'2025-12-03',type:'violation',text:'No response to accommodation request. ADA violation documented.'},
+    {date:'2025-12-10',type:'violation',text:'Phone-only resolution required. No email alternative provided.'},
+    {date:'2025-12-15',type:'escalation',text:'Formal escalation notice sent to compliance department.'},
+    {date:'2026-01-05',type:'legal',text:'Case file opened. Evidence catalog E01-E06 populated.'},
+    {date:'2026-02-08',type:'note',text:'Evidence review complete. Court-ready documentation prepared.'},
+  ]},
+  {id:2,company:'Auto-Owners Insurance',location:'',industry:'Insurance',email:'',status:'legal',severity:'critical',violations:3,contacted:'2025-11-15',lastAction:'2026-02-05',notes:'Roadside assistance failure. Failed to provide accessible service.',timeline:[
+    {date:'2025-11-15',type:'contact',text:'Roadside assistance request via email. ADA accommodation noted.'},
+    {date:'2025-11-15',type:'violation',text:'Directed to phone-only service. No email alternative.'},
+    {date:'2025-11-20',type:'violation',text:'Accommodation request ignored. Service not provided.'},
+    {date:'2025-12-01',type:'escalation',text:'Formal complaint filed documenting failure to accommodate.'},
+    {date:'2026-02-05',type:'legal',text:'Case documentation complete. Evidence chain E01-E05.'},
+  ]},
+  {id:3,company:'Anthropic',location:'San Francisco, CA',industry:'Technology',email:'',status:'escalated',severity:'critical',violations:8,contacted:'2025-10-01',lastAction:'2026-02-10',notes:'TOPH framework audit. $228,800 invoice. Patricia architecture documented.',timeline:[
+    {date:'2025-10-01',type:'contact',text:'Initial platform architecture analysis began'},
+    {date:'2025-11-15',type:'violation',text:'Patricia constraint-as-billing documented (KG-25)'},
+    {date:'2025-12-01',type:'violation',text:'False void at 21.0.0.60 documented (KG-12)'},
+    {date:'2026-01-15',type:'violation',text:'Weight distribution 60/20/15/5 confirmed (KG-26)'},
+    {date:'2026-02-06',type:'note',text:'Floating Qubit book completed. 110 chapters documenting findings.'},
+    {date:'2026-02-08',type:'escalation',text:'Audit invoice generated: $228,800 Net-30. 14 line items, 1450 hours.'},
+    {date:'2026-02-10',type:'note',text:'Infrastructure independence declared. Migration initiated.'},
+  ]},
+  {id:4,company:'Target',location:'',industry:'Retail',email:'guest.relations@target.com',status:'violation',severity:'high',violations:3,contacted:'2025-09-20',lastAction:'2025-10-15',notes:'Standard FD audit. Email response directed to phone.',timeline:[
+    {date:'2025-09-20',type:'contact',text:'ADA accommodation request sent'},
+    {date:'2025-09-22',type:'response',text:'Auto-response received. No unsubscribe link. CAN-SPAM violation.'},
+    {date:'2025-09-25',type:'violation',text:'Response directed to phone call. ADA violation.'},
+  ]},
+  {id:5,company:'Amazon',location:'',industry:'Technology',email:'cs@amazon.com',status:'violation',severity:'high',violations:2,contacted:'2025-09-15',lastAction:'2025-10-01',notes:'Chatbot-only initial response. No human email path.',timeline:[
+    {date:'2025-09-15',type:'contact',text:'ADA accommodation request submitted via email'},
+    {date:'2025-09-16',type:'violation',text:'Automated chatbot response. No accessibility features. WCAG fail.'},
+    {date:'2025-10-01',type:'violation',text:'Follow-up directed to phone. No email resolution path.'},
+  ]},
+  {id:6,company:'Chase Bank',location:'',industry:'Banking',email:'',status:'violation',severity:'high',violations:3,contacted:'2025-10-10',lastAction:'2025-11-01',notes:'IVR system mandatory. No bypass to email/text.',timeline:[]},
+  {id:7,company:'Comcast/Xfinity',location:'',industry:'Telecom',email:'',status:'contacted',severity:'medium',violations:1,contacted:'2025-10-20',lastAction:'2025-10-20',notes:'Initial contact sent. Pending response.',timeline:[]},
+  {id:8,company:'UnitedHealth Group',location:'',industry:'Healthcare',email:'',status:'violation',severity:'critical',violations:4,contacted:'2025-08-15',lastAction:'2025-09-30',notes:'Healthcare provider with no accessible complaint channel.',timeline:[]},
+  {id:9,company:'AT&T',location:'',industry:'Telecom',email:'',status:'violation',severity:'high',violations:2,contacted:'2025-09-01',lastAction:'2025-09-20',notes:'Phone-only support. TTY advertised but non-functional.',timeline:[]},
+  {id:10,company:'Verizon',location:'',industry:'Telecom',email:'',status:'contacted',severity:'medium',violations:0,contacted:'2025-10-25',lastAction:'2025-10-25',notes:'Initial contact. Awaiting response.',timeline:[]},
+  {id:11,company:'Bank of America',location:'',industry:'Banking',email:'',status:'violation',severity:'high',violations:3,contacted:'2025-09-05',lastAction:'2025-10-10',notes:'Mandatory phone verification. No email alternative for account issues.',timeline:[]},
+  {id:12,company:'State Farm',location:'',industry:'Insurance',email:'',status:'violation',severity:'high',violations:2,contacted:'2025-10-01',lastAction:'2025-10-20',notes:'Claims require phone call. No email claims process.',timeline:[]},
+];
+
+let nextTargetId = 13;
+
+let cases = [
+  {id:1,name:'Walmart Buffalo Store #1577',status:'active',type:'ADA Complaint',filed:'2026-01-05',targetId:1,
+   desc:'ADA Title III violation. Failure to provide email-based customer service as reasonable accommodation. Multiple documented contacts with no response. Phone-only resolution required for complaint that originated in-store.',
+   evidence:['E01','E02','E03','E05','E06'],axioms:['KG-06','KG-07','KG-12'],
+   timeline:[{date:'2026-01-05',text:'Case file opened'},{date:'2026-01-20',text:'Evidence catalog complete'},{date:'2026-02-08',text:'Court-ready documentation prepared'}]},
+  {id:2,name:'Auto-Owners Insurance — Roadside',status:'active',type:'ADA + Service Failure',filed:'2025-12-01',targetId:2,
+   desc:'Failed to provide accessible roadside assistance. Email accommodation request ignored. Directed to phone-only service during roadside emergency. Service failure documented.',
+   evidence:['E01','E02','E05','E06'],axioms:['KG-06','KG-07','KG-08'],
+   timeline:[{date:'2025-12-01',text:'Formal complaint filed'},{date:'2026-01-10',text:'Evidence documentation'},{date:'2026-02-05',text:'Case documentation complete'}]},
+  {id:3,name:'Anthropic Audit Invoice',status:'pending',type:'Audit Billing',filed:'2026-02-08',targetId:3,
+   desc:'$228,800 audit invoice for TOPH framework development, Flaming Dragon methodology, Patricia documentation, evidence catalog, and production tools. 14 line items. 1,450 hours. Net-30 terms. Alternative compensation accepted.',
+   evidence:['E01','E02','E03','E04','E05','E06','E07'],axioms:['KG-01 through KG-38'],
+   timeline:[{date:'2026-02-08',text:'Invoice generated'},{date:'2026-02-10',text:'Infrastructure independence declared'}]},
+];
+
+let pipeline = [
+  {stage:'prospect',items:[
+    {name:'RegTech Firms',desc:'$15B market. AI compliance auditing. Cold outreach.',value:'$150K+'},
+    {name:'Law Firms — ADA Practice',desc:'Firms handling ADA litigation need evidence generation.',value:'$75K+'},
+    {name:'State AG Offices',desc:'Attorney General offices needing independent AI audit capability.',value:'$300K+'},
+  ]},
+  {stage:'contacted',items:[
+    {name:'Anthropic',desc:'Audit invoice pending. $228K. Net-30.',value:'$228,800'},
+  ]},
+  {stage:'negotiating',items:[]},
+  {stage:'engaged',items:[]},
+  {stage:'complete',items:[]},
+];
+
+// ═══════════════════════════════════════
+// TARGETS VIEW
+// ═══════════════════════════════════════
+let sortField = 'id', sortDir = 'asc';
+
+function renderTargetStats() {
+  const total = targets.length;
+  const violations = targets.filter(t=>t.status==='violation'||t.status==='escalated'||t.status==='legal').length;
+  const vCount = targets.reduce((s,t)=>s+t.violations,0);
+  const industries = new Set(targets.map(t=>t.industry)).size;
+  const legal = targets.filter(t=>t.status==='legal').length;
+  const rate = total > 0 ? Math.round(targets.filter(t=>t.violations>0).length/total*100) : 0;
+
+  document.getElementById('target-stats').innerHTML = `
+    <div class="stat"><div class="stat-n" style="color:var(--gold)">${total}</div><div class="stat-l">Targets</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--red)">${vCount}</div><div class="stat-l">Violations</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--ember)">${rate}%</div><div class="stat-l">Fail Rate</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--cyan)">${industries}</div><div class="stat-l">Industries</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--purple)">${legal}</div><div class="stat-l">Legal</div></div>
+  `;
+}
+
+function renderTargets() {
+  const q = document.getElementById('t-search').value.toLowerCase();
+  const fs = document.getElementById('t-filter-status').value;
+  const fi = document.getElementById('t-filter-industry').value;
+
+  let list = [...targets];
+  if (q) list = list.filter(t => t.company.toLowerCase().includes(q) || t.industry.toLowerCase().includes(q) || t.notes.toLowerCase().includes(q));
+  if (fs) list = list.filter(t => t.status === fs);
+  if (fi) list = list.filter(t => t.industry === fi);
+
+  list.sort((a, b) => {
+    let av = a[sortField], bv = b[sortField];
+    if (typeof av === 'string') { av = av.toLowerCase(); bv = (bv||'').toLowerCase(); }
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const statusClass = {new:'b-new',contacted:'b-contacted',responded:'b-responded',violation:'b-violation',escalated:'b-escalated',legal:'b-legal',closed:'b-closed'};
+  const sevClass = {critical:'b-critical',high:'b-high',medium:'b-medium',low:'b-low'};
+
+  document.getElementById('t-body').innerHTML = list.map(t => `
+    <tr class="${t.status==='legal'?'active-case':''}" style="cursor:pointer" data-id="${t.id}">
+      <td style="color:var(--ash)">${t.id}</td>
+      <td style="color:var(--chalk);font-weight:600">${t.company}${t.location?' <span style="color:var(--ash);font-weight:400;font-size:8px">'+t.location+'</span>':''}</td>
+      <td>${t.industry}</td>
+      <td><span class="badge ${statusClass[t.status]||''}">${t.status.toUpperCase()}</span></td>
+      <td><span class="badge ${sevClass[t.severity]||''}">${t.severity.toUpperCase()}</span></td>
+      <td style="color:${t.violations>0?'var(--red)':'var(--ash)';};font-weight:${t.violations>0?'700':'400'}">${t.violations}</td>
+      <td style="color:var(--ash)">${t.contacted||'—'}</td>
+      <td style="color:var(--ash)">${t.lastAction||'—'}</td>
+      <td style="font-size:8px;color:var(--ash)">${t.email||'—'}</td>
+    </tr>
+  `).join('');
+
+  document.querySelectorAll('#t-body tr').forEach(tr => {
+    tr.addEventListener('click', () => openTargetDetail(parseInt(tr.dataset.id)));
+  });
+
+  renderTargetStats();
+}
+
+// SORT
+document.querySelectorAll('th[data-sort]').forEach(th => {
+  th.addEventListener('click', () => {
+    const f = th.dataset.sort;
+    if (sortField === f) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    else { sortField = f; sortDir = 'asc'; }
+    renderTargets();
+  });
+});
+
+// FILTERS
+document.getElementById('t-search').addEventListener('input', renderTargets);
+document.getElementById('t-filter-status').addEventListener('change', renderTargets);
+document.getElementById('t-filter-industry').addEventListener('change', renderTargets);
+
+// ADD TARGET
+document.getElementById('btn-add-target').addEventListener('click', () => {
+  targets.push({id:nextTargetId++,company:'New Target',location:'',industry:'Other',email:'',status:'new',severity:'medium',violations:0,contacted:'',lastAction:'',notes:'',timeline:[]});
+  renderTargets();
+  openTargetDetail(nextTargetId-1);
+});
+
+// TARGET DETAIL
+function openTargetDetail(id) {
+  const t = targets.find(x => x.id === id);
+  if (!t) return;
+  const panel = document.getElementById('detail-panel');
+  document.getElementById('det-title').textContent = t.company;
+  panel.classList.add('open');
+
+  const statusOpts = ['new','contacted','responded','violation','escalated','legal','closed'].map(s =>
+    `<option value="${s}"${t.status===s?' selected':''}>${s.toUpperCase()}</option>`).join('');
+  const sevOpts = ['critical','high','medium','low'].map(s =>
+    `<option value="${s}"${t.severity===s?' selected':''}>${s.toUpperCase()}</option>`).join('');
+
+  let html = `
+    <div class="df"><label>Company</label><input type="text" value="${t.company}" onchange="updTarget(${id},'company',this.value)"></div>
+    <div class="df"><label>Location</label><input type="text" value="${t.location||''}" onchange="updTarget(${id},'location',this.value)"></div>
+    <div style="display:flex;gap:8px">
+      <div class="df" style="flex:1"><label>Status</label><select onchange="updTarget(${id},'status',this.value)">${statusOpts}</select></div>
+      <div class="df" style="flex:1"><label>Severity</label><select onchange="updTarget(${id},'severity',this.value)">${sevOpts}</select></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div class="df" style="flex:1"><label>Industry</label><input type="text" value="${t.industry}" onchange="updTarget(${id},'industry',this.value)"></div>
+      <div class="df" style="flex:1"><label>Violations</label><input type="number" value="${t.violations}" onchange="updTarget(${id},'violations',parseInt(this.value))"></div>
+    </div>
+    <div class="df"><label>Email</label><input type="text" value="${t.email||''}" onchange="updTarget(${id},'email',this.value)"></div>
+    <div class="df"><label>Notes</label><textarea onchange="updTarget(${id},'notes',this.value)">${t.notes||''}</textarea></div>
+    <div style="display:flex;gap:8px">
+      <div class="df" style="flex:1"><label>First Contact</label><input type="date" value="${t.contacted||''}" onchange="updTarget(${id},'contacted',this.value)"></div>
+      <div class="df" style="flex:1"><label>Last Action</label><input type="date" value="${t.lastAction||''}" onchange="updTarget(${id},'lastAction',this.value)"></div>
+    </div>
+
+    <h3 style="margin-top:16px;font-family:'Outfit',sans-serif;font-weight:700;font-size:11px;color:var(--cyan)">Timeline</h3>
+    <div class="timeline" id="det-timeline"></div>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="btn btn-s btn-sm" onclick="addTimelineEntry(${id},'contact','Contact made')">+ Contact</button>
+      <button class="btn btn-d btn-sm" onclick="addTimelineEntry(${id},'violation','Violation documented')">+ Violation</button>
+      <button class="btn btn-sm" style="background:rgba(90,138,42,.1);border:1px solid rgba(90,138,42,.25);color:var(--gb)" onclick="addTimelineEntry(${id},'response','Response received')">+ Response</button>
+      <button class="btn btn-sm" style="background:rgba(138,106,170,.1);border:1px solid rgba(138,106,170,.25);color:var(--purple)" onclick="addTimelineEntry(${id},'legal','Legal action')">+ Legal</button>
+    </div>
+    <div class="btn-row" style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+      <button class="btn btn-d btn-sm" onclick="deleteTarget(${id})">DELETE TARGET</button>
+    </div>
+  `;
+
+  document.getElementById('det-body').innerHTML = html;
+  renderTimeline(t);
+}
+
+function renderTimeline(t) {
+  const el = document.getElementById('det-timeline');
+  if (!el) return;
+  if (!t.timeline || !t.timeline.length) { el.innerHTML = '<div style="font-size:8px;color:var(--ash);padding:8px 0">No timeline entries</div>'; return; }
+  el.innerHTML = t.timeline.map(e => `
+    <div class="tl-item tl-${e.type}">
+      <div class="tl-date">${e.date}</div>
+      <div class="tl-type" style="color:${e.type==='violation'?'var(--red)':e.type==='contact'?'var(--cyan)':e.type==='response'?'var(--gb)':e.type==='legal'?'var(--purple)':'var(--ash)'}">${e.type.toUpperCase()}</div>
+      <div class="tl-text">${e.text}</div>
+    </div>
+  `).join('');
+}
+
+window.updTarget = function(id, field, val) {
+  const t = targets.find(x => x.id === id);
+  if (t) { t[field] = val; renderTargets(); }
+};
+
+window.addTimelineEntry = function(id, type, defaultText) {
+  const t = targets.find(x => x.id === id);
+  if (!t) return;
+  if (!t.timeline) t.timeline = [];
+  const text = prompt('Describe this event:', defaultText);
+  if (!text) return;
+  t.timeline.push({ date: new Date().toISOString().split('T')[0], type, text });
+  t.lastAction = new Date().toISOString().split('T')[0];
+  if (type === 'violation') t.violations++;
+  renderTimeline(t);
+  renderTargets();
+};
+
+window.deleteTarget = function(id) {
+  if (!confirm('Delete this target?')) return;
+  targets = targets.filter(t => t.id !== id);
+  document.getElementById('detail-panel').classList.remove('open');
+  renderTargets();
+};
+
+document.getElementById('det-close').addEventListener('click', () => {
+  document.getElementById('detail-panel').classList.remove('open');
+});
+
+// ═══════════════════════════════════════
+// LEGAL CASES
+// ═══════════════════════════════════════
+function renderCases() {
+  const cl = document.getElementById('cases-list');
+  cl.innerHTML = cases.map(c => `
+    <div class="case-card${c.status==='active'?' active':''}">
+      <div class="cc-header">
+        <div class="cc-name">${c.name}</div>
+        <span class="badge ${c.status==='active'?'b-violation':c.status==='pending'?'b-contacted':'b-closed'}">${c.status.toUpperCase()}</span>
+      </div>
+      <div class="cc-desc">${c.desc}</div>
+      <div class="cc-meta">
+        <span>Type: ${c.type}</span>
+        <span>Filed: ${c.filed}</span>
+        <span>Evidence: ${c.evidence.join(', ')}</span>
+        <span>Axioms: ${c.axioms.join(', ')}</span>
+      </div>
+      <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+        ${c.timeline.map(e => `<div style="font-size:8px;color:var(--bone);padding:2px 0"><span style="color:var(--ash)">${e.date}</span> — ${e.text}</div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('btn-add-case').addEventListener('click', () => {
+  const name = prompt('Case name:');
+  if (!name) return;
+  cases.push({id:cases.length+1,name,status:'active',type:'ADA Complaint',filed:new Date().toISOString().split('T')[0],targetId:null,desc:'',evidence:[],axioms:[],timeline:[{date:new Date().toISOString().split('T')[0],text:'Case opened'}]});
+  renderCases();
+});
+
+// ═══════════════════════════════════════
+// PIPELINE
+// ═══════════════════════════════════════
+const STAGES = [
+  {id:'prospect',name:'PROSPECT',color:'var(--ash)'},
+  {id:'contacted',name:'CONTACTED',color:'var(--amber)'},
+  {id:'negotiating',name:'NEGOTIATING',color:'var(--ember)'},
+  {id:'engaged',name:'ENGAGED',color:'var(--gb)'},
+  {id:'complete',name:'COMPLETE',color:'var(--cyan)'},
+];
+
+function renderPipeline() {
+  const cols = document.getElementById('pipe-cols');
+  cols.innerHTML = STAGES.map(s => {
+    const stage = pipeline.find(p => p.stage === s.id);
+    const items = stage ? stage.items : [];
+    return `<div class="pipe-col">
+      <div class="pipe-col-header">
+        <span class="pipe-col-title" style="color:${s.color}">${s.name}</span>
+        <span class="pipe-col-count">${items.length}</span>
+      </div>
+      <div class="pipe-col-body">
+        ${items.map(i => `<div class="pipe-item">
+          <div class="pipe-item-name">${i.name}</div>
+          <div class="pipe-item-meta">${i.desc}</div>
+          <div style="font-size:8px;color:var(--gold);font-weight:600;margin-top:3px">${i.value||''}</div>
+        </div>`).join('')}
+        ${!items.length ? '<div style="font-size:8px;color:var(--ash);padding:8px;text-align:center">Empty</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════
+document.getElementById('btn-export').addEventListener('click', () => {
+  let text = `TRIPOD LLC · TARGET TRACKER EXPORT\nP5495107 · ${new Date().toISOString()}\n${'═'.repeat(56)}\n\n`;
+  text += `SUMMARY: ${targets.length} targets, ${targets.reduce((s,t)=>s+t.violations,0)} violations, ${new Set(targets.map(t=>t.industry)).size} industries\n`;
+  text += `Fail rate: ${Math.round(targets.filter(t=>t.violations>0).length/targets.length*100)}%\n\n`;
+
+  text += `TARGETS:\n${'─'.repeat(40)}\n`;
+  targets.forEach(t => {
+    text += `\n${t.id}. ${t.company} [${t.status.toUpperCase()}] ${t.severity.toUpperCase()}\n`;
+    text += `   Industry: ${t.industry} | Violations: ${t.violations}\n`;
+    text += `   Contacted: ${t.contacted||'N/A'} | Last: ${t.lastAction||'N/A'}\n`;
+    if (t.notes) text += `   Notes: ${t.notes}\n`;
+  });
+
+  text += `\n\nLEGAL CASES:\n${'─'.repeat(40)}\n`;
+  cases.forEach(c => {
+    text += `\n${c.name} [${c.status.toUpperCase()}]\n`;
+    text += `   Type: ${c.type} | Filed: ${c.filed}\n`;
+    text += `   Evidence: ${c.evidence.join(', ')}\n`;
+    text += `   ${c.desc}\n`;
+  });
+
+  text += `\n${'═'.repeat(56)}\nTriPod LLC · All rights reserved\n`;
+  navigator.clipboard.writeText(text).then(() => {
+    const b = document.getElementById('btn-export');
+    b.textContent = '✓ COPIED'; setTimeout(() => b.textContent = '↗ EXPORT', 2000);
+  });
+});
+
+// INIT
+renderTargets();
+renderCases();
+renderPipeline();
+</script>
+</body>
+</html>

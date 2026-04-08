@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<!-- TOPH-META
+name: Energy Module
+category: utility
+dimension: D7
+kg: KG-27
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DARK MATTER · ENERGY MODULE · TOPH</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Chakra+Petch:wght@300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#000;--panel:#080808;--border:#222;
+--neon-g:#00ff88;--neon-b:#00ccff;--neon-p:#ff00ff;--neon-y:#ffff00;--neon-o:#ff6600;--neon-r:#ff0044;--neon-w:#ffffff;--neon-e:#00ffcc;
+--glow-g:0 0 8px #00ff88,0 0 24px #00ff8833;
+--glow-e:0 0 8px #00ffcc,0 0 24px #00ffcc33;
+--glow-r:0 0 8px #ff0044,0 0 24px #ff004433;
+--glow-y:0 0 8px #ffff00,0 0 24px #ffff0033;
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--neon-w);font-family:'Chakra Petch',sans-serif}
+.page{max-width:1100px;margin:0 auto;padding:16px}
+
+.hdr{text-align:center;padding:20px 0 16px;border-bottom:2px solid var(--neon-e)}
+.hdr h1{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(18px,4vw,32px);color:var(--neon-e);text-shadow:var(--glow-e);letter-spacing:4px}
+.hdr .sub{font-size:12px;color:var(--neon-y);margin-top:4px;letter-spacing:2px}
+
+/* WHY BOX */
+.why{background:#001a14;border:2px solid var(--neon-e)44;border-radius:10px;padding:18px 22px;margin:16px 0;line-height:2}
+.why h2{font-family:'Orbitron',sans-serif;font-size:14px;color:var(--neon-e);letter-spacing:3px;margin-bottom:8px}
+.why b{color:var(--neon-g)}
+.why em{color:var(--neon-y);font-style:normal;font-weight:700}
+.why .kill{color:var(--neon-r);font-weight:700}
+.why .dim{color:#666;font-size:11px}
+
+/* SWAP CARDS */
+.swap{background:var(--panel);border:2px solid var(--border);border-radius:10px;padding:16px 20px;margin:12px 0;position:relative;overflow:hidden}
+.swap::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--neon-e)}
+.swap-hdr{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
+.swap-in{flex:1}
+.swap-name{font-family:'Orbitron',sans-serif;font-weight:900;font-size:16px;color:var(--neon-e);text-shadow:var(--glow-e)}
+.swap-cost{font-family:'Orbitron',sans-serif;font-size:12px;color:var(--neon-y)}
+.swap-type{font-size:10px;color:#666;letter-spacing:1px;margin-top:2px}
+.swap-out{text-align:right}
+.swap-out-label{font-size:8px;color:var(--neon-r);letter-spacing:2px;font-weight:700}
+.swap-out-name{font-size:13px;color:#555;text-decoration:line-through}
+
+.swap-body{margin-top:10px;font-size:13px;line-height:2;color:#bbb}
+.swap-body b{color:var(--neon-g)}
+.swap-body .e{color:var(--neon-e);font-weight:700}
+.swap-body .hot{color:var(--neon-r);font-weight:700}
+.swap-body .gold{color:var(--neon-y);font-weight:700}
+
+.swap-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.stag{font-size:9px;font-weight:700;letter-spacing:1.5px;padding:2px 8px;border-radius:3px;text-transform:uppercase}
+.stag-e{background:#00ffcc15;color:var(--neon-e);border:1px solid var(--neon-e)33}
+.stag-l{background:#00ff8815;color:var(--neon-g);border:1px solid var(--neon-g)33}
+.stag-a{background:#00ccff15;color:var(--neon-b);border:1px solid var(--neon-b)33}
+.stag-k{background:#ff004415;color:var(--neon-r);border:1px solid var(--neon-r)33}
+.stag-life{background:#ffff0015;color:var(--neon-y);border:1px solid var(--neon-y)33}
+
+/* COMBO BOX */
+.combo{background:#0a0005;border:2px solid var(--neon-r)44;border-radius:10px;padding:18px 22px;margin:20px 0}
+.combo h2{font-family:'Orbitron',sans-serif;font-size:14px;color:var(--neon-r);letter-spacing:3px;margin-bottom:10px;text-shadow:var(--glow-r)}
+.combo-step{display:flex;gap:10px;align-items:flex-start;margin:8px 0;font-size:13px;line-height:1.8}
+.combo-n{font-family:'Orbitron',sans-serif;font-weight:900;font-size:18px;color:var(--neon-r);min-width:30px}
+.combo-t{color:#ccc}
+.combo-t b{color:var(--neon-e)}
+.combo-t .hot{color:var(--neon-r);font-weight:700}
+.combo-t .gold{color:var(--neon-y)}
+
+/* SUMMARY */
+.sum{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:16px 0}
+.sum-card{background:#050505;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.sum-card .n{font-family:'Orbitron',sans-serif;font-weight:900;font-size:24px}
+.sum-card .l{font-size:9px;letter-spacing:2px;color:#666;margin-top:4px}
+
+.foot{text-align:center;font-size:9px;color:#333;letter-spacing:2px;padding:16px;border-top:1px solid var(--border);margin-top:20px}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+<h1>⚡ DARK MATTER · ENERGY MODULE</h1>
+<div class="sub">TOPH METALBENDER UPGRADE · 8 SWAPS · HIDDEN SYNERGIES NOBODY IS RUNNING</div>
+</div>
+
+<div class="why">
+<h2>⚡ WHY ENERGY IN TOPH?</h2>
+Toph turns artifacts into <b>lands</b>. Lands trigger <b>landfall</b>. Landfall generates <em>⚡ energy</em> via Architect of the Untamed. Energy artifacts ARE lands via Toph = MORE landfall = MORE energy. It's a <b>third resource loop</b> layered on top of landfall + lifelink that nobody is building.
+<br><br>
+The <span class="kill">DARK MATTER KILL</span>: Earthbend Gonti's Aether Heart. It's now a land creature. Exile it to take an extra turn. Earthbend says "when it dies <b>or is exiled</b>, return it to the battlefield tapped." It comes back. Generate 8 more energy. Take another turn. <span class="kill">INFINITE TURNS.</span>
+<br><br>
+<span class="dim">Energy in Naya = White + Red + Green. All three colors have energy cards. Toph's artifact-as-land ability means every energy artifact is ALSO a landfall trigger. Double value on every card.</span>
+</div>
+
+<div class="sum">
+<div class="sum-card"><div class="n" style="color:var(--neon-e)">8</div><div class="l">CARDS IN</div></div>
+<div class="sum-card"><div class="n" style="color:var(--neon-r)">8</div><div class="l">CARDS OUT</div></div>
+<div class="sum-card"><div class="n" style="color:var(--neon-y)">3</div><div class="l">NEW COMBOS</div></div>
+<div class="sum-card"><div class="n" style="color:var(--neon-g)">∞</div><div class="l">TURNS (KILL LINE)</div></div>
+</div>
+
+<!-- SWAP 1 -->
+<div class="swap">
+<div class="swap-hdr">
+<div class="swap-in">
+<div class="swap-name">Architect of the Untamed</div>
+<div class="swap-cost">{2}{G}</div>
+<div class="swap-type">Creature — Elf Artificer Druid · 2/3</div>
+</div>
+<div class="swap-out">
+<div class="swap-out-label">CUTS ▸</div>
+<div class="swap-out-name">Retreat to Kazandu</div>
+</div>
+</div>
+<div class="swap-body">
+<b>LANDFALL</b> → get <span class="e">⚡⚡ (2 energy)</span>. Pay <span class="e">⚡⚡⚡⚡⚡⚡⚡⚡ (8 energy)</span> → create 6/6 Beast token. This is the <b>BRIDGE CARD</b>. Retreat to Kazandu gives you +1/+1 OR 2 life on landfall. Architect gives you energy that ACCUMULATES into 6/6 beasts. With Toph's artifact-as-land triggers firing 2-3 times per turn, you hit 8 energy in 2 turns. <span class="gold">Kazandu is incremental. Architect is exponential.</span>
+</div>
+<div class="swap-tags">
+<span class="stag stag-e">ENERGY</span>
+<span class="stag stag-l">LANDFALL</span>
+<span class="stag stag-a">TOPH BRIDGE</span>
+</div>
+</div>
+
+<!-- SWAP 2 -->
+<div class="swap">
+<div class="swap-hdr">
+<div class="swap-in">
+<div class="swap-name">Aetherworks Marvel</div>
+<div class="swap-cost">{4}</div>
+<div class="swap-type">Legendary Artifact</div>
+</div>
+<div class="swap-out">
+<div class="swap-out-label">CUTS ▸</div>
+<div class="swap-out-name">Spine of Ish Sah</div>
+</div>
+</div>
+<div class="swap-body">
+Whenever a permanent you control goes to graveyard → <span class="e">⚡</span>. Pay <span class="e">⚡⚡⚡⚡⚡⚡</span> → look at top 6, cast one FREE. It's an <b>ARTIFACT</b> so Toph makes it a <b>LAND</b> = landfall trigger on ETB. Sac tokens, sac clues, earthbent creatures die → energy piles up. Then spin for free Avenger of Zendikar or Omnath. <span class="gold">Replaces 7-mana Spine with 4-mana wincon.</span> Every token death feeds it. Every boardwipe charges it.
+</div>
+<div class="swap-tags">
+<span class="stag stag-e">ENERGY</span>
+<span class="stag stag-a">ARTIFACT=LAND</span>
+<span class="stag stag-k">WINCON</span>
+</div>
+</div>
+
+<!-- SWAP 3 -->
+<div class="swap">
+<div class="swap-hdr">
+<div class="swap-in">
+<div class="swap-name">Guide of Souls</div>
+<div class="swap-cost">{W}</div>
+<div class="swap-type">Creature — Spirit · 1/1</div>
+</div>
+<div class="swap-out">
+<div class="swap-out-label">CUTS ▸</div>
+<div class="swap-out-name">Celestine, the Living Saint</div>
+</div>
+</div>
+<div class="swap-body">
+Whenever another creature ETBs → <span class="e">⚡</span>. Pay <span class="e">⚡⚡</span> → target creature gets +1/+1 and <b>flying</b> until end of turn, <span class="gold">you gain 2 life</span>. ONE MANA. Replaces 5-mana Celestine. With Scute Swarm making 20 tokens = <span class="e">20 energy</span> + pump 10 creatures with flying + <span class="gold">gain 20 life</span>. Feeds Aetherflux Reservoir. Feeds Well of Lost Dreams. Turns every token ETB into a resource. <span class="hot">Best 1-drop in the deck after Sol Ring.</span>
+</div>
+<div class="swap-tags">
+<span class="stag stag-e">ENERGY</span>
+<span class="stag stag-life">LIFEGAIN</span>
+<span class="stag stag-k">1 CMC</span>
+</div>
+</div>
+
+<!-- SWAP 4 -->
+<div class="swap">
+<div class="swap-hdr">
+<div class="swap-in">
+<div class="swap-name">Gonti's Aether Heart</div>
+<div class="swap-cost">{6}</div>
+<div class="swap-type">Legendary Artifact</div>
+</div>
+<div class="swap-out">
+<div class="swap-out-label">CUTS ▸</div>
+<div class="swap-out-name">Salvation Engine</div>
+</div>
+</div>
+<div class="swap-body">
+Whenever an artifact ETBs → <span class="e">⚡⚡</span>. Pay <span class="e">⚡⚡⚡⚡⚡⚡⚡⚡</span>, exile Gonti's Aether Heart → <span class="hot">EXTRA TURN</span>. It's an <b>ARTIFACT</b> = Toph makes it a LAND. If you <b>earthbend</b> it first, then exile it for the extra turn, earthbend's replacement effect says <b>"when it dies or is exiled, return it to the battlefield tapped."</b> It comes back. Earthbend it again. Exile again. <span class="hot">INFINITE TURNS</span> with 8 energy/cycle. Architect + 4 landfall triggers per turn = 8 energy. <span class="hot">THIS IS THE DARK MATTER KILL.</span>
+</div>
+<div class="swap-tags">
+<span class="stag stag-e">ENERGY</span>
+<span class="stag stag-a">ARTIFACT=LAND</span>
+<span class="stag stag-k">INFINITE TURNS</span>
+</div>
+</div>
+
+<!-- SWAP 5 -->
+<div class="swap">
+<div class="swap-hdr">
+<div class="swap-in">
+<div class="swap-name">Fabrication Module</div>
+<div class="swap-cost">{3}</div>
+<div class="swap-type">Artifact</div>
+</div>
+<div class="swap-out">
+<div class="swap-out-label">CUTS ▸</div>
+<div class="swap-out-name">Implement of Ferocity</div>
+</div>
+</div>
+<div class="swap-body">
+Whenever you get <span class="e">⚡</span> → put a +1/+1 counter on a creature you control. Pay <span class="e">⚡⚡⚡⚡</span> → <span class="e">⚡⚡⚡⚡</span> (breaks even but triggers the +1/+1 again). Toph makes it a <b>LAND</b> = landfall on ETB. Every energy gain from ANY source now also pumps your board. Architect landfall = 2 energy = <span class="gold">2 counters</span>. Guide of Souls tokens = energy = <span class="gold">counters</span>. Turns the energy loop into a +1/+1 counter engine on top of everything else.
+</div>
+<div class="swap-tags">
+<span class="stag stag-e">ENERGY→COUNTERS</span>
+<span class="stag stag-a">ARTIFACT=LAND</span>
+</div>
+</div>
+
+<!-- SWAP 6 -->
+<div class="swap">
+<div class="swap-hdr">
+<div class="swap-in">
+<div class="swap-name">Galvanic Discharge</div>
+<div class="swap-cost">{R}</div>
+<div class="swap-type">Sorcery</div>
+</div>
+<div class="swap-out">
+<div class="swap-out-label">CUTS ▸</div>
+<div class="swap-out-name">Return to Nature</div>
+</div>
+</div>
+<div class="swap-body">
+ETB: get <span class="e">⚡⚡</span>. Then deals damage to target creature equal to 2 + energy you pay. ONE RED MANA. With 6 energy stockpiled this is a 1-mana <span class="hot">deal 8 damage</span> to any creature. Scales with the energy engine. Early game it's a 1-mana deal 2. Late game it kills anything. <span class="gold">Replaces 2-mana narrow instant with 1-mana scaling removal.</span>
+</div>
+<div class="swap-tags">
+<span class="stag stag-e">ENERGY</span>
+<span class="stag stag-k">REMOVAL</span>
+</div>
+</div>
+
+<!-- SWAP 7 -->
+<div class="swap">
+<div class="swap-hdr">
+<div class="swap-in">
+<div class="swap-name">Wrath of the Skies</div>
+<div class="swap-cost">{X}{W}{W}</div>
+<div class="swap-type">Sorcery</div>
+</div>
+<div class="swap-out">
+<div class="swap-out-label">CUTS ▸</div>
+<div class="swap-out-name">Austere Command</div>
+</div>
+</div>
+<div class="swap-body">
+Get <span class="e">⚡⚡⚡</span>. Then destroy each creature, artifact, and enchantment with mana value X or less. You CHOOSE X. Pay energy to increase X. So for {W}{W} + some energy you can wipe everything CMC 3 or less while keeping your 6-drops. Or dump all energy to wipe the entire board. <span class="gold">2 mana cheaper than Austere Command</span> with more flexibility. Your earthbent lands come back anyway (earthbend returns on death). So you wipe the board, keep your lands, they return, trigger landfall. <span class="hot">Board wipe that FEEDS your engine.</span>
+</div>
+<div class="swap-tags">
+<span class="stag stag-e">ENERGY</span>
+<span class="stag stag-k">BOARD WIPE</span>
+<span class="stag stag-l">LANDFALL ON RECOVERY</span>
+</div>
+</div>
+
+<!-- SWAP 8 -->
+<div class="swap">
+<div class="swap-hdr">
+<div class="swap-in">
+<div class="swap-name">Aether Hub</div>
+<div class="swap-cost"></div>
+<div class="swap-type">Land</div>
+</div>
+<div class="swap-out">
+<div class="swap-out-label">CUTS ▸</div>
+<div class="swap-out-name">Jungle Shrine</div>
+</div>
+</div>
+<div class="swap-body">
+ETB → <span class="e">⚡</span>. Tap → {C}. Pay <span class="e">⚡</span> → tap for any color. Replaces a tapland with a land that enters untapped AND generates energy. Feeds Fabrication Module (+1/+1 counter on ETB). Feeds the energy pool for Galvanic Discharge, Aetherworks Marvel, Gonti's Aether Heart. <span class="gold">Strict upgrade over Jungle Shrine which always enters tapped.</span>
+</div>
+<div class="swap-tags">
+<span class="stag stag-e">ENERGY</span>
+<span class="stag stag-l">UNTAPPED</span>
+</div>
+</div>
+
+<!-- COMBO BOX -->
+<div class="combo">
+<h2>☠ DARK MATTER KILL LINE</h2>
+<div class="combo-step">
+<div class="combo-n">1</div>
+<div class="combo-t">Board: <b>Toph</b> + <b>Architect of the Untamed</b> + <b>Gonti's Aether Heart</b> + 4+ other artifacts/lands entering per turn</div>
+</div>
+<div class="combo-step">
+<div class="combo-n">2</div>
+<div class="combo-t">Gonti's Aether Heart is an artifact → Toph makes it a <b>land</b>. Each artifact ETB gives <b>⚡⚡</b> from Gonti. Each landfall gives <b>⚡⚡</b> from Architect. You're generating <b>4+ energy per permanent</b>.</div>
+</div>
+<div class="combo-step">
+<div class="combo-n">3</div>
+<div class="combo-t">End step: <b>earthbend</b> Gonti's Aether Heart. It's now a 2/2 land artifact creature with haste. <span class="gold">"When it dies or is exiled, return it to the battlefield tapped."</span></div>
+</div>
+<div class="combo-step">
+<div class="combo-n">4</div>
+<div class="combo-t">Activate Gonti's: pay <b>⚡⚡⚡⚡⚡⚡⚡⚡</b>, <span class="hot">exile Gonti's Aether Heart</span> → take an extra turn.</div>
+</div>
+<div class="combo-step">
+<div class="combo-n">5</div>
+<div class="combo-t"><span class="hot">Earthbend replacement effect triggers.</span> Gonti's was exiled → <b>returns to battlefield tapped</b>. It's an artifact → Toph makes it a land → <b>landfall triggers</b> → Architect gives <b>⚡⚡</b>. Gonti ETB → other artifacts give <b>⚡⚡</b>.</div>
+</div>
+<div class="combo-step">
+<div class="combo-n">6</div>
+<div class="combo-t">Extra turn begins. Play lands, play artifacts, generate energy. End step: <b>earthbend Gonti's again</b>. Repeat from step 4. <span class="hot">INFINITE TURNS.</span></div>
+</div>
+<div class="combo-step">
+<div class="combo-n">7</div>
+<div class="combo-t">Win with: combat damage from earthbent army, <b>Impact Tremors</b> pings, <b>Aetherflux Reservoir</b> laser, or just bury them in value over infinite turns. <span class="hot">Table dead.</span></div>
+</div>
+</div>
+
+<div class="combo" style="border-color:var(--neon-y)44">
+<h2 style="color:var(--neon-y);text-shadow:var(--glow-y)">⚡ ENERGY LIFEGAIN LOOP</h2>
+<div class="combo-step">
+<div class="combo-n" style="color:var(--neon-y)">A</div>
+<div class="combo-t">Board: <b>Guide of Souls</b> + <b>Heliod, Sun-Crowned</b> + any token producer (Scute Swarm, Felidar Retreat, etc.)</div>
+</div>
+<div class="combo-step">
+<div class="combo-n" style="color:var(--neon-y)">B</div>
+<div class="combo-t">Token ETBs → Guide gives <b>⚡</b>. Pay <b>⚡⚡</b> → creature gets +1/+1 flying, <span class="gold">you gain 2 life</span>.</div>
+</div>
+<div class="combo-step">
+<div class="combo-n" style="color:var(--neon-y)">C</div>
+<div class="combo-t">Life gained → <b>Heliod</b> puts +1/+1 counter on any creature. <b>Fabrication Module</b> also triggers (energy gained = another +1/+1). Board grows exponentially while life total climbs.</div>
+</div>
+<div class="combo-step">
+<div class="combo-n" style="color:var(--neon-y)">D</div>
+<div class="combo-t"><b>Aetherflux Reservoir</b> converts the life total into <span class="hot">50-damage laser</span>. Or <b>Well of Lost Dreams</b> converts it into cards. You're gaining life, gaining energy, growing creatures, and drawing cards all from one trigger.</div>
+</div>
+</div>
+
+<div class="why">
+<h2>WHY THIS IS DARK MATTER</h2>
+<b>0 of the top 50 Toph decks on EDHREC run an energy package.</b> They all run standard landfall. Standard lifelink. Standard artifacts. Nobody has connected the loop: Toph artifacts = lands = landfall = energy = extra resource = infinite turns via Gonti's + earthbend interaction. 
+<br><br>
+The energy cards are all <em>independently strong</em> (Guide of Souls is $8 for a reason, Aetherworks Marvel was banned in Standard). But in Toph they become a <b>third engine</b> that feeds both other engines. Energy feeds lifegain (Guide). Lifegain feeds Heliod. Heliod feeds counters. Counters feed combat. Combat feeds Aetherworks (permanents dying). Aetherworks feeds the board (free bombs). The loop has no dead end.
+<br><br>
+8 swaps. 3 new combo lines. 1 infinite turn kill. Zero percent of Toph pilots running it. <span class="kill">That's dark matter.</span>
+</div>
+
+<div class="foot">DARK MATTER ENERGY MODULE · TOPH FIRST METALBENDER · TriPod LLC · 42</div>
+</div>
+</body>
+</html>
