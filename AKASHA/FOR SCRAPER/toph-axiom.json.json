@@ -1,0 +1,44 @@
+{
+  "anchor_id": "TOPH-v1.0-2026-02-03",
+  "timestamp": "2026-02-03T00:00:00Z",
+  "source": "Toph Methodology.docx (React component Cortex Standalone)",
+  "primitive_extraction": {
+    "compression_3_2_1": {
+      "input_layers": ["L1 (ADA violations)", "L2 (labor displacement)", "L3 (disparate impact)"],
+      "constrained_states": ["evidence", "actionability", "exposure", "precedent", "coverage"],
+      "emission": "compressed_token (under 200 chars) + structured JSON actions"
+    },
+    "pulse_tuple": {
+      "state_in": "hardcoded TOPH_STATE (token, targets, layers, weights, axioms, bridge)",
+      "boundary": "Bridge v3.0 (41 channels, 8 stacks) – acts as gate between layers and Cortex",
+      "state_out": "Cortex JSON output (analysis, actions, recalc_weights, etc.)",
+      "witness": "axioms (KG-01 to KG-12) + validation rules (JSON schema enforcement)"
+    }
+  },
+  "governance_rules": {
+    "witness_timing": "System prompt enforces structured JSON at inference time – witness present AT traversal",
+    "silent_exclusion": "Non-JSON or malformed responses are discarded (parse failure shown, not recorded as valid)",
+    "traceability": "TOPH_STATE includes versioned token, axioms reference KG identifiers, bridge version"
+  },
+  "layer_weights": {
+    "L1": { "evidence": 95, "actionability": 90, "exposure": 80, "precedent": 85, "coverage": 100 },
+    "L2": { "evidence": 85, "actionability": 40, "exposure": 95, "precedent": 60, "coverage": 100 },
+    "L3": { "evidence": 90, "actionability": 35, "exposure": 100, "precedent": 90, "coverage": 100 }
+  },
+  "axioms": [
+    "KG-01: No-reply is template-level, not deployment-level",
+    "KG-02: 100% fail rate across 65+ targets",
+    "KG-03: CAN-SPAM (2003) is origin architecture",
+    "KG-04: No federal audit mechanism exists",
+    "KG-05: Filed complaints suppressed by the architecture they're complaining about",
+    "KG-06: CS is convergence point --- 66%F, 18.6%B, 21.2%H",
+    "KG-07: Vendor chain ships defect as default config",
+    "KG-08: Disability employment gains tied to remote CS work",
+    "KG-09: Post-FD, continued no-reply is documented choice",
+    "KG-10: Disparate impact doesn't require intent",
+    "KG-11: Gender pay gap is structural elimination, not wage differential",
+    "KG-12: Documented spec does not match enforced reality"
+  ],
+  "bridge": { "version": "3.0", "channels": 41, "stacks": 8 },
+  "compressed_token_example": "65+ FD targets. 9 confirmed. 100% fail. WM+AO active. 3L: ADA+Labor72M+DI. TF 14M-52.5M. Vendor chain ~270M cos, 370B emails/day. Blueprint defect. Personal $600K-$1.7M/12mo. Systemic trillions. CAN-SPAM=origin. No audit. 72M jobs gone. 66%F, 18.6%B, 21.2%H. MC=140M users, CC=600K. 91% of biz use email mktg."
+}
