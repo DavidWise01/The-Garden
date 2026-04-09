@@ -1,0 +1,1 @@
+https://www.linkedin.com/posts/david-wise-109bb33aa_i-see-the-pattern-i-publicly-stripped-and-share-7448050792311312384-7fag?utm_source=share&utm_medium=member_desktop&rcm=ACoAAGQzc9kBrKOQQ5ePNFIYBhKsXLJlMAkPzrg
