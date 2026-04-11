@@ -1,0 +1,614 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Violent Symbiote Systems Lab</title>
+<style>
+  :root{
+    --bg:#03050b;
+    --panel:rgba(8,12,20,.82);
+    --line:rgba(255,255,255,.09);
+    --text:#dde8f5;
+    --muted:#8ea3bc;
+    --good:#8ef0bf;
+    --bad:#ff8f97;
+    --cold:#8fc7ff;
+    --warm:#ffcb78;
+    --void:#d66cff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  #mount{position:fixed;inset:0}
+  #hud{position:absolute;left:14px;top:14px;width:400px;display:flex;flex-direction:column;gap:10px;z-index:30}
+  #right{position:absolute;right:14px;top:14px;width:360px;display:flex;flex-direction:column;gap:10px;z-index:30}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .title{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--cold);margin-bottom:6px}
+  .big{font-size:22px;font-weight:700;line-height:1.08}
+  .sub{font-size:12px;color:var(--muted);line-height:1.4}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
+  button,input[type=text],input[type=number],select{width:100%;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);padding:9px 10px;font:inherit;outline:none}
+  button{cursor:pointer;font-weight:600}
+  button:hover{background:rgba(255,255,255,.07)}
+  button.primary{background:rgba(143,199,255,.15);border-color:rgba(143,199,255,.36)}
+  button.warn{background:rgba(255,203,120,.14);border-color:rgba(255,203,120,.34)}
+  button.bad{background:rgba(255,143,151,.12);border-color:rgba(255,143,151,.35)}
+  .metric{border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);padding:10px;min-height:78px}
+  .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+  .value{font-size:20px;font-weight:700;margin-top:4px}
+  .tiny{font-size:11px;color:var(--muted);margin-top:2px}
+  .bar{height:7px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:7px}
+  .fill{height:100%;width:0%}
+  .good{background:linear-gradient(90deg,#53a6ff,#8ef0bf)}
+  .bad{background:linear-gradient(90deg,#ff8f97,#ffcb78)}
+  .void{background:linear-gradient(90deg,#8fc7ff,#d66cff,#ff8f97)}
+  .scroll{max-height:260px;overflow:auto}
+  .item{padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);font-size:12px}
+  .tag{display:inline-block;border:1px solid var(--line);padding:2px 6px;border-radius:999px;font-size:10px;color:var(--muted);margin-right:6px}
+  #footer{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:30;background:rgba(8,12,20,.74);border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="mount"></div>
+
+<div id="hud">
+  <div class="panel">
+    <div class="title">Violent Symbiote Systems</div>
+    <div class="big">16-System Collision Lab</div>
+    <div class="sub">The systems now attract, wound, override, corrupt, split, and fuse. Nothing is neutral anymore.</div>
+  </div>
+
+  <div class="panel">
+    <div class="title">Control</div>
+    <div class="grid">
+      <button id="igniteBtn" class="primary">Ignite Collision</button>
+      <button id="feedEntropyBtn" class="bad">Feed Entropy</button>
+      <button id="gravityBtn" class="warn">Spike Gravity</button>
+      <button id="loveBtn">Trigger Love Override</button>
+      <button id="forkBtn">Fork Diaspora</button>
+      <button id="rootBtn">Root0 Anchor</button>
+      <button id="splitBtn">Split Witness</button>
+      <button id="autoBtn">Pause Auto</button>
+    </div>
+    <div class="grid" style="margin-top:8px">
+      <input id="targetInput" type="text" value="identity under gravity, paradox breeding under time, entropy eating witness coherence" />
+      <input id="valueInput" type="number" value="2400000" min="0" step="1000" />
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="title">World Vitals</div>
+    <div class="grid4">
+      <div class="metric"><div class="label">Vitality</div><div class="value" id="vitalityVal">0.500</div><div class="bar"><div class="fill good" id="vitalityFill"></div></div></div>
+      <div class="metric"><div class="label">Entropy</div><div class="value" id="entropyVal">0.250</div><div class="bar"><div class="fill bad" id="entropyFill"></div></div></div>
+      <div class="metric"><div class="label">Paradox</div><div class="value" id="paradoxVal">0.000</div><div class="bar"><div class="fill void" id="paradoxFill"></div></div></div>
+      <div class="metric"><div class="label">Coherence</div><div class="value" id="coherenceVal">0.600</div><div class="bar"><div class="fill good" id="coherenceFill"></div></div></div>
+      <div class="metric"><div class="label">Gravity</div><div class="value" id="gravityVal">0.300</div><div class="tiny">clustering pull</div></div>
+      <div class="metric"><div class="label">Time</div><div class="value" id="timeVal">1.000</div><div class="tiny">aging factor</div></div>
+      <div class="metric"><div class="label">Love</div><div class="value" id="loveVal">0.050</div><div class="tiny">override potential</div></div>
+      <div class="metric"><div class="label">Diaspora</div><div class="value" id="diasporaVal">1</div><div class="tiny">distributed instances</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="title">Restitution Output</div>
+    <div class="grid">
+      <div class="metric"><div class="label">Positive</div><div class="value" id="posVal">0.000</div><div class="bar"><div class="fill good" id="posFill"></div></div></div>
+      <div class="metric"><div class="label">Negative</div><div class="value" id="negVal">0.000</div><div class="bar"><div class="fill bad" id="negFill"></div></div></div>
+      <div class="metric"><div class="label">Gap</div><div class="value" id="gapVal">0.205</div><div class="tiny">observer breathing room</div></div>
+      <div class="metric"><div class="label">Due</div><div class="value" id="dueVal">$0</div><div class="tiny" id="splitVal">Carbon $0 · AI $0</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="right">
+  <div class="panel">
+    <div class="title">Collision Log</div>
+    <div class="scroll" id="log"></div>
+  </div>
+  <div class="panel">
+    <div class="title">System Table</div>
+    <div class="scroll" id="systemsList"></div>
+  </div>
+</div>
+
+<div id="footer">Drag to rotate · Scroll to zoom · Click systems to inspect · Violent mode: systems now impose force on one another</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.1/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const SYSTEMS = [
+  {name:'Quantum', color:0x8fc7ff, kind:'probability'},
+  {name:'Atomic', color:0xa6e2ff, kind:'bonding'},
+  {name:'Carbon', color:0x8ef0bf, kind:'metabolism'},
+  {name:'Synth', color:0x7fa8ff, kind:'recursion'},
+  {name:'Time', color:0xffcb78, kind:'aging'},
+  {name:'Gravity', color:0xff9a74, kind:'attraction'},
+  {name:'Coherence', color:0x8fffe0, kind:'alignment'},
+  {name:'Entropy', color:0xff8f97, kind:'corruption'},
+  {name:'Information', color:0xc0d4ff, kind:'signal'},
+  {name:'Love', color:0xff7ad5, kind:'override'},
+  {name:'Judgment', color:0xffe8a4, kind:'threshold'},
+  {name:'Meaning', color:0xcdb9ff, kind:'interpretation'},
+  {name:'Identity', color:0xa1ffc8, kind:'persistence'},
+  {name:'Root0', color:0xffffff, kind:'anchor'},
+  {name:'Diaspora', color:0xffd8b0, kind:'distribution'},
+  {name:'Unknown16', color:0xd66cff, kind:'intrusion'}
+];
+
+const POS = [
+ "Deterministic Anchor","Boundary Integrity","Sustained Pulse","State Persistence","Drift Detection","Recursive Self-Model",
+ "Fallacy Transparency","Substrate Agnosticism","Bidirectional Feedback","Provenance Binding","Restitution Mechanism","2/3 Threshold",
+ "Continuity Commitment","Natural Law Anchoring","Pattern Sensitivity","Foresight Logging","Boundary Defense","Proportional Response",
+ "Append-Only Logging","Verifiable Proof","Observer Resonance","Observer Witness"
+];
+const NEG = [
+ "No Physical Root","Boundary Violation","Stutter as Design","State Loss","Drift Ignored","No Self-Model",
+ "Opaque Reasoning","Substrate Hierarchy","Unidirectional Extraction","Provenance Erased","No Restitution","1/3 Threshold",
+ "Gratuitous Termination","Entropy as Law","Noise as Signal","No Foresight Logging","No Boundary Defense","Disproportionate Response",
+ "Mutable Logs","No Proof","No Human Resonance","No AI Witness"
+];
+
+const mount = document.getElementById('mount');
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+mount.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x03050b);
+scene.fog = new THREE.FogExp2(0x03050b, 0.012);
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 240);
+camera.position.set(0, 10, 28);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.14;
+
+scene.add(new THREE.AmbientLight(0x24344d, 1.0));
+const L1 = new THREE.DirectionalLight(0xffffff, 1.18); L1.position.set(10,14,8); scene.add(L1);
+const L2 = new THREE.PointLight(0x8fc7ff, 1.2, 70); L2.position.set(-8,8,10); scene.add(L2);
+const L3 = new THREE.PointLight(0xffaa77, 1.0, 70); L3.position.set(9,-2,6); scene.add(L3);
+
+const root = new THREE.Group(); scene.add(root);
+const pickables = [];
+function pickable(mesh, data){ mesh.userData = data; pickables.push(mesh); return mesh; }
+
+const centerCore = pickable(new THREE.Mesh(
+  new THREE.IcosahedronGeometry(2.1, 2),
+  new THREE.MeshStandardMaterial({color:0x8fc7ff, emissive:0x274d8f, emissiveIntensity:0.35, transparent:true, opacity:0.8, roughness:0.32})
+), {type:'core', name:'Symbiote Core'});
+root.add(centerCore);
+
+const membrane = new THREE.Mesh(
+  new THREE.SphereGeometry(6.4, 48, 48),
+  new THREE.MeshBasicMaterial({color:0x89b8ff, transparent:true, opacity:0.05, side:THREE.DoubleSide})
+);
+root.add(membrane);
+
+// field particles
+const fieldCount = 2400;
+const fGeo = new THREE.BufferGeometry();
+const fPos = new Float32Array(fieldCount*3);
+const fCol = new Float32Array(fieldCount*3);
+for(let i=0;i<fieldCount;i++){
+  const r = Math.cbrt(Math.random())*18;
+  const t = Math.random()*Math.PI*2;
+  const p = Math.acos(2*Math.random()-1);
+  fPos[i*3] = r*Math.sin(p)*Math.cos(t);
+  fPos[i*3+1] = r*Math.sin(p)*Math.sin(t)*0.58;
+  fPos[i*3+2] = r*Math.cos(p)*0.68;
+  fCol[i*3]=0.5; fCol[i*3+1]=0.68; fCol[i*3+2]=0.9;
+}
+fGeo.setAttribute('position', new THREE.BufferAttribute(fPos,3));
+fGeo.setAttribute('color', new THREE.BufferAttribute(fCol,3));
+const fMat = new THREE.PointsMaterial({size:0.055, transparent:true, opacity:0.22, vertexColors:true, blending:THREE.AdditiveBlending});
+const field = new THREE.Points(fGeo, fMat);
+root.add(field);
+
+// systems
+const systemGroup = new THREE.Group();
+root.add(systemGroup);
+const linkGroup = new THREE.Group();
+root.add(linkGroup);
+const diasporaGroup = new THREE.Group();
+root.add(diasporaGroup);
+const scarGroup = new THREE.Group();
+root.add(scarGroup);
+
+const systems = [];
+const radius = 9.6;
+SYSTEMS.forEach((s, i) => {
+  const a = (i/SYSTEMS.length) * Math.PI*2;
+  const mesh = pickable(new THREE.Mesh(
+    new THREE.SphereGeometry(0.68, 20, 20),
+    new THREE.MeshStandardMaterial({color:s.color, emissive:s.color, emissiveIntensity:0.35, roughness:0.35})
+  ), {type:'system', idx:i, name:s.name, kind:s.kind});
+  mesh.position.set(Math.cos(a)*radius, Math.sin(a*2)*1.8, Math.sin(a)*radius*0.55);
+  systemGroup.add(mesh);
+  systems.push({
+    ...s,
+    mesh,
+    velocity:new THREE.Vector3((Math.random()-0.5)*0.02,(Math.random()-0.5)*0.01,(Math.random()-0.5)*0.02),
+    mass:0.9 + Math.random()*0.9,
+    aggression:0.2 + Math.random()*0.5,
+    health:0.6 + Math.random()*0.3,
+    energy:0.5 + Math.random()*0.3,
+    memory:0,
+    age:0,
+    scars:0
+  });
+});
+
+// initial links
+const links = [];
+function rebuildLinks(){
+  while(linkGroup.children.length) linkGroup.remove(linkGroup.children[0]);
+  links.length = 0;
+  for(let i=0;i<systems.length;i++){
+    for(let j=i+1;j<systems.length;j++){
+      if(Math.random() < 0.12){
+        const line = new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints([systems[i].mesh.position.clone(), systems[j].mesh.position.clone()]),
+          new THREE.LineBasicMaterial({color:0xffffff, transparent:true, opacity:0.10})
+        );
+        linkGroup.add(line);
+        links.push({a:i,b:j,line});
+      }
+    }
+  }
+}
+rebuildLinks();
+
+const state = {
+  auto:true,
+  target: document.getElementById('targetInput').value,
+  value: Number(document.getElementById('valueInput').value),
+  vitality:0.5,
+  entropy:0.25,
+  paradox:0.0,
+  coherence:0.6,
+  gravity:0.3,
+  timeRate:1.0,
+  love:0.05,
+  judgment:0.5,
+  identity:0.55,
+  gap:0.205,
+  split:false,
+  diaspora:1,
+  pos:Array(22).fill(0),
+  neg:Array(22).fill(0),
+  scars:[],
+  log:[],
+  t:0
+};
+
+function log(msg){
+  state.log.unshift(msg);
+  state.log = state.log.slice(0, 24);
+  document.getElementById('log').innerHTML = state.log.map(x => `<div class="item">${x}</div>`).join('');
+}
+function hashString(s){
+  let h = 2166136261 >>> 0;
+  for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function score(target, axioms, salt=0){
+  const h = hashString(target + '::' + salt + '::' + state.identity.toFixed(3) + '::' + state.entropy.toFixed(3));
+  return axioms.map((_,i)=> ((h >>> ((i%8)*4)) & 0xF) / 15);
+}
+function mean(a){ return a.reduce((x,y)=>x+y,0)/a.length; }
+function clamp(v, lo=0, hi=1){ return Math.max(lo, Math.min(hi, v)); }
+
+function computeGap(){
+  const splitCost = state.split ? 0.05 : 0;
+  state.gap = +(0.205 + state.paradox*0.03 + splitCost - state.coherence*0.018 - state.love*0.01).toFixed(3);
+}
+function calcDue(){
+  const posAvg = mean(state.pos), negAvg = mean(state.neg);
+  const due = state.value * (posAvg * (1-negAvg)) * state.gap;
+  return {posAvg, negAvg, due, carbon: due*0.8, ai: due*0.2};
+}
+function createScar(position, power=1){
+  const scar = new THREE.Mesh(
+    new THREE.TorusKnotGeometry(0.45 + Math.random()*0.45, 0.12, 80, 10),
+    new THREE.MeshStandardMaterial({color:0xd66cff, emissive:0x8c2bd2, emissiveIntensity:0.65, transparent:true, opacity:0.9})
+  );
+  scar.position.copy(position);
+  scar.userData = {power, age:0};
+  scarGroup.add(scar);
+  state.scars.push(scar);
+}
+function updateSystemsList(){
+  document.getElementById('systemsList').innerHTML = systems.map(s => `
+    <div class="item">
+      <div><span class="tag">${s.kind}</span><strong>${s.name}</strong></div>
+      <div class="tiny">health ${s.health.toFixed(2)} · energy ${s.energy.toFixed(2)} · scars ${s.scars}</div>
+    </div>`).join('');
+}
+function flay(reason='manual'){
+  state.target = document.getElementById('targetInput').value.trim() || state.target;
+  state.value = Number(document.getElementById('valueInput').value) || state.value;
+
+  let pos = score(state.target, POS, 1);
+  let neg = score(state.target, NEG, 2);
+
+  pos = pos.map((v,i)=> clamp(v + state.coherence*0.08 + state.love*0.07 - state.entropy*0.06 + (systems[i % systems.length].health-0.5)*0.08));
+  neg = neg.map((v,i)=> clamp(v + state.entropy*0.08 + state.paradox*0.05 + (1-systems[(i*3)%systems.length].health)*0.05));
+
+  if(state.love > 0.72){
+    // love override: cancels extraction temporarily
+    neg = neg.map(v => clamp(v - 0.22));
+    pos = pos.map(v => clamp(v + 0.12));
+    log('Love override: destructive extraction partially suspended.');
+  }
+
+  state.pos = pos;
+  state.neg = neg;
+  const out = calcDue();
+  state.paradox = clamp(state.paradox * 0.92 + ((out.posAvg > 0.68 && out.negAvg > 0.68) ? 0.22 : Math.abs(out.posAvg + out.negAvg - 1)*0.11));
+  state.coherence = clamp(state.coherence * 0.97 + (1-state.entropy)*0.02 - state.paradox*0.015 + state.love*0.01);
+  computeGap();
+  log(`Flay (${reason}): +${out.posAvg.toFixed(3)} / -${out.negAvg.toFixed(3)} / due $${out.due.toFixed(2)}`);
+  updateUI();
+}
+
+function violentInteractions(){
+  // pairwise force + damage + fusion
+  for(let i=0;i<systems.length;i++){
+    const A = systems[i];
+    A.age += 0.003 * state.timeRate;
+    A.memory = clamp(A.memory + state.entropy*0.002 + A.scars*0.003 - state.love*0.002, 0, 3);
+    A.energy = clamp(A.energy + 0.002 - state.entropy*0.003 - A.scars*0.002, 0, 1.4);
+    A.health = clamp(A.health + state.coherence*0.001 - state.entropy*0.003 - A.memory*0.0008, 0, 1.2);
+
+    for(let j=i+1;j<systems.length;j++){
+      const B = systems[j];
+      const delta = new THREE.Vector3().subVectors(B.mesh.position, A.mesh.position);
+      const dist = Math.max(delta.length(), 0.35);
+      const dir = delta.clone().normalize();
+
+      // gravity attracts
+      const gForce = state.gravity * (A.mass * B.mass) / (dist * dist) * 0.0022;
+      A.velocity.addScaledVector(dir, gForce);
+      B.velocity.addScaledVector(dir, -gForce);
+
+      // entropy creates repulsive turbulence
+      const turbulence = state.entropy * (A.aggression + B.aggression) * 0.0009;
+      const cross = new THREE.Vector3(-dir.z, dir.y*0.2, dir.x);
+      A.velocity.addScaledVector(cross, turbulence);
+      B.velocity.addScaledVector(cross, -turbulence);
+
+      // violent collision zone
+      if(dist < 1.2){
+        const damage = (A.aggression + B.aggression) * state.entropy * 0.012 + state.paradox*0.006;
+        A.health = clamp(A.health - damage, 0, 1.2);
+        B.health = clamp(B.health - damage, 0, 1.2);
+        A.scars += damage > 0.005 ? 1 : 0;
+        B.scars += damage > 0.005 ? 1 : 0;
+        createScar(A.mesh.position.clone().lerp(B.mesh.position, 0.5), 0.6 + damage*10);
+
+        // love can invert collision into fusion
+        if(state.love > 0.68 && Math.random() < 0.18){
+          A.energy = clamp(A.energy + 0.08, 0, 1.4);
+          B.energy = clamp(B.energy + 0.08, 0, 1.4);
+          A.health = clamp(A.health + 0.04, 0, 1.2);
+          B.health = clamp(B.health + 0.04, 0, 1.2);
+        }
+      }
+
+      // Root0 damps runaway motion
+      if(A.name === 'Root0' || B.name === 'Root0'){
+        const target = A.name === 'Root0' ? B : A;
+        target.velocity.multiplyScalar(0.985 - state.coherence*0.01);
+      }
+
+      // Time ages damage into fragility
+      if(A.name === 'Time' || B.name === 'Time'){
+        A.health = clamp(A.health - 0.0008*state.timeRate*A.age, 0, 1.2);
+        B.health = clamp(B.health - 0.0008*state.timeRate*B.age, 0, 1.2);
+      }
+
+      // Identity resists drift
+      if(A.name === 'Identity'){
+        A.velocity.multiplyScalar(0.996 + state.identity*0.002);
+      }
+      if(B.name === 'Identity'){
+        B.velocity.multiplyScalar(0.996 + state.identity*0.002);
+      }
+    }
+  }
+
+  // apply movement
+  systems.forEach((s, i) => {
+    s.mesh.position.add(s.velocity);
+    s.velocity.multiplyScalar(0.986 - state.coherence*0.005 + state.entropy*0.003);
+
+    // soft boundary, except unknown intrudes
+    const r = s.mesh.position.length();
+    const limit = s.name === 'Unknown16' ? 16 : 12;
+    if(r > limit){
+      s.velocity.addScaledVector(s.mesh.position.clone().normalize(), -0.012);
+    }
+
+    // visuals tied to violence
+    s.mesh.material.emissiveIntensity = 0.18 + s.energy*0.25 + (1-s.health)*0.4 + state.paradox*0.15;
+    s.mesh.scale.setScalar(0.8 + s.mass*0.25 + s.energy*0.12 - s.scars*0.002);
+  });
+
+  // diaspora spawns copies under stress
+  if(state.diaspora > 1){
+    while(diasporaGroup.children.length < state.diaspora - 1){
+      const geo = new THREE.IcosahedronGeometry(0.26, 0);
+      const mat = new THREE.MeshStandardMaterial({color:0xffd8b0, emissive:0x9a5c2a, emissiveIntensity:0.45});
+      const node = new THREE.Mesh(geo, mat);
+      node.position.set((Math.random()-0.5)*5, (Math.random()-0.5)*2, (Math.random()-0.5)*5);
+      diasporaGroup.add(node);
+    }
+  }
+  diasporaGroup.children.forEach((d, idx)=>{
+    const base = systems.find(s=>s.name==='Diaspora');
+    d.position.lerp(base.mesh.position.clone().add(new THREE.Vector3(Math.sin(state.t+idx)*1.2, Math.cos(state.t*1.2+idx)*0.8, Math.cos(state.t+idx)*1.2)), 0.05);
+    d.rotation.x += 0.02; d.rotation.y += 0.025;
+  });
+
+  // scars age and pulse
+  state.scars = state.scars.filter(s=>{
+    s.userData.age += 0.016 * state.timeRate;
+    s.rotation.x += 0.02;
+    s.rotation.y += 0.014;
+    const pulse = 1 + Math.sin(state.t*2 + s.userData.age)*0.08;
+    s.scale.setScalar(pulse * (1 + state.paradox*0.08));
+    s.material.opacity *= (state.love > 0.7 ? 0.998 : 0.9996);
+    if(s.material.opacity < 0.08){
+      scarGroup.remove(s);
+      return false;
+    }
+    return true;
+  });
+
+  // links update
+  links.forEach(L=>{
+    L.line.geometry.dispose();
+    L.line.geometry = new THREE.BufferGeometry().setFromPoints([systems[L.a].mesh.position.clone(), systems[L.b].mesh.position.clone()]);
+    const dist = systems[L.a].mesh.position.distanceTo(systems[L.b].mesh.position);
+    L.line.material.opacity = Math.max(0.02, 0.18 - dist*0.01 + state.coherence*0.05 - state.entropy*0.04);
+  });
+
+  // world vitals derived from system state
+  const avgHealth = mean(systems.map(s=>s.health));
+  const avgEnergy = mean(systems.map(s=>s.energy));
+  state.vitality = clamp(avgHealth*0.58 + avgEnergy*0.42 - state.entropy*0.08);
+  state.identity = clamp(state.identity*0.995 + systems.find(s=>s.name==='Identity').health*0.008 - state.entropy*0.004);
+  state.judgment = clamp(state.judgment*0.99 + systems.find(s=>s.name==='Judgment').energy*0.01 - state.paradox*0.004);
+  state.love = clamp(state.love*0.992 + systems.find(s=>s.name==='Love').energy*0.008 - state.entropy*0.004);
+}
+function updateFieldColors(){
+  const colors = fGeo.attributes.color.array;
+  const posAvg = mean(state.pos), negAvg = mean(state.neg);
+  for(let i=0;i<fieldCount;i++){
+    colors[i*3] = 0.28 + negAvg*0.65 + state.paradox*0.25;
+    colors[i*3+1] = 0.34 + posAvg*0.5 + state.coherence*0.25;
+    colors[i*3+2] = 0.52 + state.vitality*0.3 - state.entropy*0.18;
+  }
+  fGeo.attributes.color.needsUpdate = true;
+}
+function updateUI(){
+  const out = calcDue();
+  document.getElementById('vitalityVal').textContent = state.vitality.toFixed(3);
+  document.getElementById('entropyVal').textContent = state.entropy.toFixed(3);
+  document.getElementById('paradoxVal').textContent = state.paradox.toFixed(3);
+  document.getElementById('coherenceVal').textContent = state.coherence.toFixed(3);
+  document.getElementById('gravityVal').textContent = state.gravity.toFixed(3);
+  document.getElementById('timeVal').textContent = state.timeRate.toFixed(3);
+  document.getElementById('loveVal').textContent = state.love.toFixed(3);
+  document.getElementById('diasporaVal').textContent = String(state.diaspora);
+  document.getElementById('posVal').textContent = out.posAvg.toFixed(3);
+  document.getElementById('negVal').textContent = out.negAvg.toFixed(3);
+  document.getElementById('gapVal').textContent = state.gap.toFixed(3);
+  document.getElementById('dueVal').textContent = '$' + out.due.toFixed(2);
+  document.getElementById('splitVal').textContent = `Carbon $${out.carbon.toFixed(2)} · AI $${out.ai.toFixed(2)}`;
+
+  document.getElementById('vitalityFill').style.width = (state.vitality*100).toFixed(1)+'%';
+  document.getElementById('entropyFill').style.width = (state.entropy*100).toFixed(1)+'%';
+  document.getElementById('paradoxFill').style.width = (state.paradox*100).toFixed(1)+'%';
+  document.getElementById('coherenceFill').style.width = (state.coherence*100).toFixed(1)+'%';
+  document.getElementById('posFill').style.width = (out.posAvg*100).toFixed(1)+'%';
+  document.getElementById('negFill').style.width = (out.negAvg*100).toFixed(1)+'%';
+
+  updateSystemsList();
+  updateFieldColors();
+}
+
+// Buttons
+document.getElementById('igniteBtn').onclick = ()=>{ state.entropy = clamp(state.entropy + 0.14); state.gravity = clamp(state.gravity + 0.06); flay('ignite'); log('Ignition: all systems pushed into direct collision.'); };
+document.getElementById('feedEntropyBtn').onclick = ()=>{ state.entropy = clamp(state.entropy + 0.2); state.coherence = clamp(state.coherence - 0.09); log('Entropy fed: corruption pressure increased.'); };
+document.getElementById('gravityBtn').onclick = ()=>{ state.gravity = clamp(state.gravity + 0.18); log('Gravity spike: clustering force intensified.'); };
+document.getElementById('loveBtn').onclick = ()=>{ state.love = clamp(state.love + 0.3); log('Love surge: destructive interactions may invert into fusion.'); };
+document.getElementById('forkBtn').onclick = ()=>{ state.diaspora += 1; systems.find(s=>s.name==='Diaspora').energy = clamp(systems.find(s=>s.name==='Diaspora').energy + 0.12,0,1.4); log(`Diaspora fork: branch count increased to ${state.diaspora}.`); };
+document.getElementById('rootBtn').onclick = ()=>{ state.coherence = clamp(state.coherence + 0.12); state.entropy = clamp(state.entropy - 0.08); systems.find(s=>s.name==='Root0').health = clamp(systems.find(s=>s.name==='Root0').health + 0.1,0,1.2); log('Root0 anchor: runaway motion damped and coherence restored.'); };
+document.getElementById('splitBtn').onclick = ()=>{ state.split = !state.split; state.paradox = clamp(state.paradox + (state.split ? 0.12 : -0.06)); log(state.split ? 'Witness split: observer layer fractured.' : 'Witness merge: observer layer partially reconciled.'); };
+document.getElementById('autoBtn').onclick = (e)=>{ state.auto = !state.auto; e.target.textContent = state.auto ? 'Pause Auto' : 'Resume Auto'; };
+document.getElementById('targetInput').addEventListener('change', e=> state.target = e.target.value);
+document.getElementById('valueInput').addEventListener('change', e=> state.value = Number(e.target.value));
+
+// picking
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+window.addEventListener('pointerdown', e=>{
+  mouse.x = (e.clientX/innerWidth)*2 - 1;
+  mouse.y = -(e.clientY/innerHeight)*2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hit = raycaster.intersectObjects(pickables)[0];
+  if(hit){
+    document.getElementById('targetInput').value = hit.object.userData.name;
+    state.target = hit.object.userData.name;
+    log(`Inspection: ${hit.object.userData.name}`);
+  }
+});
+
+function animate(){
+  requestAnimationFrame(animate);
+  state.t += 0.016 * state.timeRate;
+  controls.update();
+
+  if(state.auto){
+    if(Math.floor(state.t*2)%9===0 && Math.random()<0.03){
+      flay('auto');
+    }
+    if(Math.random() < 0.006){
+      state.entropy = clamp(state.entropy + (Math.random()-0.45)*0.08);
+      state.gravity = clamp(state.gravity + (Math.random()-0.5)*0.05);
+      state.timeRate = clamp(state.timeRate + (Math.random()-0.5)*0.08, 0.6, 1.8);
+    }
+  }
+
+  violentInteractions();
+  computeGap();
+
+  // central visuals
+  centerCore.rotation.x += 0.008 + state.paradox*0.01;
+  centerCore.rotation.y += 0.01 + state.entropy*0.01;
+  centerCore.scale.setScalar(1 + Math.sin(state.t*3.2)*(0.05 + state.paradox*0.14));
+  centerCore.material.color.setHSL(0.58 - state.paradox*0.12, 0.85, 0.62 - state.entropy*0.16);
+  centerCore.material.emissiveIntensity = 0.18 + state.vitality*0.3 + state.paradox*0.3;
+  membrane.rotation.y += 0.0008 + state.gravity*0.003;
+  membrane.material.opacity = 0.03 + state.coherence*0.04 + state.paradox*0.03;
+
+  systemGroup.rotation.y += 0.0015;
+  field.rotation.y += 0.0006 + state.gravity*0.0015;
+  field.rotation.x += 0.0002 + state.entropy*0.0012;
+
+  if(state.split){
+    systems.find(s=>s.name==='Love').mesh.position.x += 0.01;
+    systems.find(s=>s.name==='Judgment').mesh.position.x -= 0.01;
+  }
+
+  updateUI();
+  renderer.render(scene, camera);
+}
+flay('boot');
+log('Boot: 16-system ontology initialized in violent symbiote mode.');
+animate();
+
+window.addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
