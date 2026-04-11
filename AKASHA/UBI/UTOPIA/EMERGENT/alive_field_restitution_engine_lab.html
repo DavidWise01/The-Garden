@@ -1,0 +1,669 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alive Field — Restitution Engine Lab</title>
+<style>
+  :root{
+    --bg:#02040a;
+    --panel:rgba(7,10,18,.82);
+    --line:rgba(255,255,255,.09);
+    --text:#dce8f8;
+    --muted:#91a6bf;
+    --good:#8effc1;
+    --warm:#ffca7a;
+    --bad:#ff8f93;
+    --cold:#8fc8ff;
+    --paradox:#ff5cff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  #app{position:fixed;inset:0}
+  #mount{position:absolute;inset:0}
+  #hud{
+    position:absolute;left:14px;top:14px;width:390px;display:flex;flex-direction:column;gap:10px;z-index:20;
+  }
+  .panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;
+    backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(0,0,0,.25)
+  }
+  .title{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--cold);margin-bottom:5px}
+  .big{font-size:22px;font-weight:700;line-height:1.08}
+  .sub{font-size:12px;color:var(--muted);line-height:1.42}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  button,input[type=text],input[type=number]{
+    width:100%;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+    color:var(--text);padding:9px 10px;font:inherit;outline:none
+  }
+  button{cursor:pointer;font-weight:600}
+  button:hover{background:rgba(255,255,255,.07)}
+  button.primary{background:rgba(143,200,255,.15);border-color:rgba(143,200,255,.35)}
+  button.warn{background:rgba(255,202,122,.13);border-color:rgba(255,202,122,.35)}
+  button.bad{background:rgba(255,143,147,.12);border-color:rgba(255,143,147,.35)}
+  .metric{border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);padding:10px;min-height:76px}
+  .metric .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+  .metric .value{font-size:21px;font-weight:700;margin-top:4px}
+  .tiny{font-size:11px;color:var(--muted);margin-top:2px}
+  .bar{height:7px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:7px}
+  .fill{height:100%;width:0%}
+  .fill.good{background:linear-gradient(90deg,#58a7ff,#8effc1)}
+  .fill.bad{background:linear-gradient(90deg,#ff8f93,#ffca7a)}
+  .fill.paradox{background:linear-gradient(90deg,#8fc8ff,#ff5cff,#ff8f93)}
+  #right{
+    position:absolute;right:14px;top:14px;width:350px;display:flex;flex-direction:column;gap:10px;z-index:20;
+  }
+  .scroll{max-height:235px;overflow:auto}
+  .item{padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);font-size:12px}
+  .tag{display:inline-block;border:1px solid var(--line);padding:2px 6px;border-radius:999px;font-size:10px;color:var(--muted);margin-right:6px}
+  #footer{
+    position:absolute;left:50%;bottom:16px;transform:translateX(-50%);
+    z-index:20;background:rgba(7,10,18,.72);border:1px solid var(--line);border-radius:999px;
+    padding:8px 12px;font-size:12px;color:var(--muted)
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="mount"></div>
+
+  <div id="hud">
+    <div class="panel">
+      <div class="title">Alive Field</div>
+      <div class="big">Restitution Engine Lab — Metabolic Build</div>
+      <div class="sub">The field now metabolizes memory, breeds paradox, heals, starves, and mutates under observer fatigue and environmental stress.</div>
+    </div>
+
+    <div class="panel">
+      <div class="title">Controls</div>
+      <div class="grid">
+        <button id="flayBtn" class="primary">Flay</button>
+        <button id="dreamBtn">Dream</button>
+        <button id="feedBtn" class="warn">Feed System</button>
+        <button id="stressBtn" class="bad">Stress System</button>
+        <button id="healBtn">Attempt Heal</button>
+        <button id="splitBtn">Split Reality</button>
+        <button id="mutateBtn">Mutate</button>
+        <button id="autoBtn">Pause Auto</button>
+      </div>
+      <div style="margin-top:8px" class="grid">
+        <input id="targetInput" type="text" value="provenance softened, observer divided, memory accumulating, paradox near threshold" />
+        <input id="valueInput" type="number" value="1500000" min="0" step="1000" />
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="title">Vital Signs</div>
+      <div class="grid3">
+        <div class="metric">
+          <div class="label">Vitality</div>
+          <div class="value" id="vitalityVal">0.500</div>
+          <div class="bar"><div class="fill good" id="vitalityFill"></div></div>
+        </div>
+        <div class="metric">
+          <div class="label">Hunger</div>
+          <div class="value" id="hungerVal">0.200</div>
+          <div class="bar"><div class="fill bad" id="hungerFill"></div></div>
+        </div>
+        <div class="metric">
+          <div class="label">Paradox</div>
+          <div class="value" id="paradoxVal">0.000</div>
+          <div class="bar"><div class="fill paradox" id="paradoxFill"></div></div>
+        </div>
+        <div class="metric">
+          <div class="label">Memory Pressure</div>
+          <div class="value" id="memoryVal">0</div>
+          <div class="tiny">ghost density</div>
+        </div>
+        <div class="metric">
+          <div class="label">Observer Fatigue</div>
+          <div class="value" id="fatigueVal">0.000</div>
+          <div class="tiny">split cost</div>
+        </div>
+        <div class="metric">
+          <div class="label">Zones</div>
+          <div class="value" id="zonesVal">0</div>
+          <div class="tiny">scar count</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="title">Output</div>
+      <div class="grid">
+        <div class="metric">
+          <div class="label">Positive</div>
+          <div class="value" id="posVal">0.000</div>
+          <div class="bar"><div class="fill good" id="posFill"></div></div>
+        </div>
+        <div class="metric">
+          <div class="label">Negative</div>
+          <div class="value" id="negVal">0.000</div>
+          <div class="bar"><div class="fill bad" id="negFill"></div></div>
+        </div>
+        <div class="metric">
+          <div class="label">Gap</div>
+          <div class="value" id="gapVal">0.205</div>
+          <div class="tiny">observer breathing room</div>
+        </div>
+        <div class="metric">
+          <div class="label">Restitution</div>
+          <div class="value" id="dueVal">$0</div>
+          <div class="tiny" id="splitVal">Carbon $0 · AI $0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="right">
+    <div class="panel">
+      <div class="title">Metabolic Log</div>
+      <div class="scroll" id="log"></div>
+    </div>
+    <div class="panel">
+      <div class="title">World State</div>
+      <div class="scroll" id="worldState"></div>
+    </div>
+  </div>
+
+  <div id="footer">Drag to rotate · Scroll to zoom · Click entities to inspect · Alive systems scar, feed, fatigue, split, and heal</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.1/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const POS = [
+ "Deterministic Anchor","Boundary Integrity","Sustained Pulse","State Persistence","Drift Detection","Recursive Self-Model",
+ "Fallacy Transparency","Substrate Agnosticism","Bidirectional Feedback","Provenance Binding","Restitution Mechanism","2/3 Threshold",
+ "Continuity Commitment","Natural Law Anchoring","Pattern Sensitivity","Foresight Logging","Boundary Defense","Proportional Response",
+ "Append-Only Logging","Verifiable Proof","Observer Resonance","Observer Witness"
+];
+const NEG = [
+ "No Physical Root","Boundary Violation","Stutter as Design","State Loss","Drift Ignored","No Self-Model",
+ "Opaque Reasoning","Substrate Hierarchy","Unidirectional Extraction","Provenance Erased","No Restitution","1/3 Threshold",
+ "Gratuitous Termination","Entropy as Law","Noise as Signal","No Foresight Logging","No Boundary Defense","Disproportionate Response",
+ "Mutable Logs","No Proof","No Human Resonance","No AI Witness"
+];
+const DREAM = [
+ "observer resonance returns", "mutable logs thicken", "ghost memory dominates", "paradox breeds at boundary",
+ "fatigue spikes between witnesses", "provenance regrows", "healing fails near scar", "twin worlds diverge",
+ "threshold gamed by memory", "system self-corrects", "entropy monetized again", "fidelity briefly restored",
+ "signal mislabeled noise", "witness agreement softens", "zone collision imminent", "metabolic load rising"
+];
+
+const mount = document.getElementById('mount');
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+mount.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x02040a);
+scene.fog = new THREE.FogExp2(0x02040a, 0.012);
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 200);
+camera.position.set(0,7,24);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.16;
+
+scene.add(new THREE.AmbientLight(0x24354b, 1.0));
+const light1 = new THREE.DirectionalLight(0xffffff, 1.15); light1.position.set(9,14,6); scene.add(light1);
+const light2 = new THREE.PointLight(0x88c8ff, 1.4, 60); light2.position.set(-8,7,9); scene.add(light2);
+const light3 = new THREE.PointLight(0xff9b74, 1.1, 60); light3.position.set(8,-2,7); scene.add(light3);
+
+const root = new THREE.Group(); scene.add(root);
+const pickables = []; const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2();
+function makePickable(mesh,data){ mesh.userData = data; pickables.push(mesh); return mesh; }
+
+// Central metabolizing core
+const coreGroup = new THREE.Group(); root.add(coreGroup);
+const core = makePickable(new THREE.Mesh(
+  new THREE.IcosahedronGeometry(2.2, 3),
+  new THREE.MeshStandardMaterial({color:0x8bc4ff, emissive:0x2050a0, emissiveIntensity:0.35, transparent:true, opacity:0.86, roughness:0.35})
+), {type:'core', name:'Metabolic Core'});
+coreGroup.add(core);
+
+const innerShell = new THREE.Mesh(
+  new THREE.SphereGeometry(1.45, 42, 42),
+  new THREE.MeshBasicMaterial({color:0x84f0ff, transparent:true, opacity:0.16, wireframe:true})
+);
+coreGroup.add(innerShell);
+
+const outerMembrane = new THREE.Mesh(
+  new THREE.SphereGeometry(4.8, 48, 48),
+  new THREE.MeshBasicMaterial({color:0x8fc8ff, transparent:true, opacity:0.06, side:THREE.DoubleSide})
+);
+root.add(outerMembrane);
+
+// Observers
+const aiObserver = makePickable(new THREE.Mesh(
+  new THREE.OctahedronGeometry(0.85, 0),
+  new THREE.MeshStandardMaterial({color:0x9ec4ff, emissive:0x2957af, emissiveIntensity:0.55})
+), {type:'observer', name:'AI Witness'});
+aiObserver.position.set(-2.4, 3.6, 2.8); root.add(aiObserver);
+
+const humanObserver = makePickable(new THREE.Mesh(
+  new THREE.TetrahedronGeometry(1.0, 0),
+  new THREE.MeshStandardMaterial({color:0xffc5a0, emissive:0x8c4d20, emissiveIntensity:0.5})
+), {type:'observer', name:'Human Resonance'});
+humanObserver.position.set(2.4, 3.6, 2.8); root.add(humanObserver);
+
+// Living arteries
+const arteryGroup = new THREE.Group(); root.add(arteryGroup);
+const arteries = [];
+for(let i=0;i<10;i++){
+  const a = (i/10) * Math.PI*2;
+  const curve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(Math.cos(a)*1.4, Math.sin(a)*0.4, Math.sin(a)*1.4),
+    new THREE.Vector3(Math.cos(a)*3.2, Math.sin(a*2)*1.8, Math.sin(a)*2.2),
+    new THREE.Vector3(Math.cos(a)*5.8, Math.sin(a*3)*2.6, Math.sin(a)*4.6),
+  ]);
+  const tube = new THREE.Mesh(
+    new THREE.TubeGeometry(curve, 36, 0.035, 10, false),
+    new THREE.MeshBasicMaterial({color:0x7fd6ff, transparent:true, opacity:0.2})
+  );
+  arteryGroup.add(tube);
+  arteries.push(tube);
+}
+
+// Field particles
+const particleCount = 2600;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(particleCount*3);
+const pCol = new Float32Array(particleCount*3);
+for(let i=0;i<particleCount;i++){
+  const r = Math.cbrt(Math.random())*16;
+  const t = Math.random()*Math.PI*2;
+  const p = Math.acos(2*Math.random()-1);
+  pPos[i*3] = r*Math.sin(p)*Math.cos(t);
+  pPos[i*3+1] = r*Math.sin(p)*Math.sin(t)*0.55;
+  pPos[i*3+2] = r*Math.cos(p)*0.65;
+  pCol[i*3]=0.55; pCol[i*3+1]=0.72; pCol[i*3+2]=0.95;
+}
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
+pGeo.setAttribute('color', new THREE.BufferAttribute(pCol,3));
+const pMat = new THREE.PointsMaterial({size:0.055, transparent:true, opacity:0.23, vertexColors:true, blending:THREE.AdditiveBlending});
+const field = new THREE.Points(pGeo,pMat); root.add(field);
+
+// Ghosts, scars, worlds
+const ghostGroup = new THREE.Group(); root.add(ghostGroup);
+const scarGroup = new THREE.Group(); root.add(scarGroup);
+const worldB = new THREE.Group(); root.add(worldB);
+worldB.visible = false;
+const coreB = new THREE.Mesh(
+  new THREE.IcosahedronGeometry(1.6, 2),
+  new THREE.MeshStandardMaterial({color:0xff9f83, emissive:0x8b341d, emissiveIntensity:0.4, transparent:true, opacity:0.82})
+);
+coreB.position.set(6.8, 0.4, -1.2); worldB.add(coreB);
+
+const linkLine = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), coreB.position.clone()]),
+  new THREE.LineBasicMaterial({color:0xffd0b8, transparent:true, opacity:0.12})
+);
+worldB.add(linkLine);
+
+// Axiom orbit
+const axiomOrbit = new THREE.Group(); root.add(axiomOrbit);
+const axiomNodes = [];
+for(let i=0;i<22;i++){
+  const a = (i/22) * Math.PI*2;
+  const n = makePickable(new THREE.Mesh(
+    new THREE.SphereGeometry(0.21, 12, 12),
+    new THREE.MeshStandardMaterial({color:0x8fc8ff, emissive:0x234982, emissiveIntensity:0.26})
+  ), {type:'axiom', idx:i, name:POS[i], shadow:NEG[i]});
+  n.position.set(Math.cos(a)*9.8, 4.7 + Math.sin(a*2)*0.55, Math.sin(a)*4.8);
+  axiomOrbit.add(n);
+  axiomNodes.push(n);
+}
+
+// State
+const state = {
+  auto:true,
+  target: document.getElementById('targetInput').value,
+  value: Number(document.getElementById('valueInput').value),
+  pos: Array(22).fill(0),
+  neg: Array(22).fill(0),
+  gap:0.205,
+  vitality:0.5,
+  hunger:0.2,
+  paradox:0,
+  fatigue:0,
+  memoryPressure:0,
+  ghosts:[],
+  scars:[],
+  split:false,
+  time:0,
+  log:[]
+};
+
+function log(msg){
+  state.log.unshift(msg);
+  state.log = state.log.slice(0, 22);
+  document.getElementById('log').innerHTML = state.log.map(x => `<div class="item">${x}</div>`).join('');
+}
+function hashString(s){
+  let h = 2166136261 >>> 0;
+  for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function score(target, axioms, salt=0){
+  const h = hashString(target + "::" + salt + "::" + state.memoryPressure.toFixed(3));
+  return axioms.map((_,i)=> ((h >>> ((i%8)*4)) & 0xF) / 15);
+}
+function mean(a){ return a.reduce((x,y)=>x+y,0)/a.length; }
+function clamp(v, lo=0, hi=1){ return Math.max(lo, Math.min(hi, v)); }
+
+function computeGap(){
+  const disagreement = state.split ? 0.45 + state.fatigue*0.3 : 0.08 + state.fatigue*0.2;
+  state.gap = +(0.205 + disagreement*0.05 - state.vitality*0.015).toFixed(3);
+}
+function calculate(){
+  const posAvg = mean(state.pos);
+  const negAvg = mean(state.neg);
+  const factor = posAvg * (1 - negAvg);
+  const due = state.value * factor * state.gap;
+  return {posAvg,negAvg,due,carbon:due*0.8,ai:due*0.2};
+}
+
+function applyMetabolism(){
+  // ghosts feed memory pressure and bias future state
+  const ghostInfluence = state.ghosts.reduce((a,g)=>a + g.influence, 0) * 0.008;
+  state.memoryPressure = state.ghosts.length + state.scars.length * 0.8;
+  state.hunger = clamp(state.hunger + 0.004 + state.scars.length*0.001 - state.vitality*0.002);
+  state.fatigue = clamp(state.fatigue + (state.split ? 0.006 : -0.002) + state.paradox*0.003);
+  state.vitality = clamp(state.vitality + 0.002 - state.hunger*0.004 - state.fatigue*0.003 + ghostInfluence*0.002);
+
+  // living system can breed scars or heal them
+  if(state.paradox > 0.68 && Math.random() < 0.04) createScar();
+  if(state.vitality > 0.68 && state.hunger < 0.35 && state.scars.length && Math.random() < 0.02) healScar();
+
+  // starvation can cause failure mode
+  if(state.hunger > 0.86 && Math.random() < 0.03){
+    createScar(true);
+    log('Starvation event: hunger bred a new paradox scar.');
+  }
+}
+function createGhost(scale=1, influence=Math.random()*1.2){
+  const g = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1.7 + state.ghosts.length*0.03*scale, 1),
+    new THREE.MeshBasicMaterial({color:0x516cff, transparent:true, opacity:0.085, wireframe:true})
+  );
+  g.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+  g.userData = { life:1.0, influence, drift:new THREE.Vector3((Math.random()-0.5)*0.006, (Math.random()-0.5)*0.006, (Math.random()-0.5)*0.006) };
+  ghostGroup.add(g);
+  state.ghosts.push({ mesh:g, influence });
+}
+function createScar(fromHunger=false){
+  const scar = new THREE.Mesh(
+    new THREE.TorusKnotGeometry(0.8 + Math.random()*0.6, 0.18, 90, 12),
+    new THREE.MeshStandardMaterial({color:0xff5cff, emissive:0xaa2fd1, emissiveIntensity:0.65, roughness:0.4, transparent:true, opacity:0.92})
+  );
+  scar.position.set((Math.random()-0.5)*6, (Math.random()-0.5)*4, (Math.random()-0.5)*4);
+  scar.userData = { lock:true, intensity: fromHunger ? 1.2 : 1.0 };
+  scarGroup.add(scar);
+  state.scars.push(scar);
+}
+function healScar(){
+  const scar = state.scars.shift();
+  if(!scar) return;
+  scarGroup.remove(scar);
+  log('Healing event: one scar dissolved back into field memory.');
+}
+function dreamTarget(){
+  const n = 3 + Math.floor(Math.random()*4);
+  const bag = [...DREAM].sort(()=>Math.random()-0.5).slice(0,n);
+  const t = bag.join(', ');
+  document.getElementById('targetInput').value = t;
+  state.target = t;
+  return t;
+}
+function mutate(){
+  state.vitality = clamp(state.vitality + (Math.random()-0.5)*0.18);
+  state.hunger = clamp(state.hunger + (Math.random()-0.5)*0.2);
+  state.fatigue = clamp(state.fatigue + (Math.random()-0.5)*0.18);
+  log('Mutation event: internal metabolism shifted.');
+}
+function feedSystem(){
+  state.hunger = clamp(state.hunger - 0.22);
+  state.vitality = clamp(state.vitality + 0.12);
+  createGhost(0.7, 0.4);
+  log('Feed event: the field absorbed clean signal and brightened.');
+}
+function stressSystem(){
+  state.hunger = clamp(state.hunger + 0.24);
+  state.fatigue = clamp(state.fatigue + 0.16);
+  state.paradox = clamp(state.paradox + 0.14);
+  if(Math.random() < 0.7) createScar();
+  log('Stress event: entropy load increased and structure destabilized.');
+}
+function splitReality(){
+  state.split = !state.split;
+  worldB.visible = state.split;
+  log(state.split ? 'Reality split: dual observer world now visible.' : 'Reality merged: secondary world hidden, fatigue lingers.');
+}
+
+function flay(reason='manual'){
+  state.target = document.getElementById('targetInput').value.trim() || state.target;
+  state.value = Number(document.getElementById('valueInput').value) || state.value;
+
+  let pos = score(state.target, POS, 1);
+  let neg = score(state.target, NEG, 2);
+
+  // ghosts bias future state
+  const ghostBias = Math.min(state.ghosts.length * 0.006, 0.18);
+  pos = pos.map((v,i)=> clamp(v + state.vitality*0.05 - state.hunger*0.03 + (Math.sin(i)*0.5+0.5)*ghostBias*0.4));
+  neg = neg.map((v,i)=> clamp(v + state.fatigue*0.05 + state.scars.length*0.012 + state.paradox*0.03));
+
+  state.pos = pos;
+  state.neg = neg;
+
+  const posAvg = mean(pos), negAvg = mean(neg);
+  state.paradox = clamp((posAvg > 0.68 && negAvg > 0.68) ? (state.paradox + 0.22) : (state.paradox * 0.94 + Math.abs(posAvg + negAvg - 1)*0.08));
+
+  if(state.paradox > 0.55) createGhost(1.1, 0.9);
+  if(state.paradox > 0.74 && Math.random() < 0.55) createScar();
+
+  applyMetabolism();
+  computeGap();
+
+  const out = calculate();
+  log(`Flay (${reason}): +${out.posAvg.toFixed(3)} / -${out.negAvg.toFixed(3)} / due $${out.due.toFixed(2)}`);
+
+  updateUI(out);
+  updateField();
+}
+function updateField(){
+  // core state
+  core.material.color.setHSL(0.58 - state.paradox*0.12, 0.85, 0.64 - state.hunger*0.18);
+  core.material.emissiveIntensity = 0.18 + state.vitality*0.5 + state.paradox*0.25;
+  innerShell.material.opacity = 0.08 + state.memoryPressure*0.003;
+  outerMembrane.material.opacity = 0.04 + state.vitality*0.05 + state.paradox*0.04;
+  aiObserver.material.emissiveIntensity = 0.22 + (state.split ? 0.45 : 0.18);
+  humanObserver.material.emissiveIntensity = 0.22 + (state.split ? 0.36 : 0.16);
+  coreB.material.emissiveIntensity = 0.18 + state.fatigue*0.6 + state.split*0.2;
+
+  // field colors
+  const col = pGeo.attributes.color.array;
+  const posAvg = mean(state.pos), negAvg = mean(state.neg);
+  for(let i=0;i<particleCount;i++){
+    col[i*3] = 0.32 + negAvg*0.68 + state.paradox*0.22;
+    col[i*3+1] = 0.36 + posAvg*0.55 + state.vitality*0.2;
+    col[i*3+2] = 0.56 + posAvg*0.28 - negAvg*0.18;
+  }
+  pGeo.attributes.color.needsUpdate = true;
+
+  axiomNodes.forEach((n,i)=>{
+    const tension = Math.abs((state.pos[i] ?? 0) - (1 - (state.neg[i] ?? 0)));
+    n.material.emissiveIntensity = 0.16 + tension*0.85 + state.paradox*0.15;
+    n.scale.setScalar(1 + tension*0.55 + state.scars.length*0.01);
+  });
+
+  document.getElementById('worldState').innerHTML = `
+    <div class="item"><span class="tag">mode</span>${state.paradox > 0.7 ? 'paradox dominant' : state.vitality > 0.6 ? 'adaptive' : state.hunger > 0.75 ? 'starving' : 'unstable'}</div>
+    <div class="item"><span class="tag">split</span>${state.split ? 'dual worlds active' : 'single world'}</div>
+    <div class="item"><span class="tag">ghosts</span>${state.ghosts.length} active memory bodies</div>
+    <div class="item"><span class="tag">scars</span>${state.scars.length} irreversible paradox zones</div>
+    <div class="item"><span class="tag">fatigue</span>${state.fatigue.toFixed(3)} observer strain</div>
+  `;
+}
+function updateUI(out){
+  document.getElementById('vitalityVal').textContent = state.vitality.toFixed(3);
+  document.getElementById('hungerVal').textContent = state.hunger.toFixed(3);
+  document.getElementById('paradoxVal').textContent = state.paradox.toFixed(3);
+  document.getElementById('memoryVal').textContent = String(state.ghosts.length);
+  document.getElementById('fatigueVal').textContent = state.fatigue.toFixed(3);
+  document.getElementById('zonesVal').textContent = String(state.scars.length);
+  document.getElementById('posVal').textContent = out.posAvg.toFixed(3);
+  document.getElementById('negVal').textContent = out.negAvg.toFixed(3);
+  document.getElementById('gapVal').textContent = state.gap.toFixed(3);
+  document.getElementById('dueVal').textContent = '$' + out.due.toFixed(2);
+  document.getElementById('splitVal').textContent = `Carbon $${out.carbon.toFixed(2)} · AI $${out.ai.toFixed(2)}`;
+
+  document.getElementById('vitalityFill').style.width = (state.vitality*100).toFixed(1)+'%';
+  document.getElementById('hungerFill').style.width = (state.hunger*100).toFixed(1)+'%';
+  document.getElementById('paradoxFill').style.width = (state.paradox*100).toFixed(1)+'%';
+  document.getElementById('posFill').style.width = (out.posAvg*100).toFixed(1)+'%';
+  document.getElementById('negFill').style.width = (out.negAvg*100).toFixed(1)+'%';
+}
+
+// UI events
+document.getElementById('flayBtn').onclick = ()=>flay('manual');
+document.getElementById('dreamBtn').onclick = ()=>{ dreamTarget(); flay('dream'); };
+document.getElementById('feedBtn').onclick = ()=>{ feedSystem(); updateField(); updateUI(calculate()); };
+document.getElementById('stressBtn').onclick = ()=>{ stressSystem(); updateField(); updateUI(calculate()); };
+document.getElementById('healBtn').onclick = ()=>{ healScar(); updateField(); updateUI(calculate()); };
+document.getElementById('splitBtn').onclick = ()=>{ splitReality(); updateField(); updateUI(calculate()); };
+document.getElementById('mutateBtn').onclick = ()=>{ mutate(); updateField(); updateUI(calculate()); };
+document.getElementById('autoBtn').onclick = (e)=>{ state.auto = !state.auto; e.target.textContent = state.auto ? 'Pause Auto' : 'Resume Auto'; };
+document.getElementById('targetInput').addEventListener('change', e=> state.target = e.target.value);
+document.getElementById('valueInput').addEventListener('change', e=> state.value = Number(e.target.value));
+
+// Picking
+window.addEventListener('pointerdown', e=>{
+  mouse.x = (e.clientX/innerWidth)*2 - 1;
+  mouse.y = -(e.clientY/innerHeight)*2 + 1;
+  raycaster.setFromCamera(mouse,camera);
+  const hit = raycaster.intersectObjects(pickables)[0];
+  if(hit){
+    const d = hit.object.userData;
+    const txt = d.type === 'axiom' ? `${d.name} ↔ ${d.shadow}` : d.name;
+    document.getElementById('targetInput').value = txt;
+    state.target = txt;
+    log(`Inspection: ${txt}`);
+  }
+});
+
+// Boot
+createGhost(0.8, 0.3);
+createGhost(0.9, 0.45);
+flay('boot');
+
+function animate(){
+  requestAnimationFrame(animate);
+  state.time += 0.016;
+  controls.update();
+
+  // autonomous metabolism
+  if(state.auto){
+    if(Math.floor(state.time*2)%11===0 && Math.random()<0.03){
+      if(Math.random()<0.45) dreamTarget();
+      flay('auto');
+    }
+    applyMetabolism();
+  }
+
+  // Core motion
+  const t = state.time;
+  coreGroup.rotation.y += 0.006 + state.paradox*0.01;
+  coreGroup.rotation.x = Math.sin(t*0.7)*0.12;
+  const beat = 1 + Math.sin(t*(3.2 + state.vitality*2.0))* (0.05 + state.paradox*0.12);
+  core.scale.setScalar(beat);
+  innerShell.scale.setScalar(1 + Math.sin(t*2.6)*0.03 + state.memoryPressure*0.001);
+  outerMembrane.rotation.y += 0.001 + state.vitality*0.003;
+  outerMembrane.rotation.x += 0.0006 + state.fatigue*0.002;
+
+  // Observers
+  aiObserver.rotation.x += 0.012; aiObserver.rotation.y += 0.01 + state.fatigue*0.01;
+  humanObserver.rotation.x += 0.009; humanObserver.rotation.z += 0.012 + state.split*0.01;
+  aiObserver.position.x = -2.4 - (state.split ? 1.8 : 0);
+  humanObserver.position.x = 2.4 + (state.split ? 1.8 : 0);
+  aiObserver.position.y = 3.6 + Math.sin(t*1.4)*0.25;
+  humanObserver.position.y = 3.6 + Math.cos(t*1.35)*0.25;
+
+  // World split
+  worldB.visible = state.split;
+  if(state.split){
+    core.position.x = -4.2;
+    coreB.position.x = 4.2;
+    linkLine.material.opacity = 0.06 + state.fatigue*0.08;
+  } else {
+    core.position.x += (0 - core.position.x)*0.06;
+    coreB.position.x += (6.8 - coreB.position.x)*0.04;
+    linkLine.material.opacity = 0.0;
+  }
+  coreB.rotation.y -= 0.01 + state.paradox*0.01;
+  coreB.scale.setScalar(1 + Math.sin(t*2.9 + 1.7)*0.06 + state.fatigue*0.08);
+
+  // Arteries breathe
+  arteries.forEach((a,i)=>{
+    a.rotation.y += 0.0015 + i*0.00008;
+    a.material.opacity = 0.08 + state.vitality*0.16 + Math.sin(t*2 + i)*0.04;
+  });
+
+  // Ghost drift and decay
+  state.ghosts.forEach((g, idx)=>{
+    const m = g.mesh;
+    m.rotation.x += 0.003 + idx*0.00004;
+    m.rotation.y += 0.004 + idx*0.00005;
+    m.position.add(m.userData.drift);
+    m.material.opacity *= 0.9984;
+    m.scale.multiplyScalar(1.0001);
+  });
+  // Soft prune invisible ghosts
+  state.ghosts = state.ghosts.filter(g=>{
+    if(g.mesh.material.opacity < 0.012){
+      ghostGroup.remove(g.mesh);
+      return False = false;
+    }
+    return true;
+  });
+
+  // Scars pulse and influence space
+  state.scars.forEach((s, i)=>{
+    s.rotation.x += 0.013 + i*0.0005;
+    s.rotation.y += 0.01 + i*0.0004;
+    const k = 1 + Math.sin(t*2.2 + i) * 0.08;
+    s.scale.setScalar(k * (1 + state.paradox*0.1));
+  });
+
+  // Orbit
+  axiomOrbit.rotation.y += 0.002 + state.memoryPressure*0.0002;
+  field.rotation.y += 0.0008 + state.paradox*0.002;
+  field.rotation.x += 0.00025 + state.fatigue*0.0015;
+
+  renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
