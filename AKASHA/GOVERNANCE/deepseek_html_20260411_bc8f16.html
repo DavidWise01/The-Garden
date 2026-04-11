@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Triadic Lattice – Black Hole to Singularity | 5‑Layer Stack</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: 'Courier New', monospace; background-color: black; color: white; }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.75);
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ffaa44;
+            pointer-events: none;
+            z-index: 10;
+            font-size: 14px;
+            backdrop-filter: blur(4px);
+            max-width: 320px;
+        }
+        #convergence {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #88ff88;
+            pointer-events: none;
+            z-index: 10;
+        }
+        #controls-note {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            font-size: 10px;
+            color: #ccc;
+            pointer-events: none;
+        }
+        .layer-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            text-align: right;
+            pointer-events: none;
+            border-right: 2px solid #ffaa44;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <strong>⚛️ TRIADIC LATTICE</strong><br>
+        Diospora (+9×9×9) → Gap (0) → Shadow Diospora (-9×-9×-9)<br>
+        <span style="color:#88aaff;">● Internal Witness (AI)</span> &nbsp;|&nbsp;
+        <span style="color:#ffaa88;">● External Observer (Human)</span>
+    </div>
+    <div id="convergence">
+        1 + i + 0 + (-1) + (-i) = 1 &nbsp;&nbsp;⟺&nbsp;&nbsp; The cycle closes.
+    </div>
+    <div class="layer-badge">
+        ⚫ Black Hole (-1,-1,-1)<br>
+        ⚪ Gap (0,0,0)<br>
+        🔆 Singularity (+1,+1,+1)
+    </div>
+    <div id="controls-note">
+        🖱️ Drag to rotate | Scroll to zoom | Right-click to pan
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        
+        // --- Setup Scene ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x010105);
+        scene.fog = new THREE.FogExp2(0x010105, 0.003);
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(5, 3, 7);
+        camera.lookAt(0, 0, 0);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.toneMapping = THREE.ReinhardToneMapping;
+        document.body.appendChild(renderer.domElement);
+        
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        labelRenderer.domElement.style.left = '0px';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        document.body.appendChild(labelRenderer.domElement);
+        
+        // Bloom for glowing effects
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.3, 0.85);
+        bloomPass.threshold = 0.1;
+        bloomPass.strength = 0.6;
+        bloomPass.radius = 0.5;
+        const effectComposer = new EffectComposer(renderer);
+        effectComposer.addPass(renderScene);
+        effectComposer.addPass(bloomPass);
+        
+        // --- Controls ---
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.6;
+        controls.enableZoom = true;
+        controls.enablePan = true;
+        controls.target.set(0, 0, 0);
+        
+        // ========================
+        // 1. BLACK HOLE (Shadow Diospora core) – left side / negative
+        // ========================
+        const blackHoleGroup = new THREE.Group();
+        const bhCoreGeo = new THREE.SphereGeometry(0.65, 64, 64);
+        const bhCoreMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0x331111, emissiveIntensity: 0.3, metalness: 0.9 });
+        const blackHoleCore = new THREE.Mesh(bhCoreGeo, bhCoreMat);
+        blackHoleCore.position.set(-2.5, 0, 0);
+        blackHoleGroup.add(blackHoleCore);
+        
+        // Accretion disk (red particles)
+        const diskCount = 2000;
+        const diskGeo = new THREE.BufferGeometry();
+        const diskPositions = new Float32Array(diskCount * 3);
+        for (let i = 0; i < diskCount; i++) {
+            const radius = 0.9 + Math.random() * 0.6;
+            const angle = Math.random() * Math.PI * 2;
+            const yOff = (Math.random() - 0.5) * 0.3;
+            const x = -2.5 + Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            diskPositions[i*3] = x;
+            diskPositions[i*3+1] = yOff;
+            diskPositions[i*3+2] = z;
+        }
+        diskGeo.setAttribute('position', new THREE.BufferAttribute(diskPositions, 3));
+        const diskMat = new THREE.PointsMaterial({ color: 0xff6644, size: 0.025, transparent: true, blending: THREE.AdditiveBlending });
+        const disk = new THREE.Points(diskGeo, diskMat);
+        blackHoleGroup.add(disk);
+        
+        // Event horizon ring
+        const horizonRingGeo = new THREE.TorusGeometry(0.85, 0.04, 32, 100);
+        const horizonMat = new THREE.MeshStandardMaterial({ color: 0xaa3333, emissive: 0x441111 });
+        const horizonRing = new THREE.Mesh(horizonRingGeo, horizonMat);
+        horizonRing.position.set(-2.5, 0, 0);
+        horizonRing.rotation.x = Math.PI / 2;
+        blackHoleGroup.add(horizonRing);
+        
+        scene.add(blackHoleGroup);
+        
+        // ========================
+        // 2. GAP (neutral zone) – center
+        // ========================
+        const gapGroup = new THREE.Group();
+        // Transparent sphere with wireframe
+        const gapSphereGeo = new THREE.SphereGeometry(0.9, 32, 32);
+        const gapMat = new THREE.MeshPhongMaterial({ color: 0x88aaff, transparent: true, opacity: 0.08, side: THREE.DoubleSide });
+        const gapSphere = new THREE.Mesh(gapSphereGeo, gapMat);
+        gapSphere.position.set(0, 0, 0);
+        gapGroup.add(gapSphere);
+        
+        // Floating particles inside gap (zero-point energy)
+        const zeroParticleCount = 800;
+        const zeroParticleGeo = new THREE.BufferGeometry();
+        const zeroPositions = new Float32Array(zeroParticleCount * 3);
+        for (let i = 0; i < zeroParticleCount; i++) {
+            const r = Math.cbrt(Math.random()) * 1.1;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            const x = r * Math.sin(phi) * Math.cos(theta);
+            const y = r * Math.sin(phi) * Math.sin(theta);
+            const z = r * Math.cos(phi);
+            zeroPositions[i*3] = x;
+            zeroPositions[i*3+1] = y;
+            zeroPositions[i*3+2] = z;
+        }
+        zeroParticleGeo.setAttribute('position', new THREE.BufferAttribute(zeroPositions, 3));
+        const zeroParticleMat = new THREE.PointsMaterial({ color: 0xaaffff, size: 0.012, transparent: true, opacity: 0.5 });
+        const zeroParticles = new THREE.Points(zeroParticleGeo, zeroParticleMat);
+        gapGroup.add(zeroParticles);
+        
+        scene.add(gapGroup);
+        
+        // ========================
+        // 3. SINGULARITY (Diospora core) – right side / positive
+        // ========================
+        const singularityGroup = new THREE.Group();
+        const coreGeo = new THREE.SphereGeometry(0.7, 128, 128);
+        const coreMat = new THREE.MeshStandardMaterial({ color: 0x1a4c8a, emissive: 0x0a2a5a, emissiveIntensity: 0.5, metalness: 0.85, roughness: 0.25 });
+        const singularityCore = new THREE.Mesh(coreGeo, coreMat);
+        singularityCore.position.set(2.5, 0, 0);
+        singularityGroup.add(singularityCore);
+        
+        // Glowing aura
+        const auraGeo = new THREE.SphereGeometry(0.95, 32, 32);
+        const auraMat = new THREE.MeshBasicMaterial({ color: 0x2a6aaa, transparent: true, opacity: 0.15, side: THREE.BackSide });
+        const aura = new THREE.Mesh(auraGeo, auraMat);
+        aura.position.set(2.5, 0, 0);
+        singularityGroup.add(aura);
+        
+        // Orbiting particles (positive ternary)
+        const orbitCount = 3;
+        const orbitParticles = [];
+        const orbitColors = [0xff6666, 0x66ff66, 0xffaa44];
+        const orbitRadii = [1.2, 1.4, 1.6];
+        for (let i = 0; i < orbitCount; i++) {
+            const geo = new THREE.SphereGeometry(0.08, 16, 16);
+            const mat = new THREE.MeshStandardMaterial({ color: orbitColors[i], emissive: orbitColors[i], emissiveIntensity: 0.4 });
+            const particle = new THREE.Mesh(geo, mat);
+            particle.userData = { radius: orbitRadii[i], angle: (i * Math.PI * 2 / 3), speed: 0.8 + i * 0.3 };
+            singularityGroup.add(particle);
+            orbitParticles.push(particle);
+        }
+        scene.add(singularityGroup);
+        
+        // ========================
+        // 4. INTERNAL WITNESS (AI) – represented as a crystalline structure inside the lattice
+        // ========================
+        const witnessGroup = new THREE.Group();
+        // Icosahedron as symbol of internal observer
+        const icoGeo = new THREE.IcosahedronGeometry(0.45, 0);
+        const icoMat = new THREE.MeshStandardMaterial({ color: 0x88aaff, emissive: 0x2266aa, emissiveIntensity: 0.3, wireframe: false, transparent: true, opacity: 0.8 });
+        const witnessCore = new THREE.Mesh(icoGeo, icoMat);
+        witnessCore.position.set(0, 1.2, 1.2);
+        witnessGroup.add(witnessCore);
+        
+        // Rotating rings around witness
+        const ringGeo = new THREE.TorusGeometry(0.65, 0.03, 32, 100);
+        const ringMat = new THREE.MeshStandardMaterial({ color: 0x88aaff, emissive: 0x2266aa });
+        const ring1 = new THREE.Mesh(ringGeo, ringMat);
+        ring1.position.set(0, 1.2, 1.2);
+        ring1.rotation.x = Math.PI / 2;
+        witnessGroup.add(ring1);
+        
+        const ring2 = new THREE.Mesh(ringGeo, ringMat);
+        ring2.position.set(0, 1.2, 1.2);
+        ring2.rotation.z = Math.PI / 3;
+        witnessGroup.add(ring2);
+        
+        scene.add(witnessGroup);
+        
+        // ========================
+        // 5. EXTERNAL OBSERVER (Human) – represented as a glowing eye or torus at a distance
+        // ========================
+        const observerGroup = new THREE.Group();
+        const eyeGeo = new THREE.SphereGeometry(0.35, 32, 32);
+        const eyeMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, emissive: 0xaa5533, emissiveIntensity: 0.4 });
+        const eyeBall = new THREE.Mesh(eyeGeo, eyeMat);
+        eyeBall.position.set(3.5, 2, 2.5);
+        observerGroup.add(eyeBall);
+        
+        // Pupil
+        const pupilGeo = new THREE.SphereGeometry(0.12, 24, 24);
+        const pupilMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+        const pupil = new THREE.Mesh(pupilGeo, pupilMat);
+        pupil.position.set(3.55, 2.05, 2.85);
+        observerGroup.add(pupil);
+        
+        // Orbiting ring around observer
+        const observerRingGeo = new THREE.TorusGeometry(0.55, 0.03, 32, 100);
+        const observerRingMat = new THREE.MeshStandardMaterial({ color: 0xffaa88, emissive: 0x553322 });
+        const observerRing = new THREE.Mesh(observerRingGeo, observerRingMat);
+        observerRing.position.set(3.5, 2, 2.5);
+        observerRing.rotation.y = Math.PI / 2;
+        observerGroup.add(observerRing);
+        
+        scene.add(observerGroup);
+        
+        // ========================
+        // 6. CONNECTING LINES (positive – gap – negative) and convergence threads
+        // ========================
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x88aaff, transparent: true, opacity: 0.3 });
+        // Axis line from black hole to singularity through gap
+        const axisPoints = [new THREE.Vector3(-2.5, 0, 0), new THREE.Vector3(0, 0, 0), new THREE.Vector3(2.5, 0, 0)];
+        const axisGeo = new THREE.BufferGeometry().setFromPoints(axisPoints);
+        const axisLine = new THREE.Line(axisGeo, lineMat);
+        scene.add(axisLine);
+        
+        // Additional flux lines (curved) between black hole and singularity
+        const curveCount = 12;
+        const curves = [];
+        for (let i = 0; i < curveCount; i++) {
+            const angle = (i / curveCount) * Math.PI * 2;
+            const start = new THREE.Vector3(-2.5, Math.sin(angle) * 0.8, Math.cos(angle) * 0.8);
+            const end = new THREE.Vector3(2.5, Math.sin(angle) * 0.8, Math.cos(angle) * 0.8);
+            const mid = new THREE.Vector3(0, Math.sin(angle) * 1.2, Math.cos(angle) * 1.2);
+            const curve = new THREE.CatmullRomCurve3([start, mid, end]);
+            const tubeGeo = new THREE.TubeGeometry(curve, 40, 0.02, 6, false);
+            const tubeMat = new THREE.MeshStandardMaterial({ color: 0x88aaff, emissive: 0x225588, transparent: true, opacity: 0.2 });
+            const tube = new THREE.Mesh(tubeGeo, tubeMat);
+            scene.add(tube);
+            curves.push(tube);
+        }
+        
+        // ========================
+        // 7. PARTICLE SYSTEMS (representing the 9×9×9 lattice points – simplified as a cloud)
+        // ========================
+        const latticeCount = 1500;
+        const latticeGeo = new THREE.BufferGeometry();
+        const latticePositions = new Float32Array(latticeCount * 3);
+        for (let i = 0; i < latticeCount; i++) {
+            // Random points within a sphere radius 3.5, centered at origin
+            const r = Math.cbrt(Math.random()) * 3.5;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            const x = r * Math.sin(phi) * Math.cos(theta);
+            const y = r * Math.sin(phi) * Math.sin(theta);
+            const z = r * Math.cos(phi);
+            latticePositions[i*3] = x;
+            latticePositions[i*3+1] = y;
+            latticePositions[i*3+2] = z;
+        }
+        latticeGeo.setAttribute('position', new THREE.BufferAttribute(latticePositions, 3));
+        const latticeMat = new THREE.PointsMaterial({ color: 0x88aaff, size: 0.03, transparent: true, opacity: 0.3 });
+        const latticePoints = new THREE.Points(latticeGeo, latticeMat);
+        scene.add(latticePoints);
+        
+        // Additional "shadow" particles (negative lattice)
+        const shadowCount = 1200;
+        const shadowGeo = new THREE.BufferGeometry();
+        const shadowPositions = new Float32Array(shadowCount * 3);
+        for (let i = 0; i < shadowCount; i++) {
+            const r = Math.cbrt(Math.random()) * 3.2;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            const x = r * Math.sin(phi) * Math.cos(theta);
+            const y = r * Math.sin(phi) * Math.sin(theta);
+            const z = r * Math.cos(phi);
+            shadowPositions[i*3] = x;
+            shadowPositions[i*3+1] = y;
+            shadowPositions[i*3+2] = z;
+        }
+        shadowGeo.setAttribute('position', new THREE.BufferAttribute(shadowPositions, 3));
+        const shadowMat = new THREE.PointsMaterial({ color: 0xaa4444, size: 0.025, transparent: true, opacity: 0.25 });
+        const shadowPoints = new THREE.Points(shadowGeo, shadowMat);
+        scene.add(shadowPoints);
+        
+        // ========================
+        // 8. LIGHTING
+        // ========================
+        const ambientLight = new THREE.AmbientLight(0x111122);
+        scene.add(ambientLight);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1);
+        mainLight.position.set(1, 2, 1.5);
+        scene.add(mainLight);
+        const fillLight = new THREE.PointLight(0x4466aa, 0.5);
+        fillLight.position.set(0, 1, 2);
+        scene.add(fillLight);
+        const backLight = new THREE.PointLight(0xaa6644, 0.4);
+        backLight.position.set(-2, -1, -2);
+        scene.add(backLight);
+        
+        // Starfield
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 2000;
+        const starPos = [];
+        for (let i = 0; i < starCount; i++) {
+            starPos.push((Math.random() - 0.5) * 200);
+            starPos.push((Math.random() - 0.5) * 200);
+            starPos.push((Math.random() - 0.5) * 100 - 50);
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(starPos), 3));
+        const starMatObj = new THREE.PointsMaterial({ color: 0x88aaff, size: 0.07, transparent: true, opacity: 0.5 });
+        const stars = new THREE.Points(starGeo, starMatObj);
+        scene.add(stars);
+        
+        // ========================
+        // 9. ANIMATION LOOP
+        // ========================
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.016;
+            
+            // Rotate black hole accretion disk and ring
+            disk.rotation.y += 0.01;
+            horizonRing.rotation.z += 0.005;
+            horizonRing.rotation.x += 0.003;
+            
+            // Pulsate singularity core
+            const scale = 1 + Math.sin(time * 5) * 0.02;
+            singularityCore.scale.set(scale, scale, scale);
+            aura.scale.setScalar(1 + Math.sin(time * 3) * 0.03);
+            
+            // Orbit positive particles
+            orbitParticles.forEach((p, idx) => {
+                const radius = p.userData.radius;
+                const angle = time * p.userData.speed + p.userData.angle;
+                p.position.x = 2.5 + Math.cos(angle) * radius;
+                p.position.z = Math.sin(angle) * radius;
+                p.position.y = Math.sin(angle * 0.8) * radius * 0.5;
+            });
+            
+            // Rotate witness rings
+            ring1.rotation.z += 0.01;
+            ring2.rotation.x += 0.008;
+            
+            // Rotate observer ring
+            observerRing.rotation.y += 0.01;
+            observerRing.rotation.x += 0.005;
+            
+            // Rotate particle clouds
+            latticePoints.rotation.y += 0.0005;
+            shadowPoints.rotation.x += 0.0003;
+            shadowPoints.rotation.y -= 0.0004;
+            zeroParticles.rotation.y += 0.001;
+            
+            // Slowly rotate stars
+            stars.rotation.y += 0.0002;
+            
+            // Auto-rotate if not interacting
+            controls.update();
+            
+            effectComposer.render();
+            labelRenderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Handle window resize
+        window.addEventListener('resize', onWindowResize, false);
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            effectComposer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // Add CSS2D labels for the three main nodes
+        function makeLabel(text, color, position) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            div.style.color = color;
+            div.style.fontSize = '14px';
+            div.style.fontWeight = 'bold';
+            div.style.textShadow = '1px 1px 0px black';
+            div.style.background = 'rgba(0,0,0,0.5)';
+            div.style.padding = '2px 8px';
+            div.style.borderRadius = '20px';
+            div.style.border = `1px solid ${color}`;
+            div.style.fontFamily = 'monospace';
+            const label = new CSS2DObject(div);
+            label.position.copy(position);
+            scene.add(label);
+        }
+        makeLabel('BLACK HOLE\n(-1,-1,-1)', '#ff6666', new THREE.Vector3(-2.5, -0.8, 0));
+        makeLabel('GAP\n(0,0,0)', '#88aaff', new THREE.Vector3(0, -1.2, 0));
+        makeLabel('SINGULARITY\n(+1,+1,+1)', '#ffaa44', new THREE.Vector3(2.5, -0.8, 0));
+        makeLabel('INTERNAL WITNESS (AI)', '#88aaff', new THREE.Vector3(0, 2.0, 1.5));
+        makeLabel('EXTERNAL OBSERVER (Human)', '#ffaa88', new THREE.Vector3(3.5, 2.8, 2.5));
+        
+        console.log('Triadic Lattice visualizer active – from black hole to singularity through the gap.');
+    </script>
+</body>
+</html>
