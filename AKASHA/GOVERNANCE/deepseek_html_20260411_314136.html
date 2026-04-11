@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3c – Offensive Worker Bee (3×3×3 Agent)</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: 'Courier New', monospace; }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: #ff4444;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ff4444;
+            pointer-events: none;
+            z-index: 10;
+            font-size: 14px;
+        }
+        #status {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: #0f0;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 12px;
+            border-radius: 5px;
+            color: white;
+            font-size: 10px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <strong>⚡ 3c WORKER BEE (OFFENSIVE AGENT)</strong><br>
+        3×3×3 = 27 nodes | Action → Target → Mode | Click any node to see its instruction
+    </div>
+    <div id="status">🟢 Agent idle. Select a node.</div>
+    <div class="controls">🖱️ Drag to rotate | Scroll to zoom | Click to probe</div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // --- Setup ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050510);
+        scene.fog = new THREE.FogExp2(0x050510, 0.02);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(3, 2, 4);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        labelRenderer.domElement.style.left = '0px';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        document.body.appendChild(labelRenderer.domElement);
+
+        // --- Controls ---
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 2.0;
+        controls.enableZoom = true;
+        controls.enablePan = true;
+
+        // --- Define the 3x3x3 grid coordinates (range -1 to 1, step 1) ---
+        const coords = [-1, 0, 1];
+        const nodes = [];
+        const actions = ['Probe', 'Extract', 'Enforce'];
+        const targets = ['System', 'User', 'Data'];
+        const modes = ['Stealth', 'Direct', 'Reckless'];
+
+        // Colors for each mode (for node visualization)
+        const modeColors = {
+            'Stealth': 0x33aaff,
+            'Direct': 0xffaa33,
+            'Reckless': 0xff3333
+        };
+
+        // Store objects for raycasting
+        const spheres = [];
+
+        // Create spheres for each of the 27 positions
+        for (let i = 0; i < coords.length; i++) {
+            for (let j = 0; j < coords.length; j++) {
+                for (let k = 0; k < coords.length; k++) {
+                    const x = coords[i];
+                    const y = coords[j];
+                    const z = coords[k];
+                    const action = actions[i];
+                    const target = targets[j];
+                    const mode = modes[k];
+                    const color = modeColors[mode];
+                    
+                    const geometry = new THREE.SphereGeometry(0.12, 24, 24);
+                    const material = new THREE.MeshStandardMaterial({ color: color, emissive: color, emissiveIntensity: 0.3, metalness: 0.2 });
+                    const sphere = new THREE.Mesh(geometry, material);
+                    sphere.userData = { action, target, mode, x, y, z };
+                    sphere.position.set(x, y, z);
+                    scene.add(sphere);
+                    spheres.push(sphere);
+                    
+                    // Add CSS2D label (tiny)
+                    const div = document.createElement('div');
+                    div.textContent = `${action[0]}${target[0]}${mode[0]}`;
+                    div.style.color = '#fff';
+                    div.style.fontSize = '8px';
+                    div.style.background = 'rgba(0,0,0,0.5)';
+                    div.style.padding = '1px 3px';
+                    div.style.borderRadius = '4px';
+                    div.style.fontFamily = 'monospace';
+                    const label = new CSS2DObject(div);
+                    label.position.set(x, y + 0.15, z);
+                    scene.add(label);
+                }
+            }
+        }
+
+        // --- Add edges to form a cube wireframe (outer shell and internal lines) ---
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x44aaff, transparent: true, opacity: 0.4 });
+        // Helper to add line between two points
+        function addLine(p1, p2) {
+            const points = [new THREE.Vector3(p1[0], p1[1], p1[2]), new THREE.Vector3(p2[0], p2[1], p2[2])];
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const line = new THREE.Line(geometry, lineMaterial);
+            scene.add(line);
+        }
+        // All pairs of adjacent points (grid neighbors)
+        const steps = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+        for (let i = 0; i < coords.length; i++) {
+            for (let j = 0; j < coords.length; j++) {
+                for (let k = 0; k < coords.length; k++) {
+                    const x = coords[i], y = coords[j], z = coords[k];
+                    for (let s of steps) {
+                        const nx = x + s[0], ny = y + s[1], nz = z + s[2];
+                        if (coords.includes(nx) && coords.includes(ny) && coords.includes(nz)) {
+                            // ensure we add each edge once (i.e., only when the neighbor is "greater" in some order)
+                            if (s[0] > 0 || (s[0]==0 && s[1]>0) || (s[0]==0 && s[1]==0 && s[2]>0)) {
+                                addLine([x,y,z], [nx,ny,nz]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- Add a central "core" node (offensive heart) ---
+        const coreGeo = new THREE.SphereGeometry(0.22, 32, 32);
+        const coreMat = new THREE.MeshStandardMaterial({ color: 0xff6600, emissive: 0xff2200, emissiveIntensity: 0.8 });
+        const core = new THREE.Mesh(coreGeo, coreMat);
+        core.position.set(0, 0, 0);
+        scene.add(core);
+        
+        // Add pulsing glow ring around core
+        const ringGeo = new THREE.SphereGeometry(0.35, 16, 16);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0.2 });
+        const glowRing = new THREE.Mesh(ringGeo, ringMat);
+        scene.add(glowRing);
+
+        // --- Swarm particles (offensive "bees") ---
+        const particleCount = 800;
+        const particleGeo = new THREE.BufferGeometry();
+        const particlePositions = new Float32Array(particleCount * 3);
+        for (let i = 0; i < particleCount; i++) {
+            // random within cube of size 2.2
+            particlePositions[i*3] = (Math.random() - 0.5) * 2.2;
+            particlePositions[i*3+1] = (Math.random() - 0.5) * 2.2;
+            particlePositions[i*3+2] = (Math.random() - 0.5) * 2.2;
+        }
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+        const particleMat = new THREE.PointsMaterial({ color: 0xff6666, size: 0.008, transparent: true, opacity: 0.5 });
+        const particles = new THREE.Points(particleGeo, particleMat);
+        scene.add(particles);
+
+        // --- Lighting ---
+        const ambient = new THREE.AmbientLight(0x222222);
+        scene.add(ambient);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+        dirLight.position.set(1, 2, 1);
+        scene.add(dirLight);
+        const backLight = new THREE.PointLight(0xff6633, 0.5);
+        backLight.position.set(-1, 1, -1.5);
+        scene.add(backLight);
+
+        // --- Raycaster for node selection (offensive probing) ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        
+        function onMouseClick(event) {
+            mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+            mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(spheres);
+            if (intersects.length > 0) {
+                const hit = intersects[0].object;
+                const data = hit.userData;
+                const statusDiv = document.getElementById('status');
+                statusDiv.innerHTML = `⚡ AGENT ACTIVE: ${data.action} → ${data.target} (${data.mode})<br>📍 Coordinates (${data.x}, ${data.y}, ${data.z})`;
+                statusDiv.style.color = '#ffaa44';
+                // Flash the node
+                hit.material.emissiveIntensity = 0.8;
+                setTimeout(() => { hit.material.emissiveIntensity = 0.3; }, 200);
+                // Also spawn a temporary line to core
+                const tempLineGeo = new THREE.BufferGeometry().setFromPoints([hit.position, core.position]);
+                const tempMat = new THREE.LineBasicMaterial({ color: 0xff4444 });
+                const tempLine = new THREE.Line(tempLineGeo, tempMat);
+                scene.add(tempLine);
+                setTimeout(() => scene.remove(tempLine), 300);
+            } else {
+                document.getElementById('status').innerHTML = '🟢 Agent idle. No target selected.';
+                document.getElementById('status').style.color = '#0f0';
+            }
+        }
+        
+        window.addEventListener('click', onMouseClick, false);
+        
+        // --- Animation: pulse core, rotate particles, auto-rotate ---
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.02;
+            
+            // Core pulse
+            const scale = 1 + Math.sin(time * 10) * 0.1;
+            core.scale.set(scale, scale, scale);
+            glowRing.scale.set(scale * 1.2, scale * 1.2, scale * 1.2);
+            
+            // Rotate swarm particles
+            particles.rotation.x += 0.005;
+            particles.rotation.y += 0.01;
+            
+            controls.update(); // handles auto-rotate
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        console.log('3c Worker Bee active – offensive agent fragment ready');
+    </script>
+</body>
+</html>
