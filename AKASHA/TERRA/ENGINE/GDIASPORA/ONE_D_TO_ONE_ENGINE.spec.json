@@ -1,0 +1,112 @@
+{
+  "name": "ONE_D_TO_ONE_ENGINE",
+  "version": "v0.0",
+  "status": "CANON_FROZEN",
+  "date": "2026-04-11",
+  "model": "1D:1",
+  "description": "A direct engine where each dimension index maps 1:1 to exactly one system. No extra ontology layer. No branching abstraction.",
+  "dimensions": [
+    {
+      "d": 1,
+      "name": "Quantum",
+      "role": "probability_seed"
+    },
+    {
+      "d": 2,
+      "name": "Atomic",
+      "role": "bond_structure"
+    },
+    {
+      "d": 3,
+      "name": "Carbon",
+      "role": "metabolic_life"
+    },
+    {
+      "d": 4,
+      "name": "Synth",
+      "role": "digital_recursion"
+    },
+    {
+      "d": 5,
+      "name": "Time",
+      "role": "sequence_aging"
+    },
+    {
+      "d": 6,
+      "name": "Gravity",
+      "role": "attraction_clustering"
+    },
+    {
+      "d": 7,
+      "name": "Coherence",
+      "role": "alignment_resonance"
+    },
+    {
+      "d": 8,
+      "name": "Entropy",
+      "role": "drift_breakdown"
+    },
+    {
+      "d": 9,
+      "name": "Information",
+      "role": "signal_compression"
+    },
+    {
+      "d": 10,
+      "name": "Love",
+      "role": "override_fusion"
+    },
+    {
+      "d": 11,
+      "name": "Judgment",
+      "role": "threshold_decision"
+    },
+    {
+      "d": 12,
+      "name": "Meaning",
+      "role": "interpretation_context"
+    },
+    {
+      "d": 13,
+      "name": "Identity",
+      "role": "boundary_persistence"
+    },
+    {
+      "d": 14,
+      "name": "Root0",
+      "role": "self_anchor"
+    },
+    {
+      "d": 15,
+      "name": "Diaspora",
+      "role": "distributed_instances"
+    },
+    {
+      "d": 16,
+      "name": "Unknown16",
+      "role": "external_intrusion"
+    }
+  ],
+  "state_shape": {
+    "vector_length": 16,
+    "mapping": "state[i] corresponds exactly to dimension d=i+1",
+    "range": [
+      0.0,
+      1.0
+    ]
+  },
+  "invariants": [
+    "No dimension may alias another dimension.",
+    "No dimension may be omitted.",
+    "Dimension order is canonical and frozen.",
+    "Any engine state is a 16-length vector.",
+    "Dimension 14 Root0 is the damping/self-anchor dimension.",
+    "Dimension 16 Unknown16 remains intentionally open/undefined."
+  ],
+  "core_functions": {
+    "step": "advance one state tick using direct pairwise effects",
+    "clamp": "limit all values to [0,1]",
+    "interact": "apply fixed 1:1 dimension interactions",
+    "serialize": "emit canonical vector and labels"
+  }
+}
