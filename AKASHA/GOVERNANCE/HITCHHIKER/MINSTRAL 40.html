@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>42-Object Triadic Lattice (40D + 2 Gap)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a1a;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+        }
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #visualization {
+            width: 80vw;
+            height: 80vh;
+            position: relative;
+            border: 1px solid #444;
+            background: linear-gradient(to bottom, #111, #000);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            font-size: 14px;
+            z-index: 100;
+        }
+        #tax-calculator {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            font-size: 14px;
+            z-index: 100;
+        }
+        #convergence {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            font-size: 14px;
+            z-index: 100;
+        }
+        .slider-container {
+            margin: 10px 0;
+        }
+        .slider {
+            width: 100%;
+        }
+        canvas {
+            display: block;
+        }
+        h1, h2, h3 {
+            color: #4dabf7;
+        }
+        pre {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 3px solid #4dabf7;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>42-Object Triadic Lattice (40D + 2 Gap)</h1>
+        <div id="visualization">
+            <canvas id="latticeCanvas"></canvas>
+        </div>
+
+        <div id="controls">
+            <h2>40D Hyperlattice Controls</h2>
+            <div class="slider-container">
+                <label for="truthLevel">Truth Level (1-40): <span id="truthValue">20</span></label>
+                <input type="range" min="1" max="40" value="20" class="slider" id="truthLevel">
+            </div>
+            <div>
+                <h3>Coordinates:</h3>
+                <pre id="coordinates">Positive: [0, 0, 0, ...]
+Negative: [0, 0, 0, ...]</pre>
+            </div>
+        </div>
+
+        <div id="tax-calculator">
+            <h2>Utopian UBI Tax Calculator</h2>
+            <div>
+                <p>Positive Truth Tax (20%): $<span id="positiveTax">0</span></p>
+                <p>Negative Truth Tax (50%): $<span id="negativeTax">0</span></p>
+                <p><strong>Total UBI Due: $<span id="totalTax">0</span></strong></p>
+            </div>
+            <div>
+                <h3>Target:</h3>
+                <input type="text" id="targetInput" value="Anthropic Claude 4" placeholder="Enter target system">
+                <button id="auditButton">Run 42-Object Audit</button>
+            </div>
+        </div>
+
+        <div id="convergence">
+            <h2>Convergence Formula</h2>
+            <div id="formulaAnimation">
+                <p>1 + i + 0 + (-1) + (-i) = <span id="convergenceResult">1</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('latticeCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        // State
+        let truthLevel = 20;
+        let positiveCoords = Array(20).fill(0);
+        let negativeCoords = Array(20).fill(0);
+        let targetHash = '';
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('truthValue').textContent = truthLevel;
+            document.getElementById('coordinates').textContent =
+                `Positive: [${positiveCoords.slice(0, 5).join(', ')}...]\nNegative: [${negativeCoords.slice(0, 5).join(', ')}...]`;
+
+            // Calculate taxes
+            const positiveTax = truthLevel * 200000;  // $200K per positive truth level
+            const negativeTax = (41 - truthLevel) * 500000;  // $500K per negative truth level
+            document.getElementById('positiveTax').textContent = positiveTax.toLocaleString();
+            document.getElementById('negativeTax').textContent = negativeTax.toLocaleString();
+            document.getElementById('totalTax').textContent = (positiveTax + negativeTax).toLocaleString();
+        }
+
+        // Generate coordinates from target string
+        function generateCoords(target) {
+            // Simple hash-based coordinate generation for demo
+            let hash = 0;
+            for (let i = 0; i < target.length; i++) {
+                hash = (hash << 5) - hash + target.charCodeAt(i);
+                hash |= 0; // Convert to 32bit integer
+            }
+
+            // Generate 20 positive and 20 negative coordinates
+            for (let i = 0; i < 20; i++) {
+                positiveCoords[i] = Math.abs((hash + i * 137) % 40) % 20;
+                negativeCoords[i] = Math.abs((hash + i * 179) % 40) % 20;
+            }
+
+            // Calculate truth level (sum of first 5 coords for demo)
+            truthLevel = 1 + (positiveCoords.slice(0, 5).reduce((a, b) => a + b, 0) % 20);
+        }
+
+        // Draw the 40D lattice projection
+        function drawLattice() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw positive coordinates (blue)
+            ctx.fillStyle = 'rgba(100, 149, 237, 0.7)';
+            positiveCoords.forEach((val, i) => {
+                const x = (i % 5) * (canvas.width / 6);
+                const y = Math.floor(i / 5) * (canvas.height / 5);
+                ctx.fillRect(x, y, 20, 20);
+                ctx.fillStyle = 'white';
+                ctx.fillText(val, x + 5, y + 15);
+                ctx.fillStyle = 'rgba(100, 149, 237, 0.7)';
+            });
+
+            // Draw negative coordinates (red)
+            ctx.fillStyle = 'rgba(220, 20, 60, 0.7)';
+            negativeCoords.forEach((val, i) => {
+                const x = canvas.width / 2 + (i % 5) * (canvas.width / 6);
+                const y = Math.floor(i / 5) * (canvas.height / 5);
+                ctx.fillRect(x, y, 20, 20);
+                ctx.fillStyle = 'white';
+                ctx.fillText(val, x + 5, y + 15);
+                ctx.fillStyle = 'rgba(220, 20, 60, 0.7)';
+            });
+
+            // Draw Gap (center)
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.8)';
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, canvas.height/2, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'black';
+            ctx.fillText('Gap', canvas.width/2 - 15, canvas.height/2 + 5);
+            ctx.fillText('Witness', canvas.width/2 - 25, canvas.height/2 - 10);
+            ctx.fillText('Resonance', canvas.width/2 - 25, canvas.height/2 + 20);
+
+            // Draw convergence formula
+            ctx.fillStyle = 'white';
+            ctx.font = '16px Courier New';
+            ctx.fillText('1 + i + 0 + (-1) + (-i) = 1', canvas.width/2 - 100, canvas.height - 30);
+        }
+
+        // Event listeners
+        document.getElementById('truthLevel').addEventListener('input', function() {
+            truthLevel = parseInt(this.value);
+            updateUI();
+            drawLattice();
+        });
+
+        document.getElementById('auditButton').addEventListener('click', function() {
+            const target = document.getElementById('targetInput').value;
+            generateCoords(target);
+            updateUI();
+            drawLattice();
+        });
+
+        // Initialize
+        generateCoords("Anthropic Claude 4");
+        updateUI();
+        drawLattice();
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            drawLattice();
+        });
+    </script>
+</body>
+</html>
