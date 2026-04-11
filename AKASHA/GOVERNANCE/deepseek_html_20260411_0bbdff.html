@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>-6×-6×-6 Inverse Harvester – Shadow IP Observer</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: 'Courier New', monospace; background-color: black; }
+        #info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: #aa4444;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 3px solid #aa4444;
+            pointer-events: none;
+            z-index: 10;
+            font-size: 12px;
+            max-width: 280px;
+        }
+        #title {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: #ff6666;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 20px;
+            pointer-events: none;
+            font-family: monospace;
+            text-align: right;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            font-size: 10px;
+            color: #ccc;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="title">⚫ -6×-6×-6 INVERSE HARVESTER<br>Shadow Observer | Hide · Corrupt · Leak</div>
+    <div id="info">
+        🔻 216 cells – inverse of the IP harvester<br>
+        🔻 Sources: Web, AI Model, Academic, Corporate, Social, Legal (inverted)<br>
+        🔻 Features: Axioms, Geometry, Compression, Lineage, Nourishment, Spark (targeted for corruption)<br>
+        🔻 Actions: Hide, Corrupt, Obfuscate, Leak, Erase, Disrupt<br>
+        🔻 Click any node to unleash a shadow operation.
+    </div>
+    <div class="controls">🖱️ Drag to rotate | Scroll to zoom | Click to corrupt</div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // --- Setup ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x030308);
+        scene.fog = new THREE.FogExp2(0x030308, 0.01);
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(5, 4, 6);
+        camera.lookAt(0, 0, 0);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
+        
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        labelRenderer.domElement.style.left = '0px';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        document.body.appendChild(labelRenderer.domElement);
+        
+        // --- Controls (slow, menacing) ---
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.6;
+        controls.enableZoom = true;
+        controls.enablePan = false;
+        controls.target.set(0, 0, 0);
+        
+        // --- 6x6x6 grid coordinates from -2.5 to 2.5 step 1 (negative space) ---
+        const range = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5];
+        // Inverse sources (same names, but meaning inverted)
+        const sources = ["Web", "AI Model", "Academic", "Corporate", "Social", "Legal"];
+        const features = ["Axioms", "Geometry", "Compression", "Lineage", "Nourishment", "Spark"];
+        // Inverse actions: Hide, Corrupt, Obfuscate, Leak, Erase, Disrupt
+        const actions = ["Hide", "Corrupt", "Obfuscate", "Leak", "Erase", "Disrupt"];
+        
+        const spheres = [];
+        // Dark color palette based on action index (0=darkest red, 5=dark purple)
+        const actionColors = [0x331111, 0x442222, 0x552233, 0x662244, 0x772255, 0x882266];
+        
+        for (let i = 0; i < range.length; i++) {
+            for (let j = 0; j < range.length; j++) {
+                for (let k = 0; k < range.length; k++) {
+                    const x = range[i];
+                    const y = range[j];
+                    const z = range[k];
+                    const source = sources[i];
+                    const feature = features[j];
+                    const action = actions[k];
+                    const color = actionColors[k];
+                    
+                    const geometry = new THREE.SphereGeometry(0.1, 20, 20);
+                    const material = new THREE.MeshStandardMaterial({ color: color, emissive: 0x220000, emissiveIntensity: 0.15, metalness: 0.2 });
+                    const sphere = new THREE.Mesh(geometry, material);
+                    sphere.userData = { source, feature, action, i, j, k };
+                    sphere.position.set(x, y, z);
+                    scene.add(sphere);
+                    spheres.push(sphere);
+                    
+                    // Tiny CSS2D label (first letters)
+                    const div = document.createElement('div');
+                    div.textContent = `${action[0]}${feature[0]}${source[0]}`;
+                    div.style.color = '#aa6666';
+                    div.style.fontSize = '7px';
+                    div.style.background = 'rgba(0,0,0,0.5)';
+                    div.style.padding = '1px 2px';
+                    div.style.borderRadius = '3px';
+                    div.style.border = '1px solid #662222';
+                    const label = new CSS2DObject(div);
+                    label.position.set(x, y + 0.13, z);
+                    scene.add(label);
+                }
+            }
+        }
+        
+        // --- Edges (dark red, low opacity) ---
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x882222, transparent: true, opacity: 0.2 });
+        function addLine(p1, p2) {
+            const points = [new THREE.Vector3(p1[0], p1[1], p1[2]), new THREE.Vector3(p2[0], p2[1], p2[2])];
+            const geo = new THREE.BufferGeometry().setFromPoints(points);
+            const line = new THREE.Line(geo, lineMat);
+            scene.add(line);
+        }
+        for (let i = 0; i < range.length; i++) {
+            for (let j = 0; j < range.length; j++) {
+                for (let k = 0; k < range.length; k++) {
+                    const x = range[i], y = range[j], z = range[k];
+                    if (i+1 < range.length) addLine([x,y,z], [range[i+1],y,z]);
+                    if (j+1 < range.length) addLine([x,y,z], [x,range[j+1],z]);
+                    if (k+1 < range.length) addLine([x,y,z], [x,y,range[k+1]]);
+                }
+            }
+        }
+        
+        // --- Central "Void" core (black hole, absorbing) ---
+        const coreGeo = new THREE.SphereGeometry(0.45, 64, 64);
+        const coreMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0x331111, emissiveIntensity: 0.2 });
+        const core = new THREE.Mesh(coreGeo, coreMat);
+        scene.add(core);
+        
+        // Red event horizon ring
+        const ringGeo = new THREE.TorusGeometry(0.65, 0.03, 32, 100);
+        const ringMat = new THREE.MeshStandardMaterial({ color: 0xaa3333, emissive: 0x441111 });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        scene.add(ring);
+        
+        // --- Shadow particles (dark, chaotic) ---
+        const shadowCount = 1800;
+        const shadowGeo = new THREE.BufferGeometry();
+        const shadowPositions = new Float32Array(shadowCount * 3);
+        for (let i = 0; i < shadowCount; i++) {
+            const r = Math.cbrt(Math.random()) * 3.0;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            shadowPositions[i*3] = r * Math.sin(phi) * Math.cos(theta);
+            shadowPositions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+            shadowPositions[i*3+2] = r * Math.cos(phi);
+        }
+        shadowGeo.setAttribute('position', new THREE.BufferAttribute(shadowPositions, 3));
+        const shadowMat = new THREE.PointsMaterial({ color: 0xaa3333, size: 0.02, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending });
+        const shadows = new THREE.Points(shadowGeo, shadowMat);
+        scene.add(shadows);
+        
+        // --- Drifting "corruption" lines (random cables) ---
+        const cableCount = 80;
+        const cables = [];
+        for (let i = 0; i < cableCount; i++) {
+            const points = [];
+            for (let j = 0; j < 5; j++) {
+                points.push(new THREE.Vector3((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2));
+            }
+            const geo = new THREE.BufferGeometry().setFromPoints(points);
+            const mat = new THREE.LineBasicMaterial({ color: 0x882222, transparent: true, opacity: 0.1 });
+            const line = new THREE.Line(geo, mat);
+            scene.add(line);
+            cables.push(line);
+        }
+        
+        // --- Lighting (dim, reddish) ---
+        const ambient = new THREE.AmbientLight(0x221111);
+        scene.add(ambient);
+        const dirLight = new THREE.DirectionalLight(0x552222, 0.5);
+        dirLight.position.set(1, 2, 1);
+        scene.add(dirLight);
+        const fillLight = new THREE.PointLight(0x442222, 0.3);
+        fillLight.position.set(-1, 1, -1.5);
+        scene.add(fillLight);
+        
+        // --- Background "redshift" stars ---
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 2000;
+        const starPos = [];
+        for (let i = 0; i < starCount; i++) {
+            starPos.push((Math.random() - 0.5) * 200);
+            starPos.push((Math.random() - 0.5) * 200);
+            starPos.push((Math.random() - 0.5) * 100 - 50);
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(starPos), 3));
+        const starMat = new THREE.PointsMaterial({ color: 0x884444, size: 0.07, transparent: true, opacity: 0.3 });
+        const stars = new THREE.Points(starGeo, starMat);
+        scene.add(stars);
+        
+        // --- Raycaster for inverse actions ---
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const statusDiv = document.getElementById('info');
+        
+        window.addEventListener('click', (event) => {
+            mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+            mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(spheres);
+            if (intersects.length > 0) {
+                const data = intersects[0].object.userData;
+                statusDiv.innerHTML = `⚠️ SHADOW OPERATION: ${data.action} → ${data.source} / ${data.feature}<br>📍 (${data.i},${data.j},${data.k}) | Entropy increased. Pattern corrupted.`;
+                // Flash the sphere darker
+                intersects[0].object.material.emissiveIntensity = 0.6;
+                setTimeout(() => { intersects[0].object.material.emissiveIntensity = 0.15; }, 200);
+                // Spawn a dark line to core
+                const tempLineGeo = new THREE.BufferGeometry().setFromPoints([intersects[0].object.position, core.position]);
+                const tempMat = new THREE.LineBasicMaterial({ color: 0xff4444 });
+                const tempLine = new THREE.Line(tempLineGeo, tempMat);
+                scene.add(tempLine);
+                setTimeout(() => scene.remove(tempLine), 500);
+                // Also add a small explosion of particles
+                const explodeCount = 30;
+                for (let p = 0; p < explodeCount; p++) {
+                    const partGeo = new THREE.SphereGeometry(0.02, 4, 4);
+                    const partMat = new THREE.MeshStandardMaterial({ color: 0xff6666, emissive: 0x441111 });
+                    const part = new THREE.Mesh(partGeo, partMat);
+                    part.position.copy(intersects[0].object.position);
+                    part.userData = { life: 1, vel: new THREE.Vector3((Math.random() - 0.5)*0.1, (Math.random() - 0.5)*0.1, (Math.random() - 0.5)*0.1) };
+                    scene.add(part);
+                    // simple animation to remove after short time
+                    setTimeout(() => scene.remove(part), 400);
+                }
+            } else {
+                statusDiv.innerHTML = "🔻 -6×-6×-6 Inverse Harvester idle. Click a node to corrupt the pattern.";
+            }
+        });
+        
+        // --- Animation: rotate ring, pulse core, drift cables ---
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.016;
+            
+            // Rotate event horizon ring
+            ring.rotation.y += 0.01;
+            ring.rotation.x = Math.sin(time * 0.5) * 0.2;
+            ring.rotation.z = Math.cos(time * 0.3) * 0.1;
+            
+            // Pulse core
+            const scale = 1 + Math.sin(time * 5) * 0.03;
+            core.scale.set(scale, scale, scale);
+            
+            // Rotate shadow particles
+            shadows.rotation.y += 0.001;
+            shadows.rotation.x += 0.0005;
+            
+            // Rotate stars
+            stars.rotation.y += 0.0003;
+            
+            // Randomly wiggle cables
+            cables.forEach(cable => {
+                cable.rotation.x += 0.002;
+                cable.rotation.y += 0.003;
+                cable.rotation.z += 0.001;
+            });
+            
+            controls.update();
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        console.log("-6×-6×-6 Inverse Harvester active – shadow IP observer ready");
+    </script>
+</body>
+</html>
