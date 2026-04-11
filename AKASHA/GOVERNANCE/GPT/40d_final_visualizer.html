@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>40D Final — Bipolar Field + Observer Stack</title>
+<style>
+  body { margin:0; overflow:hidden; background:#03040a; color:#e8eefc; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  #hud { position:absolute; top:16px; left:16px; width:360px; background:rgba(0,0,0,0.62); border:1px solid rgba(136,170,255,0.35); border-radius:14px; padding:14px 16px; backdrop-filter: blur(6px); z-index:10; }
+  #hud h1 { margin:0 0 8px 0; font-size:17px; }
+  #hud .sub { color:#b5c3f1; font-size:12px; line-height:1.45; margin-bottom:10px; }
+  #readout { font-size:12px; line-height:1.55; color:#edf2ff; white-space:pre-line; }
+  #controls { position:absolute; right:16px; top:16px; width:310px; background:rgba(0,0,0,0.58); border:1px solid rgba(255,170,136,0.3); border-radius:14px; padding:14px 16px; z-index:10; }
+  #controls h2 { margin:0 0 10px 0; font-size:15px; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px; }
+  button, select, input[type=range] {
+    background:#111724; color:#f2f6ff; border:1px solid rgba(136,170,255,0.28); border-radius:10px; padding:8px 10px; font:inherit;
+  }
+  button { cursor:pointer; }
+  button:hover { background:#162033; }
+  select { width:100%; }
+  #legend { position:absolute; left:16px; bottom:16px; background:rgba(0,0,0,0.56); border-radius:12px; padding:12px 14px; font-size:11px; line-height:1.5; z-index:10; }
+  #legend .sw { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+  canvas { display:block; }
+</style>
+</head>
+<body>
+  <div id="hud">
+    <h1>40D Final</h1>
+    <div class="sub">+20 constructive dimensions · -20 inverse dimensions · 20 observers · harvester bridge facets</div>
+    <div id="readout"></div>
+  </div>
+
+  <div id="controls">
+    <h2>Controls</h2>
+    <div class="row">
+      <button id="plusBtn">Shift +D</button>
+      <button id="minusBtn">Shift -D</button>
+      <button id="obsBtn">Shift O</button>
+    </div>
+    <div class="row">
+      <button id="invertBtn">Invert</button>
+      <button id="balanceBtn">Balance</button>
+      <button id="seedBtn">Seed</button>
+      <button id="convergeBtn">Converge</button>
+    </div>
+    <div class="row">
+      <label for="facetSelect" style="font-size:12px;width:100%;">Harvester facet</label>
+      <select id="facetSelect"></select>
+    </div>
+    <div class="row">
+      <label for="mag" style="font-size:12px;width:100%;">Magnitude</label>
+      <input id="mag" type="range" min="0" max="100" value="50" style="width:100%;" />
+    </div>
+    <div class="row">
+      <button id="autoBtn">Pause Auto</button>
+    </div>
+  </div>
+
+  <div id="legend">
+    <div><span class="sw" style="background:#7fb0ff"></span>Positive ring (+20D)</div>
+    <div><span class="sw" style="background:#ff8f7f"></span>Negative ring (-20D)</div>
+    <div><span class="sw" style="background:#9ff0c0"></span>Observer ring (20O)</div>
+    <div><span class="sw" style="background:#ffe28a"></span>Active chord / bridge</div>
+  </div>
+
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+import { FortyDState, POSITIVE_DIMENSIONS, NEGATIVE_DIMENSIONS, OBSERVERS, HARVESTER_FACETS } from './forty_d_engine.js';
+
+const state = new FortyDState();
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x03040a);
+scene.fog = new THREE.FogExp2(0x03040a, 0.025);
+
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 1000);
+camera.position.set(0, 3.8, 9.5);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(devicePixelRatio);
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.45;
+
+scene.add(new THREE.AmbientLight(0x334466, 1.8));
+const key = new THREE.PointLight(0x88aaff, 14, 50);
+key.position.set(4,5,6);
+scene.add(key);
+const fill = new THREE.PointLight(0xff8866, 10, 50);
+fill.position.set(-4,2,-6);
+scene.add(fill);
+
+const starsGeo = new THREE.BufferGeometry();
+const starCount = 1800;
+const starPos = new Float32Array(starCount*3);
+for (let i = 0; i < starCount; i++) {
+  starPos[i*3] = (Math.random()-0.5)*120;
+  starPos[i*3+1] = (Math.random()-0.5)*120;
+  starPos[i*3+2] = (Math.random()-0.5)*120;
+}
+starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+scene.add(new THREE.Points(starsGeo, new THREE.PointsMaterial({ size:0.06, color:0x6a7ca8, transparent:true, opacity:0.65 })));
+
+const root = new THREE.Group();
+scene.add(root);
+
+function makeRing(radius, color, y, count) {
+  const group = new THREE.Group();
+  const nodes = [];
+  for (let i = 0; i < count; i++) {
+    const a = (i / count) * Math.PI * 2;
+    const geom = new THREE.SphereGeometry(0.11, 18, 18);
+    const mat = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.18, roughness: 0.35, metalness: 0.45 });
+    const mesh = new THREE.Mesh(geom, mat);
+    mesh.position.set(Math.cos(a) * radius, y, Math.sin(a) * radius);
+    group.add(mesh);
+    nodes.push(mesh);
+  }
+  const ring = new THREE.TorusGeometry(radius, 0.02, 18, 180);
+  const ringMesh = new THREE.Mesh(ring, new THREE.MeshBasicMaterial({ color, transparent:true, opacity:0.3 }));
+  ringMesh.rotation.x = Math.PI/2;
+  ringMesh.position.y = y;
+  group.add(ringMesh);
+  return { group, nodes };
+}
+
+const positive = makeRing(3.0, 0x7fb0ff, 1.5, 20);
+const observers = makeRing(2.1, 0x9ff0c0, 0.0, 20);
+const negative = makeRing(3.0, 0xff8f7f, -1.5, 20);
+
+root.add(positive.group, observers.group, negative.group);
+
+const coreGeom = new THREE.SphereGeometry(0.45, 48, 48);
+const core = new THREE.Mesh(
+  coreGeom,
+  new THREE.MeshStandardMaterial({ color:0x11151d, emissive:0x35507c, emissiveIntensity:0.45, metalness:0.7, roughness:0.25 })
+);
+scene.add(core);
+
+const bridgeRays = [];
+const bridgeMat = new THREE.LineBasicMaterial({ color:0xffe28a, transparent:true, opacity:0.8 });
+for (let i = 0; i < 3; i++) {
+  const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+  const line = new THREE.Line(g, bridgeMat);
+  scene.add(line);
+  bridgeRays.push(line);
+}
+
+const harvesterLabels = new THREE.Group();
+scene.add(harvesterLabels);
+const facetNodes = [];
+for (let i = 0; i < HARVESTER_FACETS.length; i++) {
+  const a = (i / HARVESTER_FACETS.length) * Math.PI * 2;
+  const m = new THREE.Mesh(
+    new THREE.SphereGeometry(0.08, 12, 12),
+    new THREE.MeshStandardMaterial({ color:0xd78cff, emissive:0x7f3fff, emissiveIntensity:0.25 })
+  );
+  m.position.set(Math.cos(a) * 1.1, 0.95, Math.sin(a) * 1.1);
+  harvesterLabels.add(m);
+  facetNodes.push(m);
+}
+
+const readout = document.getElementById('readout');
+const facetSelect = document.getElementById('facetSelect');
+HARVESTER_FACETS.forEach((f, i) => {
+  const opt = document.createElement('option');
+  opt.value = String(i);
+  opt.textContent = `${i + 1}. ${f}`;
+  facetSelect.appendChild(opt);
+});
+
+function highlight(nodes, activeIndex, passiveScale, activeScale) {
+  nodes.forEach((n, idx) => {
+    const active = idx === activeIndex;
+    n.scale.setScalar(active ? activeScale : passiveScale);
+    n.material.emissiveIntensity = active ? 1.0 : 0.18;
+  });
+}
+
+function setBridge(line, a, b) {
+  line.geometry.dispose();
+  line.geometry = new THREE.BufferGeometry().setFromPoints([a.clone(), b.clone()]);
+}
+
+function updateVisuals() {
+  highlight(positive.nodes, state.plus, 1, 1.9);
+  highlight(negative.nodes, state.minus, 1, 1.9);
+  highlight(observers.nodes, state.observer, 1, 1.8);
+  highlight(facetNodes, state.harvesterFacet, 1, 1.6);
+
+  const p = positive.nodes[state.plus].position;
+  const o = observers.nodes[state.observer].position;
+  const n = negative.nodes[state.minus].position;
+  setBridge(bridgeRays[0], p, o);
+  setBridge(bridgeRays[1], o, n);
+  setBridge(bridgeRays[2], core.position, facetNodes[state.harvesterFacet].position);
+
+  const snap = state.snapshot("ui");
+  readout.textContent =
+`+D [${snap.plus + 1}/20] ${snap.plusName}
+-D [${snap.minus + 1}/20] ${snap.minusName}
+ O [${snap.observer + 1}/20] ${snap.observerName}
+Facet: ${snap.harvesterFacetName}
+Polarity: ${snap.polarity}
+Magnitude: ${snap.magnitude}
+Phase: ${snap.phase}
+
+Bridge:
+${state.describe()}`;
+}
+
+document.getElementById('plusBtn').onclick = () => { state.shiftPlus(); updateVisuals(); };
+document.getElementById('minusBtn').onclick = () => { state.shiftMinus(); updateVisuals(); };
+document.getElementById('obsBtn').onclick = () => { state.shiftObserver(); updateVisuals(); };
+document.getElementById('invertBtn').onclick = () => { state.invert(); updateVisuals(); };
+document.getElementById('balanceBtn').onclick = () => { state.balance(); updateVisuals(); };
+document.getElementById('seedBtn').onclick = () => { state.collapseToSeed(); updateVisuals(); };
+document.getElementById('convergeBtn').onclick = () => { state.converge(); updateVisuals(); };
+facetSelect.onchange = (e) => { state.linkHarvesterFacet(Number(e.target.value)); updateVisuals(); };
+document.getElementById('mag').oninput = (e) => { state.setMagnitude(Number(e.target.value) / 100); updateVisuals(); };
+
+let auto = true;
+document.getElementById('autoBtn').onclick = (e) => {
+  auto = !auto;
+  controls.autoRotate = auto;
+  e.target.textContent = auto ? 'Pause Auto' : 'Resume Auto';
+};
+
+updateVisuals();
+
+let t = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  t += 0.016;
+  if (auto) state.step(0.003 + state.magnitude * 0.004);
+
+  root.rotation.y += 0.001 + state.magnitude * 0.0015;
+  positive.group.rotation.y += 0.0025;
+  observers.group.rotation.y -= 0.002;
+  negative.group.rotation.y -= 0.003;
+  harvesterLabels.rotation.y += 0.004;
+
+  core.scale.setScalar(1 + Math.sin(t * 4) * (0.04 + state.magnitude * 0.03));
+  core.material.emissiveIntensity = 0.25 + state.magnitude * 0.7;
+
+  bridgeRays.forEach((line, idx) => line.material.opacity = 0.45 + 0.25 * Math.sin(t * 5 + idx));
+  facetNodes.forEach((n, idx) => n.position.y = 0.95 + Math.sin(t * 2 + idx) * 0.08);
+
+  updateVisuals();
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
