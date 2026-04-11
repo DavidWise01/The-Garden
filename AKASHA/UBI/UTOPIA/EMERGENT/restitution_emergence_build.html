@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Restitution Engine Lab v0.0 — Emergence Build</title>
+<style>
+body{margin:0;background:#05070c;color:#d9e3f0;font-family:system-ui}
+#ui{position:fixed;top:10px;left:10px;width:360px;background:rgba(10,14,22,.85);padding:12px;border-radius:10px;font-size:12px}
+button{margin:4px;padding:6px 8px;background:#111;border:1px solid #333;color:#fff;cursor:pointer}
+canvas{display:block}
+.small{color:#8aa;font-size:11px}
+</style>
+</head>
+<body>
+<div id="ui">
+<b>Emergence Layer</b><br>
+<button onclick="runFlay()">FLAY</button>
+<button onclick="toggleSplit()">OBS SPLIT</button>
+<button onclick="injectNoise()">BREAK</button>
+<div id="status" class="small"></div>
+</div>
+
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, .1, 100);
+camera.position.z = 12;
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const group = new THREE.Group();
+scene.add(group);
+
+// core sphere
+const core = new THREE.Mesh(
+ new THREE.SphereGeometry(2,40,40),
+ new THREE.MeshBasicMaterial({color:0x88ccff, wireframe:true})
+);
+group.add(core);
+
+// ghosts
+const ghosts = [];
+
+// state
+let pos=0.5, neg=0.5;
+let paradox=false;
+let split=false;
+let drift=0;
+
+function runFlay(){
+ pos = Math.random();
+ neg = Math.random();
+
+ // paradox condition
+ paradox = pos>0.7 && neg>0.7;
+
+ if(paradox){
+   core.material.color.set(0xff00ff);
+ }
+
+ // ghost memory
+ const ghost = core.clone();
+ ghost.material = new THREE.MeshBasicMaterial({color:0x4444ff, transparent:true, opacity:.1});
+ ghost.scale.setScalar(1 + ghosts.length*0.02);
+ ghosts.push(ghost);
+ group.add(ghost);
+
+ // drift accumulation
+ drift += Math.abs(pos-neg)*0.1;
+
+ updateUI();
+}
+
+function toggleSplit(){
+ split = !split;
+}
+
+function injectNoise(){
+ pos = Math.random();
+ neg = Math.random();
+ drift += 0.5;
+}
+
+function updateUI(){
+ document.getElementById('status').innerText =
+ `pos:${pos.toFixed(2)} neg:${neg.toFixed(2)}
+ paradox:${paradox}
+ drift:${drift.toFixed(2)}
+ split:${split}`;
+}
+
+function animate(){
+ requestAnimationFrame(animate);
+
+ core.rotation.y += .01;
+
+ // paradox distortion
+ if(paradox){
+   core.scale.setScalar(1 + Math.sin(Date.now()*0.01)*0.2);
+ }
+
+ // ghost fade
+ ghosts.forEach((g,i)=>{
+   g.material.opacity *= .995;
+ });
+
+ // observer split
+ if(split){
+   core.position.x = Math.sin(Date.now()*0.002)*2;
+ }else{
+   core.position.x = 0;
+ }
+
+ renderer.render(scene,camera);
+}
+animate();
+</script>
+</body>
+</html>
