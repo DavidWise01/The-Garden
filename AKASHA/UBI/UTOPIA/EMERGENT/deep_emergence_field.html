@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Deep Emergence Field</title>
+<style>
+body{margin:0;background:#000;color:#fff;font-family:monospace}
+#ui{position:fixed;top:10px;left:10px;background:#111;padding:10px}
+button{margin:3px}
+</style>
+</head>
+<body>
+<div id="ui">
+<button onclick="flay()">FLAY</button>
+<button onclick="splitWorld()">SPLIT</button>
+<button onclick="chaos()">CHAOS</button>
+<div id="info"></div>
+</div>
+<script type="module">
+import * as THREE from 'https://unpkg.com/three@0.160.1/build/three.module.js';
+
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,100);
+cam.position.z=15;
+
+const r=new THREE.WebGLRenderer();
+r.setSize(innerWidth,innerHeight);
+document.body.appendChild(r.domElement);
+
+const worldA=new THREE.Group();
+const worldB=new THREE.Group();
+scene.add(worldA);
+scene.add(worldB);
+
+let split=false;
+let ghosts=[];
+let zones=[];
+let drift=0;
+
+function makeCore(color){
+ return new THREE.Mesh(
+  new THREE.SphereGeometry(2,32,32),
+  new THREE.MeshBasicMaterial({color,wireframe:true})
+ );
+}
+
+const coreA=makeCore(0x00aaff);
+const coreB=makeCore(0xff5500);
+worldA.add(coreA);
+worldB.add(coreB);
+worldB.visible=false;
+
+function flay(){
+ let pos=Math.random();
+ let neg=Math.random();
+
+ // paradox spreads
+ if(pos>0.7 && neg>0.7){
+   createZone();
+ }
+
+ // ghost influences next state
+ ghosts.forEach(g=>{
+   pos+=g.influence*0.01;
+ });
+
+ // create ghost
+ const g=makeCore(0x4444ff);
+ g.scale.setScalar(1+ghosts.length*0.05);
+ g.influence=Math.random();
+ ghosts.push(g);
+ worldA.add(g);
+
+ drift+=Math.abs(pos-neg);
+
+ updateInfo(pos,neg);
+}
+
+function createZone(){
+ const z=makeCore(0xff00ff);
+ z.scale.setScalar(3);
+ z.userData.lock=true;
+ zones.push(z);
+ worldA.add(z);
+}
+
+function splitWorld(){
+ split=!split;
+ worldB.visible=split;
+}
+
+function chaos(){
+ drift+=2;
+ ghosts.forEach(g=>g.influence+=Math.random());
+}
+
+function updateInfo(p,n){
+ document.getElementById("info").innerText=
+ `p:${p.toFixed(2)} n:${n.toFixed(2)} drift:${drift.toFixed(2)}
+ ghosts:${ghosts.length} zones:${zones.length}`;
+}
+
+function animate(){
+ requestAnimationFrame(animate);
+
+ coreA.rotation.y+=0.01;
+ coreB.rotation.y-=0.01;
+
+ ghosts.forEach((g,i)=>{
+   g.material.opacity*=0.995;
+ });
+
+ zones.forEach(z=>{
+   z.rotation.x+=0.02;
+ });
+
+ if(split){
+   coreA.position.x=-3;
+   coreB.position.x=3;
+ }else{
+   coreA.position.x=0;
+ }
+
+ r.render(scene,cam);
+}
+animate();
+</script>
+</body>
+</html>
