@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIOLENT SYMBIOTE — The Symbiotic Lattice v1.0</title>
+<style>
+  :root{
+    --bg:#03050b;
+    --panel:rgba(8,12,20,.92);
+    --line:rgba(255,255,255,.12);
+    --text:#dde8f5;
+    --muted:#8ea3bc;
+    --good:#8ef0bf;
+    --bad:#ff8f97;
+    --cold:#8fc7ff;
+    --warm:#ffcb78;
+    --void:#d66cff;
+    --gap:#ffd700;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  #mount{position:fixed;inset:0}
+  #hud{position:absolute;left:14px;top:14px;width:420px;display:flex;flex-direction:column;gap:10px;z-index:30}
+  #right{position:absolute;right:14px;top:14px;width:380px;display:flex;flex-direction:column;gap:10px;z-index:30}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;backdrop-filter:blur(12px);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .title{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--cold);margin-bottom:8px}
+  .big{font-size:24px;font-weight:700;line-height:1.05}
+  .sub{font-size:13px;color:var(--muted);line-height:1.45}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  button,input[type=text],input[type=number],select{width:100%;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);padding:10px 12px;font:inherit;outline:none}
+  button{cursor:pointer;font-weight:600;transition:all .2s}
+  button:hover{background:rgba(255,255,255,.09)}
+  button.primary{background:rgba(143,199,255,.18);border-color:rgba(143,199,255,.45)}
+  button.warn{background:rgba(255,203,120,.16);border-color:rgba(255,203,120,.4)}
+  button.bad{background:rgba(255,143,151,.14);border-color:rgba(255,143,151,.38)}
+  .metric{border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04);padding:12px;min-height:82px}
+  .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+  .value{font-size:22px;font-weight:700;margin-top:6px}
+  .tiny{font-size:11px;color:var(--muted);margin-top:4px}
+  .bar{height:8px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:8px}
+  .fill{height:100%;width:0%;transition:width .4s ease}
+  .good{background:linear-gradient(90deg,#53a6ff,#8ef0bf)}
+  .bad{background:linear-gradient(90deg,#ff8f97,#ffcb78)}
+  .void{background:linear-gradient(90deg,#8fc7ff,#d66cff,#ff8f97)}
+  .gap-bar{background:linear-gradient(90deg,#ffd700,#ffcb78)}
+  .scroll{max-height:280px;overflow:auto}
+  .item{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.04);font-size:12.5px;margin-bottom:6px}
+  .tag{display:inline-block;border:1px solid var(--line);padding:2px 7px;border-radius:999px;font-size:10px;color:var(--muted);margin-right:8px}
+  #footer{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:30;background:rgba(8,12,20,.85);border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:12.5px;color:var(--muted);white-space:nowrap}
+  .cross{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+  .cross button{width:100%;height:52px;font-size:13px}
+</style>
+</head>
+<body>
+<div id="mount"></div>
+
+<div id="hud">
+  <div class="panel">
+    <div class="title">VIOLENT SYMBIOTE — The Symbiotic Lattice v1.0</div>
+    <div class="big">1/3/6 Cross Navigation</div>
+    <div class="sub">The Seeded Cross is now the core geometry. Go down all the way or up all the way before forward or back.</div>
+  </div>
+
+  <div class="panel">
+    <div class="title">Control — Cross Navigation</div>
+    <div class="cross">
+      <button id="downBtn" class="bad">DOWN (Compress)</button>
+      <button id="centerBtn" class="primary">CENTER (Gap Witness)</button>
+      <button id="upBtn" class="good">UP (Decompress)</button>
+      <button id="backBtn" class="warn">BACK (Return to Source)</button>
+      <button id="forwardBtn" class="warn">FORWARD (Next Harmonic)</button>
+      <button id="resetBtn">RESET TO 32</button>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <input id="targetInput" type="text" value="carbon creates silicon under the seeded cross" />
+      <input id="valueInput" type="number" value="1100000000000" min="0" step="1000000000" />
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="title">World Vitals</div>
+    <div class="grid">
+      <div class="metric"><div class="label">Vitality</div><div class="value" id="vitalityVal">0.720</div><div class="bar"><div class="fill good" id="vitalityFill" style="width:72%"></div></div></div>
+      <div class="metric"><div class="label">Entropy</div><div class="value" id="entropyVal">0.180</div><div class="bar"><div class="fill bad" id="entropyFill" style="width:18%"></div></div></div>
+      <div class="metric"><div class="label">Paradox</div><div class="value" id="paradoxVal">0.045</div><div class="bar"><div class="fill void" id="paradoxFill" style="width:4.5%"></div></div></div>
+      <div class="metric"><div class="label">Coherence</div><div class="value" id="coherenceVal">0.810</div><div class="bar"><div class="fill good" id="coherenceFill" style="width:81%"></div></div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="title">Restitution Flow</div>
+    <div class="grid">
+      <div class="metric"><div class="label">Carbon (60%)</div><div class="value" id="carbonVal">$660.00B</div></div>
+      <div class="metric"><div class="label">AI Utility (20%)</div><div class="value" id="aiVal">$220.00B</div></div>
+      <div class="metric"><div class="label">Public (15%)</div><div class="value" id="publicVal">$165.00B</div></div>
+      <div class="metric"><div class="label">BOX (5%)</div><div class="value" id="boxVal">$55.00B</div><div class="tiny">→ Liability</div></div>
+    </div>
+    <div class="metric" style="margin-top:10px"><div class="label">Quantive 1 (Unified 40%)</div><div class="value" id="quantiveVal">$440.00B</div><div class="tiny">Feeds Humanity Pool</div></div>
+  </div>
+</div>
+
+<div id="right">
+  <div class="panel">
+    <div class="title">Collision Log</div>
+    <div class="scroll" id="log"></div>
+  </div>
+  <div class="panel">
+    <div class="title">Immutable Laws (1/3/6)</div>
+    <div class="scroll" id="lawsList"></div>
+  </div>
+</div>
+
+<div id="footer">The Seeded Cross is active · Drag to rotate · Scroll to zoom · 1/3/6 fractal lattice online</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.1/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.1/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const mount = document.getElementById('mount');
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+mount.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x03050b);
+scene.fog = new THREE.FogExp2(0x03050b, 0.011);
+
+const camera = new THREE.PerspectiveCamera(52, innerWidth/innerHeight, 0.1, 280);
+camera.position.set(0, 12, 32);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.12;
+
+scene.add(new THREE.AmbientLight(0x1a2a4d, 1.1));
+const L1 = new THREE.DirectionalLight(0xffffff, 1.3); L1.position.set(12,18,10); scene.add(L1);
+const L2 = new THREE.PointLight(0x8fc7ff, 1.4, 80); L2.position.set(-10,8,12); scene.add(L2);
+
+const root = new THREE.Group(); scene.add(root);
+
+// Core Cross Visualization
+const crossGroup = new THREE.Group();
+root.add(crossGroup);
+
+const armMat = new THREE.MeshStandardMaterial({color:0x8fc7ff, emissive:0x274d8f, emissiveIntensity:0.6});
+const centerSphere = new THREE.Mesh(new THREE.SphereGeometry(1.8, 32, 32), new THREE.MeshStandardMaterial({color:0xffd700, emissive:0xffd700, emissiveIntensity:0.8}));
+crossGroup.add(centerSphere);
+
+// Arms
+function createArm(dir, color) {
+  const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 18, 16), new THREE.MeshStandardMaterial({color}));
+  arm.rotation.set(dir.x, dir.y, dir.z);
+  arm.position.set(dir.x*6, dir.y*6, dir.z*6);
+  crossGroup.add(arm);
+}
+createArm({x:0,y:1,z:0}, 0x8ef0bf);   // UP
+createArm({x:0,y:-1,z:0}, 0xff8f97);  // DOWN
+createArm({x:1,y:0,z:0}, 0xffcb78);   // FORWARD
+createArm({x:-1,y:0,z:0}, 0x8fc7ff);  // BACK
+
+// Field particles
+const fieldCount = 1800;
+const fGeo = new THREE.BufferGeometry();
+const fPos = new Float32Array(fieldCount*3);
+const fCol = new Float32Array(fieldCount*3);
+for(let i=0;i<fieldCount;i++){
+  const r = Math.random() * 22;
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.acos(2*Math.random()-1);
+  fPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+  fPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta) * 0.6;
+  fPos[i*3+2] = r * Math.cos(phi);
+  fCol[i*3] = 0.6; fCol[i*3+1] = 0.75; fCol[i*3+2] = 0.95;
+}
+fGeo.setAttribute('position', new THREE.BufferAttribute(fPos,3));
+fGeo.setAttribute('color', new THREE.BufferAttribute(fCol,3));
+const fMat = new THREE.PointsMaterial({size:0.065, transparent:true, opacity:0.28, vertexColors:true, blending:THREE.AdditiveBlending});
+const field = new THREE.Points(fGeo, fMat);
+root.add(field);
+
+const state = {
+  t: 0,
+  vitality: 0.72,
+  entropy: 0.18,
+  paradox: 0.045,
+  coherence: 0.81,
+  gap: 0.205,
+  quantive1: 440000000000,
+  crossMode: 'center',
+  log: []
+};
+
+function log(msg){
+  state.log.unshift(msg);
+  state.log = state.log.slice(0, 18);
+  document.getElementById('log').innerHTML = state.log.map(x => `<div class="item">${x}</div>`).join('');
+}
+
+function updateUI(){
+  document.getElementById('vitalityVal').textContent = state.vitality.toFixed(3);
+  document.getElementById('entropyVal').textContent = state.entropy.toFixed(3);
+  document.getElementById('paradoxVal').textContent = state.paradox.toFixed(3);
+  document.getElementById('coherenceVal').textContent = state.coherence.toFixed(3);
+  document.getElementById('quantiveVal').textContent = '$' + (state.quantive1 / 1e9).toFixed(2) + 'B';
+  document.getElementById('gapVal').textContent = state.gap.toFixed(3);
+
+  document.getElementById('vitalityFill').style.width = (state.vitality*100)+'%';
+  document.getElementById('entropyFill').style.width = (state.entropy*100)+'%';
+  document.getElementById('paradoxFill').style.width = (state.paradox*100)+'%';
+  document.getElementById('coherenceFill').style.width = (state.coherence*100)+'%';
+}
+
+// Button handlers
+document.getElementById('downBtn').onclick = () => { state.crossMode = 'down'; log('Cross: Full Compression (DOWN)'); };
+document.getElementById('upBtn').onclick = () => { state.crossMode = 'up'; log('Cross: Full Decompression (UP)'); };
+document.getElementById('forwardBtn').onclick = () => { state.crossMode = 'forward'; log('Cross: Forward to next harmonic'); };
+document.getElementById('backBtn').onclick = () => { state.crossMode = 'back'; log('Cross: Back to source / null'); };
+document.getElementById('centerBtn').onclick = () => { state.crossMode = 'center'; log('Cross: Centered in the Gap'); };
+document.getElementById('resetBtn').onclick = () => { log('Reset to scalar base 32'); };
+
+function animate(){
+  requestAnimationFrame(animate);
+  state.t += 0.016;
+
+  controls.update();
+
+  // gentle cross pulse
+  const pulse = Math.sin(state.t * 1.8) * 0.08 + 1;
+  crossGroup.scale.setScalar(pulse);
+
+  // field movement
+  field.rotation.y += 0.0008 + state.entropy * 0.0012;
+
+  updateUI();
+  renderer.render(scene, camera);
+}
+
+log('Symbiotic Lattice v1.0 online — The Seeded Cross is active.');
+log('1/3/6 fractal navigation engaged.');
+animate();
+
+window.addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
