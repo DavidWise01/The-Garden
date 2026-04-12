@@ -1,0 +1,22 @@
+import os, sys, subprocess
+
+# Write test
+try:
+    with open('/tmp/test_write', 'w') as f:
+        f.write('write_ok')
+    print('WRITE: /tmp is writable')
+except Exception as e:
+    print(f'WRITE FAIL: {e}')
+
+# Environment variables
+print('ENV vars:', list(os.environ.keys())[:10])
+
+# Process info
+try:
+    print('CGROUP:', open('/proc/1/cgroup').read()[:200])
+except: pass
+
+# Check for docker
+try:
+    print('DOCKER:', os.path.exists('/.dockerenv'))
+except: pass
