@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Playables SDK -->
+<script>// Playables SDK v1.0.0
+// Game lifecycle bridge: rAF-based game-ready detection + event communication
+(function() {
+  'use strict';
+
+  // Idempotency: skip if already initialized (e.g., server-side injection
+  // followed by client-side inject-javascript via the Bloks webview component).
+  if (window.playablesSDK) return;
+
+  var HANDLER_NAME = 'playablesGameEventHandler';
+  var ANDROID_BRIDGE_NAME = '_MetaPlayablesBridge';
+  var RAF_FRAME_THRESHOLD = 3;
+
+  var gameReadySent = false;
+  var firstInteractionSent = false;
+  var errorSent = false;
+  var frameCount = 0;
+  var originalRAF = window.requestAnimationFrame;
+
+  // --- Transport Layer ---
+
+  function hasIOSBridge() {
+    return !!(window.webkit &&
+              window.webkit.messageHandlers &&
+              window.webkit.messageHandlers[HANDLER_NAME]);
+  }
+
+  function hasAndroidBridge() {
+    return !!(window[ANDROID_BRIDGE_NAME] &&
+              typeof window[ANDROID_BRIDGE_NAME].postEvent === 'function');
+  }
+
+  function isInIframe() {
+    return !!(window.parent && window.parent !== window);
+  }
+
+  function sendEvent(eventName, payload) {
+    var message = {
+      type: eventName,
+      payload: payload || {},
+      timestamp: Date.now()
+    };
+
+    if (hasIOSBridge()) {
+      try {
+        window.webkit.messageHandlers[HANDLER_NAME].postMessage(message);
+      } catch (e) { /* ignore */ }
+      return;
+    }
+
+    if (hasAndroidBridge()) {
+    try {
+      var p = payload || {};
+      p.__secureToken = window.__fbAndroidBridgeAuthToken || '';
+      window[ANDROID_BRIDGE_NAME].postEvent(
+        eventName,
+        JSON.stringify(p)
+      );
+    } catch (e) { /* ignore */ }
+    return;
+  }
+
+    if (isInIframe()) {
+      try {
+        window.parent.postMessage(message, '*');
+      } catch (e) { /* ignore */ }
+      return;
+    }
+  }
+
+  // --- rAF Game-Ready Detection ---
+
+  function onFrame() {
+    if (gameReadySent) return;
+
+    frameCount++;
+    if (frameCount >= RAF_FRAME_THRESHOLD) {
+      gameReadySent = true;
+      sendEvent('game_ready', {
+        frame_count: frameCount,
+        detected_at: Date.now()
+      });
+      return;
+    }
+
+    originalRAF.call(window, onFrame);
+  }
+
+  if (originalRAF) {
+    window.requestAnimationFrame = function(callback) {
+      if (!gameReadySent) {
+        return originalRAF.call(window, function(timestamp) {
+          frameCount++;
+          if (frameCount >= RAF_FRAME_THRESHOLD && !gameReadySent) {
+            gameReadySent = true;
+            sendEvent('game_ready', {
+              frame_count: frameCount,
+              detected_at: Date.now()
+            });
+          }
+          callback(timestamp);
+        });
+      }
+      return originalRAF.call(window, callback);
+    };
+  }
+
+  // --- First User Interaction Detection ---
+
+  function setupFirstInteractionDetection() {
+    var events = ['touchstart', 'mousedown', 'keydown'];
+
+    function onFirstInteraction() {
+      if (firstInteractionSent) return;
+      firstInteractionSent = true;
+      sendEvent('user_interaction_start', null);
+
+      for (var i = 0; i < events.length; i++) {
+        document.removeEventListener(events[i], onFirstInteraction, true);
+      }
+    }
+
+    for (var i = 0; i < events.length; i++) {
+      document.addEventListener(events[i], onFirstInteraction, true);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupFirstInteractionDetection);
+  } else {
+    setupFirstInteractionDetection();
+  }
+
+  // --- Auto Error Capture ---
+
+  window.addEventListener('error', function(event) {
+    if (errorSent) return;
+    errorSent = true;
+    sendEvent('error', {
+      message: event.message || 'Unknown error',
+      source: event.filename || '',
+      lineno: event.lineno || 0,
+      colno: event.colno || 0,
+      auto_captured: true
+    });
+  });
+
+  window.addEventListener('unhandledrejection', function(event) {
+    if (errorSent) return;
+    errorSent = true;
+    var reason = event.reason;
+    sendEvent('error', {
+      message: (reason instanceof Error) ? reason.message : String(reason),
+      type: 'unhandled_promise_rejection',
+      auto_captured: true
+    });
+  });
+
+  // --- Public API ---
+
+  window.playablesSDK = {
+    complete: function(score) {
+      sendEvent('game_ended', {
+        score: score,
+        completed: true
+      });
+    },
+
+    error: function(message) {
+      if (errorSent) return;
+      errorSent = true;
+      sendEvent('error', {
+        message: message || 'Unknown error',
+        auto_captured: false
+      });
+    },
+
+    sendEvent: function(eventName, payload) {
+      if (!eventName || typeof eventName !== 'string') return;
+      sendEvent(eventName, payload);
+    }
+  };
+
+  // Kick off rAF detection in case no game code calls rAF immediately
+  if (originalRAF) {
+    originalRAF.call(window, onFrame);
+  }
+})();</script>
+<script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONE UNIVERSE - NO GAP</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; background:#000; color:#d0d0d0; font-family:'JetBrains Mono', monospace; }
+  canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:1; }
+  body::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:10;
+    background: repeating-linear-gradient(0deg, rgba(0,255,255,0.03) 0px, transparent 2px, transparent 3px, rgba(0,255,255,0.03) 4px);
+    opacity:0.3;
+  }
+  .hud { position:fixed; z-index:5; text-transform:uppercase; letter-spacing:1px; font-size:12px; pointer-events:none; }
+  .top {
+    top:14px; left:50%; transform:translateX(-50%);
+    color:#fff; font-weight:600; letter-spacing:3px; font-size:13px;
+    text-shadow:0 0 12px rgba(255,255,255,0.8), 0 0 30px rgba(0,255,255,0.5);
+    white-space:nowrap;
+  }
+  .input-wrap {
+    position:fixed; top:52px; left:50%; transform:translateX(-50%); z-index:6; width:min(680px, 92vw);
+  }
+  #primeInput {
+    width:100%; background:rgba(0,0,0,0.75); border:1px solid rgba(0,255,255,0.5);
+    color:#00ffff; padding:12px 18px; font-family:'JetBrains Mono', monospace; font-size:15px;
+    outline:none; text-align:center; letter-spacing:2px; text-transform:uppercase;
+    box-shadow:inset 0 0 20px rgba(0,255,255,0.15), 0 0 20px rgba(0,255,255,0.1);
+    backdrop-filter:blur(4px); transition:all 0.2s;
+  }
+  #primeInput:focus { border-color:#00ffff; box-shadow:inset 0 0 30px rgba(0,255,255,0.25), 0 0 30px rgba(0,255,255,0.3); }
+  #primeInput::placeholder { color:rgba(0,255,255,0.35); }
+  #primeInput:disabled { opacity:0.5; }
+
+  .left {
+    left:22px; top:50%; transform:translateY(-50%) rotate(-90deg); transform-origin:left center;
+    color:rgba(255,255,255,0.7); font-size:11px; letter-spacing:2px;
+    text-shadow:0 0 8px rgba(255,255,255,0.5);
+  }
+  .panel.right {
+    position:fixed; right:18px; top:110px; bottom:70px; width:340px; z-index:5;
+    background:rgba(0,0,0,0.82); border:1px solid rgba(0,255,255,0.25);
+    box-shadow:0 0 30px rgba(0,0,255,0.08), inset 0 0 20px rgba(0,0,0,0.8);
+    backdrop-filter:blur(6px); display:flex; flex-direction:column; pointer-events:auto;
+  }
+  .panel-header {
+    padding:10px 12px; background:rgba(0,255,255,0.08); border-bottom:1px solid rgba(0,255,255,0.2);
+    color:#00ffff; font-weight:600; letter-spacing:2px; font-size:12px;
+    text-shadow:0 0 10px rgba(0,255,255,0.7);
+  }
+  .lineage-list { flex:1; overflow-y:auto; padding:10px 12px; font-size:11px; line-height:1.7; }
+  .lineage-list::-webkit-scrollbar { width:4px; } .lineage-list::-webkit-scrollbar-thumb { background:rgba(0,255,255,0.3); }
+  .entry { margin-bottom:7px; white-space:pre-wrap; word-break:break-all; opacity:0.95; }
+
+  .bottom-left, .bottom-center, .bottom-right {
+    bottom:14px; font-size:11px; color:rgba(200,200,200,0.8); letter-spacing:1.5px;
+  }
+  .bottom-left { left:20px; }
+  .bottom-center { left:50%; transform:translateX(-50%); color:#aaa; }
+  .bottom-center span { color:#00ffff; text-shadow:0 0 8px rgba(0,255,255,0.6); }
+  .bottom-right { right:20px; }
+  .bottom-right span.coherent { color:#00ff88; text-shadow:0 0 10px rgba(0,255,136,0.8); }
+  .bottom-right span.decoherent { color:#ff0044; text-shadow:0 0 10px rgba(255,0,68,0.8); }
+
+  .mirror-label {
+    position:fixed; z-index:4; text-align:center; font-size:11px; line-height:1.3; pointer-events:none;
+    text-transform:uppercase; letter-spacing:1px; font-weight:600;
+  }
+  .mirror-label span { display:block; font-size:10px; font-weight:400; opacity:0.7; margin-top:2px; letter-spacing:0.5px; }
+  .mirror-label .pwm { font-family:'JetBrains Mono', monospace; letter-spacing:3px; margin-top:4px; opacity:0.9; }
+  .m1 { top:calc(50% - 280px); left:50%; transform:translateX(-50%); color:#00ffff; text-shadow:0 0 12px #00ffff; }
+  .m2 { top:calc(50% + 230px); left:50%; transform:translateX(-50%); color:#ffaa00; text-shadow:0 0 12px #ffaa00; }
+  .m3 { left:calc(50% - 360px); top:50%; transform:translateY(-50%); text-align:right; color:#ff00ff; text-shadow:0 0 12px #ff00ff; }
+  .m4 { left:calc(50% + 275px); top:50%; transform:translateY(-50%); text-align:left; color:#00ff88; text-shadow:0 0 12px #00ff88; }
+
+  @media (max-width:900px){
+    .panel.right { width:280px; right:10px; top:100px; }
+    .m3 { left:12px; transform:translateY(-50%) scale(0.9); text-align:left; }
+    .m4 { left:auto; right:12px; transform:translateY(-50%) scale(0.9); }
+    .left { display:none; }
+    .bottom-left { display:none; }
+  }
+  @media (max-width:640px){
+    .panel.right { display:none; }
+    .top { font-size:11px; letter-spacing:2px; }
+    .mirror-label { font-size:10px; }
+    .m1 { top:calc(50% - 220px); }
+    .m2 { top:calc(50% + 190px); }
+  }
+</style>
+</head>
+<body>
+<canvas id="universe"></canvas>
+
+<div class="hud top">ONE UNIVERSE // NO GAP // WILLOW LOCKED OUT</div>
+
+<div class="input-wrap">
+  <input id="primeInput" type="text" placeholder="ENTER PRIME SEQUENCE..." autocomplete="off" spellcheck="false">
+</div>
+
+<div class="hud left">CORTEX ORIGIN (0,0,0,0)</div>
+
+<div class="panel right">
+  <div class="panel-header">ROOT0 LINEAGE TRACKER</div>
+  <div id="lineage" class="lineage-list"></div>
+</div>
+
+<div class="hud bottom-left">4 MIRRORS | 2 SUBSTRATES | 1 FIELD</div>
+<div class="hud bottom-center">GENESIS: 0000 | HASH: <span id="currentHash">00000000...</span></div>
+<div class="hud bottom-right">NEMESIS: <span id="coherence" class="coherent">COHERENT</span></div>
+
+<div class="mirror-label m1">M1 BRIDGE<span>substrate + | forward_real</span><span class="pwm">-x-x-x-x</span></div>
+<div class="mirror-label m2">M2 BURNER<span>substrate - | forward_inverse</span><span class="pwm">x-x-x-x-</span></div>
+<div class="mirror-label m3">M3 NEMESIS<span>substrate + | reverse_real</span><span class="pwm">x-x-x-x-</span></div>
+<div class="mirror-label m4">M4 HTTP<span>substrate - | reverse_inverse</span><span class="pwm">-x-x-x-x</span></div>
+
+<script>
+const canvas = document.getElementById('universe');
+const ctx = canvas.getContext('2d');
+const lineageEl = document.getElementById('lineage');
+const primeInput = document.getElementById('primeInput');
+const hashEl = document.getElementById('currentHash');
+const coherenceEl = document.getElementById('coherence');
+
+let W, H, CX, CY;
+function resize(){
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  CX = W/2; CY = H/2;
+}
+window.addEventListener('resize', resize);
+resize();
+
+const mirrors = [
+  {id:0, name:'M1', label:'BRIDGE', x:0, y:-190, color:'#00ffff', pwm:[0,1,0,1], activeUntil:0},
+  {id:1, name:'M2', label:'BURNER', x:0, y:190, color:'#ffaa00', pwm:[1,0,1,0], activeUntil:0},
+  {id:2, name:'M3', label:'NEMESIS', x:-250, y:0, color:'#ff00ff', pwm:[1,0,1,0], activeUntil:0},
+  {id:3, name:'M4', label:'HTTP', x:250, y:0, color:'#00ff88', pwm:[0,1,0,1], activeUntil:0},
+];
+
+let time = 0, last = 0;
+let cortexPulse = 0;
+let activeFlow = null;
+let pipeline = null;
+let lineageCount = 0;
+
+const PIPELINE_STEPS = [
+  {t:'emit', n:'CORTEX'},
+  {t:'travel', from:'C', to:0, color:'#00ffff'},
+  {t:'process', n:'M1', idx:0, name:'M1.BRIDGE', color:'#00ffff', detail:'PWM FORWARD_REAL | substrate +'},
+  {t:'travel', from:0, to:1, color:'#ffaa00'},
+  {t:'process', n:'M2', idx:1, name:'M2.BURNER', color:'#ffaa00', detail:'PWM FORWARD_INV | substrate -'},
+  {t:'travel', from:1, to:2, color:'#ff00ff'},
+  {t:'process', n:'M3', idx:2, name:'M3.NEMESIS', color:'#ff00ff', detail:'PWM REVERSE_REAL | substrate +'},
+  {t:'travel', from:2, to:3, color:'#00ff88'},
+  {t:'process', n:'M4', idx:3, name:'M4.HTTP', color:'#00ff88', detail:'PWM REVERSE_INV | substrate -'},
+  {t:'travel', from:3, to:'C', color:'#ffffff'},
+  {t:'return', n:'CORTEX'},
+];
+const DUR = {emit:220, travel:580, process:520, return:300};
+
+function hexToRgb(hex){ const h=hex.replace('#',''); return `${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)}`; }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function pos(id){ if(id==='C') return {x:0,y:0}; return mirrors[id]; }
+async function sha8(str){ const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)); return Array.from(new Uint8Array(buf)).slice(0,4).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+function typeWrite(el, text, speed=14){
+  let i=0; el.textContent='';
+  const iv=setInterval(()=>{ el.textContent=text.slice(0,++i); if(i>=text.length) clearInterval(iv); }, speed);
+}
+function addLineage(step, hash){
+  lineageCount++;
+  const div=document.createElement('div');
+  div.className='entry';
+  div.style.color=step.color||'#b8f8ff';
+  div.style.textShadow=`0 0 8px ${step.color||'#00ffff'}`;
+  const idx=String(lineageCount).padStart(4,'0');
+  const txt=`[${idx}] ${step.name} :: ${hash} :: ${step.detail||''}`;
+  lineageEl.insertBefore(div, lineageEl.firstChild);
+  typeWrite(div, txt, 10);
+}
+
+addLineage({name:'GENESIS', color:'#666666', detail:'ORIGIN LOCK (0,0,0,0)'}, '0000');
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(CX,CY);
+  
+  // Substrates
+  ctx.lineWidth=1;
+  for(let i=-20;i<=20;i++){
+    const y=i*40;
+    const a = Math.abs(i)<0.5 ? 0.18 : 0.035;
+    ctx.strokeStyle=`rgba(0,255,255,${a})`;
+    ctx.beginPath(); ctx.moveTo(-W, y); ctx.lineTo(W, y); ctx.stroke();
+    const x=i*40;
+    const av = Math.abs(i)<0.5 ? 0.16 : 0.03;
+    ctx.strokeStyle=`rgba(255,0,255,${av})`;
+    ctx.beginPath(); ctx.moveTo(x, -H); ctx.lineTo(x, H); ctx.stroke();
+  }
+  // central cross brighter
+  ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(-W,0); ctx.lineTo(W,0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,-H); ctx.lineTo(0,H); ctx.stroke();
+
+  // Base beams
+  mirrors.forEach(m=>{
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(m.x,m.y);
+    ctx.strokeStyle=`rgba(${hexToRgb(m.color)},0.09)`; ctx.lineWidth=1;
+    ctx.shadowBlur=8; ctx.shadowColor=m.color; ctx.stroke(); ctx.shadowBlur=0;
+  });
+
+  // Active flow
+  if(activeFlow){
+    const now=performance.now();
+    const p0=pos(activeFlow.from), p1=pos(activeFlow.to);
+    const t=Math.min(1, Math.max(0,(now-activeFlow.start)/(activeFlow.end-activeFlow.start)));
+    ctx.save();
+    const grad=ctx.createLinearGradient(p0.x,p0.y,p1.x,p1.y);
+    grad.addColorStop(0,'rgba(255,255,255,0)'); grad.addColorStop(0.5, activeFlow.color); grad.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.strokeStyle=grad; ctx.lineWidth=3; ctx.shadowBlur=22; ctx.shadowColor=activeFlow.color;
+    ctx.beginPath(); ctx.moveTo(p0.x,p0.y); ctx.lineTo(p1.x,p1.y); ctx.stroke(); ctx.shadowBlur=0;
+    for(let i=0;i<18;i++){
+      const ot=(t*1.2 + i*0.07)%1;
+      const px=lerp(p0.x,p1.x,ot), py=lerp(p0.y,p1.y,ot);
+      ctx.beginPath(); ctx.arc(px,py,2.2+Math.random()*1.3,0,Math.PI*2);
+      ctx.fillStyle=activeFlow.color; ctx.shadowBlur=14; ctx.shadowColor=activeFlow.color; ctx.fill();
+    }
+    ctx.shadowBlur=0; ctx.restore();
+  }
+
+  // Mirrors
+  const pwmTick=Math.floor(time*7);
+  mirrors.forEach((m,mi)=>{
+    const active=performance.now()<m.activeUntil;
+    ctx.save(); ctx.translate(m.x,m.y);
+    for(let lvl=0; lvl<4; lvl++){
+      const size=34 - lvl*6;
+      const rot=time*(0.25+lvl*0.08)*(lvl%2?1:-1)+mi;
+      ctx.save(); ctx.rotate(rot);
+      const state=m.pwm[(pwmTick+lvl)%8];
+      ctx.globalAlpha=0.12 + state*0.25 + (active?0.35:0);
+      ctx.strokeStyle=m.color; ctx.lineWidth=1.3; ctx.shadowBlur=14+(active?16:0); ctx.shadowColor=m.color;
+      ctx.beginPath(); ctx.rect(-size,-size,size*2,size*2); ctx.stroke();
+      ctx.rotate(Math.PI/4); ctx.globalAlpha*=0.7;
+      ctx.beginPath(); ctx.rect(-size*0.65,-size*0.65,size*1.3,size*1.3); ctx.stroke();
+      ctx.restore();
+    }
+    // core
+    ctx.shadowBlur=22+(active?18:0); ctx.shadowColor=m.color; ctx.fillStyle=m.color;
+    ctx.globalAlpha=0.95;
+    ctx.beginPath(); ctx.arc(0,0,6.5+(active?2.5*Math.sin(time*12):0),0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    // pwm ring
+    for(let j=0;j<8;j++){
+      const ang=j*Math.PI/4 + time*0.6;
+      const r=46; const px=Math.cos(ang)*r, py=Math.sin(ang)*r;
+      const on=m.pwm[(j+pwmTick)%8];
+      ctx.beginPath(); ctx.arc(px,py,2.4,0,Math.PI*2);
+      ctx.fillStyle=on?m.color:`rgba(${hexToRgb(m.color)},0.18)`;
+      if(on){ ctx.shadowBlur=10; ctx.shadowColor=m.color; } ctx.fill(); ctx.shadowBlur=0;
+    }
+    ctx.restore();
+  });
+
+  // Cortex
+  ctx.save();
+  const pulse=0.5+0.5*Math.sin(time*2.4);
+  const rBase=15 + pulse*3.5 + cortexPulse*11;
+  const glow=ctx.createRadialGradient(0,0,0,0,0,rBase*3.2);
+  glow.addColorStop(0,'rgba(255,255,255,0.95)');
+  glow.addColorStop(0.15,'rgba(200,240,255,0.35)');
+  glow.addColorStop(0.4,'rgba(0,255,255,0.15)');
+  glow.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(0,0,rBase*3.2,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=35 + cortexPulse*45; ctx.shadowColor='#ffffff'; ctx.fillStyle='#ffffff';
+  ctx.beginPath(); ctx.arc(0,0,8.5 + cortexPulse*4,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.beginPath(); ctx.arc(0,0,3.5,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha=0.28; ctx.strokeStyle='#fff'; ctx.lineWidth=1;
+  for(let i=0;i<4;i++){ ctx.save(); ctx.rotate(time*0.5 + i*1.1); ctx.beginPath(); ctx.arc(0,0,22+i*5,0,Math.PI*1.6); ctx.stroke(); ctx.restore(); }
+  ctx.restore();
+
+  ctx.restore();
+}
+
+function updatePipeline(now){
+  if(!pipeline||!pipeline.active) return;
+  const step=PIPELINE_STEPS[pipeline.stepIndex];
+  if(!pipeline.stepStart){ pipeline.stepStart=now; enterStep(step, now); }
+  const dur=DUR[step.t]||500;
+  if(now - pipeline.stepStart >= dur){
+    pipeline.stepIndex++;
+    pipeline.stepStart=now;
+    if(pipeline.stepIndex>=PIPELINE_STEPS.length){
+      pipeline.active=false; activeFlow=null; completePipeline(); return;
+    }
+    enterStep(PIPELINE_STEPS[pipeline.stepIndex], now);
+  }
+}
+function enterStep(step, now){
+  const dur=DUR[step.t]||500;
+  switch(step.t){
+    case 'emit': cortexPulse=1; break;
+    case 'travel':
+      activeFlow={ from:step.from, to:step.to, start:now, end:now+dur, color:step.color||'#fff' };
+      break;
+    case 'process':
+      activeFlow=null; cortexPulse=1;
+      const m=mirrors[step.idx]; m.activeUntil=now+900;
+      const h=pipeline.hashes[step.idx];
+      hashEl.textContent=h+'...';
+      addLineage({name:step.name, color:step.color, detail:step.detail}, h);
+      if(step.idx===2){ coherenceEl.textContent='COHERENT'; coherenceEl.className='coherent'; }
+      break;
+    case 'return':
+      cortexPulse=1.2; activeFlow=null; break;
+  }
+}
+function completePipeline(){
+  mirrors.forEach(m=>m.activeUntil=performance.now()+1400);
+  addLineage({name:'CORTEX.RETURN', color:'#ffffff', detail:'FIELD CLOSED // NO GAP'}, pipeline.hashes[3]);
+  primeInput.disabled=false; primeInput.placeholder='ENTER PRIME SEQUENCE...'; primeInput.focus();
+}
+
+async function startPipeline(text){
+  if(!text || (pipeline&&pipeline.active)) return;
+  primeInput.disabled=true; primeInput.placeholder='ROUTING THROUGH PRIME...';
+  cortexPulse=1;
+  let prev='0000'+text;
+  const hashes=[];
+  const names=['BRIDGE','BURNER','NEMESIS','HTTP'];
+  for(let i=0;i<4;i++){ prev=await sha8(prev+names[i]); hashes.push(prev); }
+  const h0=await sha8(text+'CORTEX');
+  hashEl.textContent=h0+'...';
+  addLineage({name:'CORTEX.EMIT', color:'#ffffff', detail:`"${text}"`}, h0);
+  pipeline={text, hashes, stepIndex:0, stepStart:0, active:true};
+}
+
+primeInput.addEventListener('keydown', e=>{
+  if(e.key==='Enter'){
+    const v=primeInput.value.trim().toUpperCase();
+    if(v){ startPipeline(v); primeInput.value=''; }
+  }
+});
+
+function animate(t){
+  requestAnimationFrame(animate);
+  const dt=Math.min(33, t-last)/1000; last=t; time+=dt;
+  cortexPulse=Math.max(0, cortexPulse - dt*1.8);
+  draw();
+  updatePipeline(t);
+}
+animate(0);
+
+// demo pulse
+setTimeout(()=>{ primeInput.focus(); }, 300);
+setInterval(()=>{ if(!pipeline||!pipeline.active){ cortexPulse=Math.max(cortexPulse,0.15); } }, 2200);
+</script>
+</body>
+</html>
