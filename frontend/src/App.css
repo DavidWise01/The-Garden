@@ -1,0 +1,170 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  color: #333;
+  text-align: center;
+}
+
+h2 {
+  color: #555;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.tabs button {
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+}
+
+.tabs button.active {
+  color: #007bff;
+  border-bottom-color: #007bff;
+}
+
+.tabs button:hover {
+  color: #007bff;
+}
+
+.panel {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table th {
+  background-color: #f8f9fa;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+}
+
+table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+table tr:hover {
+  background-color: #f9f9f9;
+}
+
+table tr.total {
+  background-color: #e7f3ff;
+  font-weight: 600;
+}
+
+.number {
+  text-align: right;
+  font-weight: 600;
+}
+
+.structure {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #e7f3ff;
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+  color: #004085;
+}
+
+.agents-table, .tasks-table {
+  width: 100%;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-orchestrator {
+  background-color: #ff6b6b;
+  color: white;
+}
+
+.badge-team_lead {
+  background-color: #4ecdc4;
+  color: white;
+}
+
+.badge-sub_team_lead {
+  background-color: #45b7d1;
+  color: white;
+}
+
+.badge-execution {
+  background-color: #9b59b6;
+  color: white;
+}
+
+.status {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-idle {
+  background-color: #d3d3d3;
+  color: #333;
+}
+
+.status-active {
+  background-color: #ffc107;
+  color: #333;
+}
+
+.status-completed {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-failed {
+  background-color: #dc3545;
+  color: white;
+}
+
+.role-orchestrator {
+  background-color: #fff5f5;
+}
+
+.role-team_lead {
+  background-color: #f0fdfc;
+}
+
+.role-sub_team_lead {
+  background-color: #f0f8ff;
+}
+
+.role-execution {
+  background-color: #faf0ff;
+}

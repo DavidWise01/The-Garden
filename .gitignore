@@ -1,0 +1,25 @@
+﻿__pycache__/
+*.pyc
+*.pyo
+repo_export.txt
+nano_output/
+
+# Vendored third-party framework (not ROOT0 IP)
+mainflux/
+
+# Artifacts
+*.zip
+*.bmp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+*.swp
+
+# Env
+.env
+*.log
